@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-G.evaluators.iso = {
+G.evaluators.cinergi = {
 
   version: "iso.v1",
 
@@ -24,6 +24,8 @@ G.evaluators.iso = {
     this.evalTemporal(task);
     this.evalInspire(task);
     this.evalOther(task);
+    this.evalCinergi(task);
+    this.evalCallHierarchy(task);
   },
 
   evalBase: function(task) {
@@ -35,7 +37,7 @@ G.evaluators.iso = {
     G.evalProp(task,item,iden,"title","gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString");
     G.evalProp(task,item,iden,"description","gmd:abstract/gco:CharacterString");
     G.evalProps(task,item,root,"keywords_s","//gmd:MD_TopicCategoryCode | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gmx:Anchor");
-    G.evalProps(task,item,root,"links_s","//gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL | //gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL | //gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
+    G.evalProps(task,item,root,"links_s","//gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
     G.evalProp(task,item,iden,"thumbnail_s","gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString");
     G.evalProps(task,item,root,"contact_organizations_s","//gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString");
     G.evalProps(task,item,root,"contact_people_s","//gmd:CI_ResponsibleParty/gmd:individualName/gco:CharacterString");
@@ -215,6 +217,113 @@ G.evaluators.iso = {
 
       if (params) G.analyzeTimePeriod(task,params);
     }); 
+  },
+
+  evalCinergi: function(task) {
+    var item = task.item, root = task.root;
+    /*
+     1) if keyword node ia an anchor, and citation title contains > then treat is as a hierachy
+     //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString[contains(.,'>')]
+     //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString[contains(.,'C')]/../../../../gmd:keyword
+     //| //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gmx:Anchor
+     md_keywords: //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString[contains(.,'C')]/../../../..
+     2) if the title of a keyword viaf put in oranization
+     */
+
+
+    G.forEachNode(task, root, "//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString[contains(.,'>')]/../../../../gmd:keyword", function (node) {
+      var cat = G.getString(task, node, "../gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString") + ' > ';
+      var name = G.getString(task, node, "gmx:Anchor");
+      cat = cat.concat(name);
+      G.writeMultiProp(task.item, "categories_cat", cat);
+
+    });
+  },
+
+  evalCallHierarchy: function(task) {
+    var item = task.item, root = task.root;
+    var fileid = G.getString(task,root,"gmd:fileIdentifier/gco:CharacterString");
+
+    /* calls Cinergi Hierarchy Service with a document ID,
+     http://132.249.238.151:8080/foundry/api/cinergi/docs/keyword/hierarchies/?id=%7bad308574-044c-3942-81dc-7d6e155dafac%7d
+         {"keywords": [
+         {
+         "keyword": "Water Chemistry",
+         "hierarchy": "Science Domain > Chemistry > Geochemistry > Hydrochemistry"
+         },
+         {
+         "keyword": "Chemistry",
+         "hierarchy": "Science Domain > Chemistry"
+         },
+         }
+     Extracts path
+    puts paths in document
+     */
+
+  try {
+    var url = 'http://132.249.238.151:8080/foundry/api/cinergi/docs/keyword/hierarchies?id=';
+    url = url + fileid;
+    var hier = edu.sdsc.cinergi.service.client.hierarchy.getUrlAsJsonObject(url);
+    if (hier == undefined) {
+      print("No Hierarchy id:", fileid);
+      return;
+    }   //var kwds = hier.getJsonArray("keywords");
+    var kwds = hier.keywords;
+
+    //print (kwds);
+    //print (kwds[0].hierarchy);
+
+    for (i = 0; i < kwds.length; i++)    {
+      //print (kwds[i]);
+      //print (kwds[i].hierarchy);
+      G.writeMultiProp(task.item, "hierarchies_cat", "Category > "+ kwds[i].hierarchy.getString());
+      //print (task.item.hierarchies_cat);
+    }
+
+    //kwds.foreach(
+    //    function(element, index, array) {
+    //      G.writeProp(task.item, "hierarchies_cat", element.hierarchy);
+    //    }
+    //)
+    //var kwds = getJSON(url ,
+    //    function(err, data) {
+    //      if (err != null) {
+    //        alert("Something went wrong: " + err);
+    //      } else {
+    //        kwds.foreach(
+    //         function(element, index, array) {
+    //           G.writeProp(task.item, "hierarchies_cat", element.hierarchy);
+    //         }
+    //        )
+    //      }
+    //    });
+
+  } catch (e)
+  {
+    print (e.stack);
   }
+    //G.forEachNode(task,root,"//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString[contains(.,'>')]/../../../../gmd:keyword",function(node){
+    //  var cat = G.getString(task,node,"../gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString") + '>';
+    //  var name = G.getString(task,node,"gmd:keyword/gmx:Anchor");
+    //  cat.concat( name );
+    //  G.writeMultiProp(task.item,"hierarchies_cat",cat);
+    //
+    //});
+
+     },
 
 };
+//var getJSON = function(url, callback) {
+//  var xhr = new XMLHttpRequest();
+//  xhr.open("get", url, true);
+//  xhr.responseType = "json";
+//  xhr.onload = function() {
+//    var status = xhr.status;
+//    if (status == 200) {
+//      callback(null, xhr.response);
+//    } else {
+//      callback(status);
+//    }
+//  };
+//  xhr.send();
+//};

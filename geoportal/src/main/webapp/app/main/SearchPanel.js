@@ -24,6 +24,7 @@ define(["dojo/_base/declare",
         "app/search/DateFilter",
         "app/search/TemporalFilter",
         "app/search/TermsAggregation",
+        "app/search/HierarchyAggregation",
         "app/search/AppliedFilters",
         "app/search/ResultsPane"], 
 function(declare, lang, Templated, template, i18n) {

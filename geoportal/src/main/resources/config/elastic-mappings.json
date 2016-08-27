@@ -8,7 +8,29 @@
         },
         "case_insensitive_sort": {
           "tokenizer": "keyword",
-          "filter": ["lowercase"] 
+          "filter": ["lowercase"]
+        },
+        "category": {
+          "tokenizer": "category_tokenizer",
+          "filter": ["lowercase"]
+        }
+      ,
+        "hierarchy": {
+          "tokenizer": "hierarchy_tokenizer"
+        }
+      },
+      "tokenizer": {
+        "category_tokenizer": {
+          "type": "path_hierarchy",
+          "delimiter": ">",
+          "reverse": false
+        }
+      },
+      "tokenizer": {
+        "hierarchy_tokenizer": {
+          "type": "path_hierarchy",
+          "delimiter": "/",
+          "reverse": false
         }
       },
       "filter": {
@@ -193,6 +215,28 @@
               "index":"no",
               "store": false,
               "doc_values": false
+            }
+          }
+        },
+        {
+          "_cat":{
+            "match":"*_cat",
+            "mapping":{
+              "type":"string",
+              "analyzer": "category",
+              "search_analyzer": "keyword"
+
+            }
+          }
+        },
+        {
+          "_hier":{
+            "match":"*_hier",
+            "mapping":{
+              "type":"string",
+              "analyzer": "category",
+              "search_analyzer": "keyword"
+
             }
           }
         }

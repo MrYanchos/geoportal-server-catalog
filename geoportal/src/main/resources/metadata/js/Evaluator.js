@@ -25,8 +25,19 @@ load("classpath:metadata/js/EvaluatorFor_ArcGIS.js");
 load("classpath:metadata/js/EvaluatorFor_DC.js");
 load("classpath:metadata/js/EvaluatorFor_FGDC.js");
 load("classpath:metadata/js/EvaluatorFor_ISO.js");
+load("classpath:metadata/js/EvaluatorFor_ISO_CINERGI.js");
 
 G._metadataTypes =  {
+  "iso19115-CINERGI": {
+    key: "iso19115-CINERGI",
+    evaluator: G.evaluators.cinergi,
+    //interrogationXPath: "/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString[text()='Earthcube CINERGI Metadata Pipeline']",
+    interrogationXPath: "/gmi:MI_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString[text()='Earthcube CINERGI Metadata Pipeline']",
+    identifier: "http://www.isotc211.org/2005/gmi",
+    detailsXslt: "metadata/details/iso-details/xml-to-html-ISO.xsl",
+    xsdLocation: "http://www.ngdc.noaa.gov/metadata/published/xsd/schema.xsd",
+    schematronXslt: null
+  },
   "iso19115": {
     key: "iso19115",
     evaluator: G.evaluators.iso,
@@ -39,7 +50,8 @@ G._metadataTypes =  {
   },
   "iso19115-2": {
     key: "iso19115-2",
-    evaluator: G.evaluators.iso,
+   // evaluator: G.evaluators.iso,
+    evaluator: G.evaluators.cinergi,
     interrogationXPath: "/gmi:MI_Metadata",
     identifier: "http://www.isotc211.org/2005/gmi",
     detailsXslt: "metadata/details/iso-details/xml-to-html-ISO.xsl",
@@ -77,6 +89,10 @@ G._initializeTask = function(mdoc) {
   nsmap.put("gml","http://www.opengis.net/gml");
   nsmap.put("gml32","http://www.opengis.net/gml/3.2");
   nsmap.put("srv","http://www.isotc211.org/2005/srv");
+  nsmap.put("gmx","http://www.isotc211.org/2005/gmx");
+  nsmap.put("gsr","http://www.isotc211.org/2005/gsr");
+  nsmap.put("gss","http://www.isotc211.org/2005/gss");
+  nsmap.put("gts","http://www.isotc211.org/2005/gts");
   nsmap.put("xlink","http://www.w3.org/1999/xlink");
   nsmap.put("rdf","http://www.w3.org/1999/02/22-rdf-syntax-ns#");
   nsmap.put("dc","http://purl.org/dc/elements/1.1/");

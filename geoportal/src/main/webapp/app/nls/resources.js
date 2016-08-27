@@ -65,6 +65,7 @@ define({
         metadataType: "Metadata Type",
         organizations: "Organizations",
         keywords: "Keywords",
+        categories: "Science Domain",
       },
       componentSettings: {
         componentLabel: "Label",
@@ -162,6 +163,31 @@ define({
       termsAggregation: {
         settings: {
           caption: "Terms Aggregation",
+          field: "Field",
+          fieldPlaceholder: "",
+          size: "Size",
+          sizePlaceholder: "number > 0",
+          minDocCount: "Minimum Count",
+          minDocCountPlaceholder: "number > 0",
+          include: "Include",
+          includePlaceholder: "filter",
+          exclude: "Exclude",
+          excludePlaceholder: "filter",
+          missing: "Missing",
+          missingPlaceholder: "label",
+          order: {
+            label: "Order",
+            placeholder: "",
+            countAsc: "Count - ascending",
+            countDesc: "Count - descending",
+            termAsc: "Term - ascending",
+            termDesc: "Term - descending",
+          }
+        }
+      },
+      hierarchyAggregation: {
+        settings: {
+          caption: "Hierarchy Aggregation",
           field: "Field",
           fieldPlaceholder: "",
           size: "Size",
