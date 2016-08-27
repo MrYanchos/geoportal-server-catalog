@@ -86,6 +86,7 @@ G._initializeTask = function(mdoc) {
   nsmap.put("gmd","http://www.isotc211.org/2005/gmd");
   nsmap.put("gmi","http://www.isotc211.org/2005/gmi");
   nsmap.put("gco","http://www.isotc211.org/2005/gco");
+
   nsmap.put("gml","http://www.opengis.net/gml");
   nsmap.put("gml32","http://www.opengis.net/gml/3.2");
   nsmap.put("srv","http://www.isotc211.org/2005/srv");
