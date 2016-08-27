@@ -35,7 +35,8 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
     allowSettings: null,
     field: null,
     label: null,
-    open: true,
+    open: false,
+    showRoot:false,
     props: null,
     treeData: [],
     rootTerm: '',
@@ -187,6 +188,8 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
       });
       var tree = new Tree({
         model: catModel,
+        open: this.open,
+        showRoot: this.showRoot,
         onClick: lang.hitch(this,function(item) {
           var query = {"term": {}};
           query.term[this.field] = item.key;
@@ -203,7 +206,7 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
         })
       });
       tree.placeAt( this.categoryNode);
-      tree.startup();
+     // tree.startup();
     }
     
   });
