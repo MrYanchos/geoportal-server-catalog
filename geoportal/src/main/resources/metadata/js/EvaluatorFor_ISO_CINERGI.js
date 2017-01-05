@@ -15,7 +15,7 @@
 
 G.evaluators.cinergi = {
 
-  version: "iso.v1",
+  version: "iso.v1.cinergi",
 
   evaluate: function(task) {
     this.evalBase(task);
@@ -25,7 +25,7 @@ G.evaluators.cinergi = {
     this.evalInspire(task);
     this.evalOther(task);
     this.evalCinergi(task);
-    this.evalCallHierarchy(task);
+   // this.evalCallHierarchy(task);
   },
 
   evalBase: function(task) {

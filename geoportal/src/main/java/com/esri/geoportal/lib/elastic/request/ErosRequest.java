@@ -12,29 +12,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.service.rest;
-import java.util.HashSet;
-import java.util.Set;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+package com.esri.geoportal.lib.elastic.request;
+
+import com.esri.geoportal.context.AppResponse;
 
 /**
- * The rest application.
+ * Eros request.
  */
-@ApplicationPath("rest")
-public class RestApplication extends Application {
-  
-  /** Constructor. */
-  public RestApplication() {
+public class ErosRequest extends OpensearchRequest {
+  private static final String [] EROS_TYPES = {"FeatureServer","ImageServer","MapServer","CSW","IMS","SOS","WCS","WFS","WMS"};
+
+  /** Constructor */
+  public ErosRequest() {
     super();
+    setDescriptionFile("search/eros-description.xml");
   }
+
+  /** Methods =============================================================== */
 
   @Override
-  public Set<Class<?>> getClasses() {
-    Set<Class<?>> resources = new HashSet<Class<?>>();
-    resources.add(GeoportalService.class);
-    resources.add(MetadataService.class);
-    return resources;
+  public AppResponse execute() throws Exception {
+    this.setUrlTypes(EROS_TYPES);
+    return super.execute();
   }
-
+  
+  protected void setDefaultF() {
+    this.setF("eros");
+  }
 }

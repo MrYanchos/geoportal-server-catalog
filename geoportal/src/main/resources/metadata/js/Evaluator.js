@@ -26,6 +26,7 @@ load("classpath:metadata/js/EvaluatorFor_DC.js");
 load("classpath:metadata/js/EvaluatorFor_FGDC.js");
 load("classpath:metadata/js/EvaluatorFor_ISO.js");
 load("classpath:metadata/js/EvaluatorFor_ISO_CINERGI.js");
+load("classpath:metadata/js/EvaluatorFor_OAIDC.js");
 
 G._metadataTypes =  {
   "iso19115-CINERGI": {
@@ -101,6 +102,9 @@ G._initializeTask = function(mdoc) {
   nsmap.put("ows","http://www.opengis.net/ows");
   nsmap.put("ows2","http://www.opengis.net/ows/2.0");
   nsmap.put("atom","http://www.w3.org/2005/Atom");
+  nsmap.put("oai_dc","http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd");
+  nsmap.put("doc","http://www.lyncode.com/xoai");
+
   var xpath = javax.xml.xpath.XPathFactory.newInstance().newXPath();
   xpath.setNamespaceContext(new com.esri.geoportal.base.xml.XmlNamespaceContext(nsmap));
 

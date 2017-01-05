@@ -12,29 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.esri.geoportal.service.rest;
-import java.util.HashSet;
-import java.util.Set;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
 
 /**
- * The rest application.
+ * Proxy to the 'harvester' instance(s).
  */
-@ApplicationPath("rest")
-public class RestApplication extends Application {
-  
-  /** Constructor. */
-  public RestApplication() {
-    super();
-  }
-
-  @Override
-  public Set<Class<?>> getClasses() {
-    Set<Class<?>> resources = new HashSet<Class<?>>();
-    resources.add(GeoportalService.class);
-    resources.add(MetadataService.class);
-    return resources;
-  }
-
-}
+package com.esri.geoportal.lib.harvester;

@@ -16,6 +16,7 @@
   <security:http realm="Geoportal" auto-config="true">
     <security:headers>
        <security:frame-options policy="SAMEORIGIN"/>
+       <security:header name="Access-Control-Allow-Origin" value="*" />
     </security:headers>
     <security:custom-filter ref="oauthResourceFilter" before="PRE_AUTH_FILTER" />
     <security:http-basic />
@@ -42,7 +43,11 @@
     <security:intercept-url pattern="/elastic/metadata/*/_search/**" access="permitAll" />
     <security:intercept-url pattern="/elastic/metadata/_mappings/**" method="GET" access="permitAll" />
     <security:intercept-url pattern="/elastic/metadata/*/_mappings/**" method="GET" access="permitAll" />
+    <security:intercept-url pattern="/elastic/_search/scroll/**" method="GET" access="hasRole('PUBLISHER')" />
     <security:intercept-url pattern="/elastic/**" access="hasRole('ADMIN')" />
+    
+    <!-- /harvester/ - proxied to the Harvester -->
+    <security:intercept-url pattern="/harvester/**" access="hasRole('PUBLISHER')" />
     
   </security:http>
 

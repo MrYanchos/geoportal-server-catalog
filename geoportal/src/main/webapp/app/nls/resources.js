@@ -65,6 +65,7 @@ define({
         metadataType: "Metadata Type",
         organizations: "Organizations",
         keywords: "Keywords",
+        origin: "Source of Origin"
         categories: "Science Domain",
       },
       componentSettings: {
@@ -80,7 +81,11 @@ define({
         any: "Any",
         intersects: "Intersects",
         within: "Within",
-        countPattern: "{count} centered here"
+        countPattern: "{count} centered here",
+        settings: {
+          caption: "Spatial Filter",
+          aggregations: "Aggregations"
+        }
       },
       temporalFilter: {
         label: "Temporal",
@@ -124,6 +129,24 @@ define({
           counts: "Item Count",
           noData: "No Data",
           rangePattern: "{from} .. {to}"
+        }
+      },
+      numericFilter: {
+        label: "Numeric",
+        rangePattern: "{from}..{to}",
+        countPattern: "{count} aggregated here",
+        searchTip: "Search",
+        interval: "Interval",
+        settings: {
+          caption: "Numeric Filter",
+          field: "Numeric Field",
+          fieldPlaceholder: "",
+          interval: "Interval",
+          intervalPlaceholder: "number > 0",
+          ticks: "Ticks",
+          ticksPlaceholder: "integer > 0",
+          places: "Decimal Places",
+          placesPlaceholder: "integer > 0"
         }
       },
       appliedFilters: {

@@ -16,7 +16,7 @@ package com.esri.geoportal.service;
 import com.esri.geoportal.context.AppResponse;
 import com.esri.geoportal.context.AppUser;
 import com.esri.geoportal.context.GeoportalContext;
-import com.esri.geoportal.lib.elastic.request.OpensearchRequest;
+import com.esri.geoportal.lib.elastic.request.ErosRequest;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -36,14 +36,14 @@ import javax.ws.rs.core.UriInfo;
 /**
  * Opensearch service provider.
  */
-@ApplicationPath("opensearch")
+@ApplicationPath("Eros")
 @Path("")
-public class OpensearchService extends Application {
+public class ErosService extends Application {
   
   @Override
   public Set<Class<?>> getClasses() {
     Set<Class<?>> resources = new HashSet<Class<?>>();
-    resources.add(OpensearchService.class);
+    resources.add(ErosService.class);
     return resources;
   }
   
@@ -53,7 +53,7 @@ public class OpensearchService extends Application {
       @Context SecurityContext sc,
       @Context HttpServletRequest hsr,
       @Context UriInfo uriInfo) {
-    // http://localhost:8080/geoportal2/opensearch/description
+    // http://localhost:8080/geoportal2/Eros/description
     AppUser user = new AppUser(sc);
     boolean pretty = false;
     return description(user,pretty,hsr);
@@ -80,7 +80,7 @@ public class OpensearchService extends Application {
   }
   
   /**
-   * Return the Opensearch descriptor.
+   * Return the Eros descriptor.
    * @param user the active user
    * @param pretty for pretty response
    * @param hsr the http request
@@ -88,8 +88,8 @@ public class OpensearchService extends Application {
    */
   protected Response description(AppUser user, boolean pretty, HttpServletRequest hsr) {
     try {
-      OpensearchRequest request = GeoportalContext.getInstance().getBean(
-          "request.OpensearchRequest",OpensearchRequest.class);
+      ErosRequest request = GeoportalContext.getInstance().getBean(
+          "request.ErosRequest",ErosRequest.class);
       request.init(user,pretty);
       request.initBaseUrl(hsr,null);
       AppResponse response = request.description();
@@ -108,8 +108,8 @@ public class OpensearchService extends Application {
    */
   protected Response search(AppUser user, boolean pretty, HttpServletRequest hsr, String body) {
     try {
-      OpensearchRequest request = GeoportalContext.getInstance().getBean(
-          "request.OpensearchRequest",OpensearchRequest.class);
+      ErosRequest request = GeoportalContext.getInstance().getBean(
+          "request.ErosRequest",ErosRequest.class);
       request.init(user,pretty);
       request.initBaseUrl(hsr,null);
       request.setParameterMap(hsr.getParameterMap());
