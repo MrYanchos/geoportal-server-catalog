@@ -1,8 +1,5 @@
-geoportal/target/
-geoportal-search/target/
-geoportal-search/Projects/
+.gitignore
 
-node_modules/
 ignore/
 z_*
 zz_*
@@ -22,6 +19,7 @@ zzz_*
 *.war
 *.ear
 
+target/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -40,9 +38,6 @@ Thumbs.db
 # User-specific stuff:
 .idea/workspace.xml
 .idea/tasks.xml
-
-geoportal/nb-configuration.xml
-
 
 # Sensitive or high-churn files:
 .idea/dataSources/
@@ -80,6 +75,3 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 /geoportal/geoportal.iml
-
-*.bku
-

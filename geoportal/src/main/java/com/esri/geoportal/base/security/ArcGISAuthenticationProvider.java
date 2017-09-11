@@ -187,7 +187,7 @@ public class ArcGISAuthenticationProvider implements AuthenticationProvider {
     HttpEntity<String> requestEntity = new HttpEntity<String>(headers);
     ResponseEntity<String> responseEntity = rest.exchange(url,HttpMethod.GET,requestEntity,String.class);
     String response = responseEntity.getBody();
-    //if (response != null) LOGGER.trace(response);
+    if (response != null) LOGGER.trace(response);
     if (!responseEntity.getStatusCode().equals(HttpStatus.OK)) {
       throw new AuthenticationServiceException("Error communicating with the authentication service.");
     }
@@ -218,6 +218,7 @@ public class ArcGISAuthenticationProvider implements AuthenticationProvider {
     boolean isPublisher = false;
     if ((adminGroupId != null) && (adminGroupId.length() > 0)) {
       if (isInAdminGroup) isAdmin = true;
+      if (hasOrgAdminRole) isAdmin = true;
     } else {
       if (hasOrgAdminRole) isAdmin = true;
     }

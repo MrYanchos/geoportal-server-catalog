@@ -16,8 +16,6 @@ package com.esri.geoportal.base.xml;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-
-import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -171,11 +169,7 @@ public class XmlUtil {
    */
   public static void transform(javax.xml.transform.Source source,
       javax.xml.transform.Result result, boolean indent) throws TransformerException {
-    TransformerFactory factory = TransformerFactory.newInstance();
-    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD,"");
-    factory.setFeature("http://javax.xml.XMLConstants/feature/secure-processing",true);
-    //factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true); 
-    Transformer transformer = factory.newTransformer();
+    Transformer transformer = TransformerFactory.newInstance().newTransformer() ;
     transformer.setOutputProperty(OutputKeys.ENCODING,DEFAULT_ENCODING);
     transformer.setOutputProperty(OutputKeys.METHOD,"xml");
     if (indent) {

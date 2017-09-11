@@ -291,11 +291,9 @@ public class PublishMetadataRequest extends AppRequest {
         source = getResponse.getSource();
         sourceAsString = getResponse.getSourceAsString();
       } else {
-        if (searchHit != null) {
-          mdoc.setItemId(searchHit.getId());
-          source = searchHit.getSource();
-          sourceAsString = searchHit.getSourceAsString();
-        }
+        mdoc.setItemId(searchHit.getId());
+        source = searchHit.getSource();
+        sourceAsString = searchHit.getSourceAsString();
       }
       au.ensureOwner(getUser(),FieldNames.FIELD_SYS_OWNER,source);
       jb = itemio.mixin(mdoc,sourceAsString);
@@ -314,10 +312,7 @@ public class PublishMetadataRequest extends AppRequest {
       setOwner = true;
     } else {
       jb.add(FieldNames.FIELD_SYS_MODIFIED,now);
-      String v = null;
-      if (source != null) {
-        v = Val.trim((String)source.get(FieldNames.FIELD_SYS_OWNER));
-      }
+      String v = Val.trim((String)source.get(FieldNames.FIELD_SYS_OWNER));
       if (v == null || v.length() == 0) setOwner = true;
     }
     if (setOwner) {

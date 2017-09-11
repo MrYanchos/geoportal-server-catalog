@@ -57,10 +57,7 @@ public class DomUtil {
   public static Document makeDom(InputSource source, boolean namespaceAware) 
       throws ParserConfigurationException, SAXException, IOException {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    factory.setNamespaceAware(true);
-    factory.setExpandEntityReferences(false);
-    factory.setFeature("http://javax.xml.XMLConstants/feature/secure-processing",true);
-    //factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true); 
+    factory.setNamespaceAware(namespaceAware);
     DocumentBuilder builder = factory.newDocumentBuilder();
     Document dom = builder.parse(source);
     return dom;

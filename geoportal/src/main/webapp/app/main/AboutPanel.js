@@ -17,7 +17,6 @@ define(["dojo/_base/declare",
         "app/common/Templated",
         "dojo/text!./templates/AboutPanel.html",
         "dojo/i18n!../nls/resources",
-
         ],
 function(declare, lang, Templated, template, i18n) {
 
@@ -29,7 +28,6 @@ function(declare, lang, Templated, template, i18n) {
     postCreate: function() {
       this.inherited(arguments);
     }
-
 
   });
 

@@ -18,7 +18,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Locale;
 import java.util.StringTokenizer;
 
 /**
@@ -34,7 +33,7 @@ public class Val {
    */
   public static boolean chkBool(String v, boolean defaultVal) {
     boolean b = defaultVal;
-    v = chkStr(v,"").toLowerCase(Locale.ENGLISH);
+    v = chkStr(v,"").toLowerCase();
     if (v.length() > 0) {
       if (v.equals("true")) {
         b = true;

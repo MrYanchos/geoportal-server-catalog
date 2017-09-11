@@ -111,7 +111,7 @@ public class ItemIO {
       src = (JsonObject)JsonUtil.toJsonStructure(elasticSource);
       title = getTitle(src,title);
     }
-    if (hasElasticSource && src != null) {
+    if (hasElasticSource) {
       title = getTitle(src,title);
       for (Entry<String, JsonValue> entry: src.entrySet()) {
         // TODO need a naming convention ??
@@ -128,7 +128,7 @@ public class ItemIO {
         }
       }
     }
-    if (hasEvaluatedJson && eval != null) {
+    if (hasEvaluatedJson) {
       for (Entry<String, JsonValue> entry: eval.entrySet()) {
         // TODO need a naming convention ??
         String name = entry.getKey();
@@ -144,7 +144,7 @@ public class ItemIO {
         }
       }
     }
-    if (hasSuppliedJson && supplied != null) {
+    if (hasSuppliedJson) {
       for (Entry<String, JsonValue> entry: supplied.entrySet()) {
         // TODO need a naming convention ??
         String name = entry.getKey();

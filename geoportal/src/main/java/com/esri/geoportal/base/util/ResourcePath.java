@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 package com.esri.geoportal.base.util;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import org.xml.sax.InputSource;
@@ -45,8 +46,7 @@ public class ResourcePath {
    */
   public URL makeUrl(String path) throws IOException {
     URL url = null;
-    // config from an OS folder??
-    /*
+    // TODO config from an OS folder??
     if ((path != null) && path.startsWith("geoportal-config/")) {
       String gHome = System.getProperty("geoportal.home");
       if (gHome != null) gHome = gHome.trim();
@@ -58,7 +58,6 @@ public class ResourcePath {
         }
       }
     }
-    */
     if (url == null) {
       url = Thread.currentThread().getContextClassLoader().getResource(path);
     }
