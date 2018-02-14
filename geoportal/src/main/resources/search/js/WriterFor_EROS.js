@@ -14,7 +14,7 @@
  */
 load("classpath:search/js/WriterBase.js");
 
-G.writers.atom = {
+G.writers.eros = {
   
   writeItem: function(appRequest,appResponse,itemId,itemString,responseString) {
     var now = G.nowAsString();
@@ -209,9 +209,9 @@ G.writers.atom = {
 };
 
 function writeItem(appRequest,appResponse,itemId,itemString,responseString) {
-  G.writers.atom.writeItem(appRequest,appResponse,itemId,itemString,responseString);
+  G.writers.eros.writeItem(appRequest,appResponse,itemId,itemString,responseString);
 }
 
 function writeItems(searchRequest,appResponse,searchResponse) {
-  G.writers.atom.writeItems(searchRequest,appResponse,searchResponse);
+  G.writers.eros.writeItems(searchRequest,appResponse,searchResponse);
 }
