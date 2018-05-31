@@ -454,4 +454,42 @@ body {
 	margin-bottom: 8px;
 }
 
+/* cinergi about and contribute */
+.aGrid {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: 20px 300px auto 300px 20px ;
+  background-color: #fff;
+}
 
+.aBox {
+
+
+  border-radius: 5px;
+  padding: 20px;
+
+
+}
+
+.aaa {
+  grid-column: 1 / span 4;
+
+}
+
+.aa {
+  grid-column: 2 / span 2;
+  background-color: #ABCADE;
+
+}
+.dd {
+  grid-column: 2 ;
+  grid-row: 3 / span 2;
+}
+.bb {
+  grid-column: 4 ;
+  grid-row: 2 ;
+}
+.cc {
+  grid-column: 3 / span 2;
+  grid-row: 4 ;
+}
