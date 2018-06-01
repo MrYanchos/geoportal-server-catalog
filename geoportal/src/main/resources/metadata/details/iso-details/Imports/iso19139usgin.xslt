@@ -19,7 +19,7 @@
 	<!-- SMR add imports 2012-09-07 -->
 	<!-- SMR 2017-10-03 add test for gmi:MI_Metadata as root elemenent. Doesn't display any other gmi elements if present. -->
 	
-	<xsl:import href = "general.xslt" />
+	<xsl:import href = "generalwMap.xslt" />
 	<xsl:import href = "XML.xslt" />
 	<xsl:import href = "codelists.xslt" />
 	<xsl:import href = "auxLanguages.xslt" />
