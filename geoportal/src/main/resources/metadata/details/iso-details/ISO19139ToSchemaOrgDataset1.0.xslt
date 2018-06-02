@@ -6,7 +6,7 @@
     xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx"
     xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
     xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink"
-    exclude-result-prefixes="xs" version="1.0">
+    exclude-result-prefixes="xs xsi gmi gmd srv gml gco gmx csw" version="1.1">
 
     <!-- 
   Template to build xsl transform to map content from standard ISO19139 xml metadata format to 
@@ -18,8 +18,16 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
     
     
   Stephen M. Richard
-    2017-02-25
+    2018-02-25
     version 1.0
+    
+    2018-05-01 version 1.1 update spatialCoverage handling.  Only transforms geographicIdentifier,
+    gml:polygon/gml:Point, and gmd:geographicBounding box; other gml geometries are ignored. 
+    2018-05-20 name template iso2sdo and add input parameter isopath, use these to inject a link
+    to the full iso record that is being trasformed as and additional distribution; following
+    recommendation from DataOne for harvest to DataOne coordinating node. To use as stand alone 
+    transform, comment out template definition with name and uncomment template definition with 
+    match (lines 38, 39).
  -->
 
     <xsl:output method="text" indent="yes" encoding="UTF-8"/>
@@ -27,505 +35,9 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
     <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
     <xsl:variable name="authorRoles" select="'editor,coAuthor,author,orginator'"/>
 
-    <xsl:template match="gmd:CI_ResponsibleParty">
-        <xsl:param name="role"/>
-
-        <!-- input is a gmd:CI_ResponsibleParty element; should be filtered for role = -->
-        <!-- because of way that schema.org is handling roles, have to pass in the name
-        of the sdo element that contains this role because it gets repeated inside the content-->
-        <!-- returns JSON array of schema.org Role objects -->
-
-        <xsl:variable name="agentID">
-            <xsl:if test="@xlink:href">
-                <xsl:value-of select="@xlink:href"/>
-            </xsl:if>
-        </xsl:variable>
-        <xsl:variable name="personName">
-            <xsl:if test="string-length(gmd:individualName/gco:CharacterString) > 0">
-                <xsl:value-of
-                    select="normalize-space(string(gmd:individualName/gco:CharacterString))"/>
-            </xsl:if>
-        </xsl:variable>
-        <xsl:variable name="organisationName">
-            <xsl:if test="string-length(gmd:organisationName/gco:CharacterString) > 0">
-                <xsl:value-of
-                    select="normalize-space(string(gmd:organisationName/gco:CharacterString))"/>
-            </xsl:if>
-        </xsl:variable>
-        <xsl:variable name="agentRole">
-            <xsl:if test="string-length(normalize-space(gmd:positionName/gco:CharacterString)) > 0">
-                <xsl:value-of select="normalize-space(string(gmd:positionName/gco:CharacterString))"/>
-                <xsl:text>; </xsl:text>
-            </xsl:if>
-            <!-- test for non existant role code and skip if that's it (NGCD records) -->
-            <xsl:if test="string-length(gmd:role/gmd:CI_RoleCode/@codeListValue) > 0">
-                <xsl:value-of select="string(gmd:role/gmd:CI_RoleCode/@codeListValue)"/>
-            </xsl:if>
-            <xsl:if
-                test="
-                    string-length(gmd:role/gmd:CI_RoleCode/text()) > 0 and
-                    not(contains(normalize-space(gmd:role/gmd:CI_RoleCode/@codeListValue), normalize-space(gmd:role/gmd:CI_RoleCode/text())))">
-                <xsl:text>; </xsl:text>
-                <xsl:value-of select="normalize-space(gmd:role/gmd:CI_RoleCode/text())"/>
-            </xsl:if>
-        </xsl:variable>
-        <xsl:variable name="agentemail">
-            <xsl:if test="count(gmd:contactInfo//gmd:electronicMailAddress/gco:CharacterString) > 0"
-                > [ </xsl:if>
-            <xsl:for-each select="gmd:contactInfo//gmd:electronicMailAddress">
-                <xsl:if test="string-length(gco:CharacterString) > 0">
-                    <xsl:text>"</xsl:text>
-                    <xsl:value-of select="normalize-space(string(.))"/>
-                    <xsl:text>"</xsl:text>
-                    <xsl:if test="following-sibling::gmd:electronicMailAddress">
-                        <xsl:text>, </xsl:text>
-                    </xsl:if>
-                </xsl:if>
-            </xsl:for-each>
-            <xsl:if test="count(gmd:contactInfo//gmd:electronicMailAddress/gco:CharacterString) > 0"
-                > ] </xsl:if>
-        </xsl:variable>
-
-        <xsl:text>{&#10;    "@type":"Role",&#10;</xsl:text>
-        <xsl:text>      "roleName": "</xsl:text>
-        <xsl:value-of select="string($agentRole)"/>
-        <xsl:text>",&#10;</xsl:text>
-        <xsl:text>"</xsl:text>
-        <xsl:value-of select="string($role)"/>
-        <xsl:text>": {&#10;</xsl:text>
-
-        <xsl:choose>
-            <xsl:when test="string-length(normalize-space($personName)) > 0 and string-length($organisationName) = 0">
-                <xsl:text>    "@type":"Person",&#10;      "additionalType": "http://schema.geolink.org/1.0/base/main#Person",&#10;</xsl:text>
-                <xsl:if test="string-length($agentID) > 0">
-                    <xsl:text>      "@id": "</xsl:text>
-                    <xsl:value-of select="string($agentID)"/>
-                    <xsl:text>",&#10;</xsl:text>
-                </xsl:if>
-                <xsl:text>      "name": "</xsl:text>
-                <xsl:value-of select="string($personName)"/>
-                <xsl:text>"</xsl:text>
-                <!-- email address -->
-                <xsl:if test="string-length($agentemail) > 0">
-                    <xsl:text>,&#10;      "email": </xsl:text>
-                    <xsl:value-of select="normalize-space(string($agentemail))"/>
-                </xsl:if>
-                <xsl:text>&#10;      }</xsl:text>
-
-            </xsl:when>
-            <xsl:when test="string-length($organisationName) > 0 and string-length($personName) = 0">
-                <xsl:text>&#10;  "@type":"Organization",&#10;</xsl:text>
-                <xsl:if test="string-length($agentID) > 0">
-                    <xsl:text>      "@id": "</xsl:text>
-                    <xsl:value-of select="string($agentID)"/>
-                    <xsl:text>",&#10;</xsl:text>
-                </xsl:if>
-                <xsl:text>      "name": "</xsl:text>
-                <xsl:value-of select="string($organisationName)"/>
-                <xsl:text>"</xsl:text>
-                <!-- email address -->
-                <xsl:if test="string-length($agentemail) > 0">
-                    <xsl:text>,&#10;      "email": </xsl:text>
-                    <xsl:value-of select="normalize-space(string($agentemail))"/>
-                </xsl:if>
-                <xsl:text>&#10;      }</xsl:text>
-
-            </xsl:when>
-            <xsl:when test="string-length($organisationName) > 0 and string-length($personName) > 0">
-                <xsl:text>&#10;  "@type":"Person",&#10;</xsl:text>
-                <xsl:if test="string-length($agentID) > 0">
-                    <xsl:text>      "@id": "</xsl:text>
-                    <xsl:value-of select="string($agentID)"/>
-                    <xsl:text>",&#10;</xsl:text>
-                </xsl:if>
-                <xsl:text>      "name": "</xsl:text>
-                <xsl:value-of select="string($personName)"/>
-                <xsl:text>"</xsl:text>
-                <!-- email address -->
-                <xsl:if test="string-length($agentemail) > 0">
-                    <xsl:text>,&#10;      "email": </xsl:text>
-                    <xsl:value-of select="normalize-space(string($agentemail))"/>
-                </xsl:if>
-                <xsl:text>,&#10;     "affiliation": {&#10;</xsl:text>
-                <xsl:text>&#10;  "@type":"Organization",&#10;</xsl:text>
-                <xsl:text>      "name": "</xsl:text>
-                <xsl:value-of select="string($organisationName)"/>
-                <xsl:text>"}&#10;      }</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:text>&#10;  "@type": "Role",&#10;</xsl:text>
-                <xsl:text>      "roleName": "</xsl:text>
-                <xsl:value-of select="string($agentRole)"/>
-                <xsl:text>"&#10;</xsl:text>
-                <xsl:text>}&#10;</xsl:text>
-            </xsl:otherwise>
-        </xsl:choose>
-        <xsl:text>}</xsl:text>
-
-    </xsl:template>
-
-    <xsl:template name="distributions">
-        <!-- this template generates content for a DataDownload element -->
-        <xsl:param name="por"/>
-        <!-- CI_OnlineResource -->
-        <xsl:param name="pfor"/>
-        <!-- MD_Format -->
-        <xsl:param name="prp"/>
-        <!-- CI_ResponsibleParty -->
-        <!--distributorContacts map to provider. 
-            Formats to fileFormat,
-        CI_onlineResurce.linkage.URL to URL, except if the CI_OnLineFunctionCode is 'download' then it maps to contentURL. -->
-        <xsl:variable name="accessURL" select="$por/gmd:linkage/gmd:URL"/>
-        <xsl:variable name="distFormat">
-            <xsl:if test="count($pfor/gmd:name) > 1">
-                <xsl:text>[&#10;</xsl:text>
-            </xsl:if>
-            <xsl:for-each select="$pfor/gmd:name">
-                <xsl:text>"</xsl:text>
-                <xsl:if test="string-length(normalize-space(child::node()/text())) > 0">
-                    <xsl:value-of select="normalize-space(child::node()/text())"/>
-                </xsl:if>
-                <xsl:if
-                    test="string-length(following-sibling::gmd:version/child::node()/text()) > 0">
-                    <xsl:value-of
-                        select="concat(' v.', normalize-space(following-sibling::gmd:version/child::node()/text()))"
-                    />
-                </xsl:if>
-                <xsl:if
-                    test="string-length(following-sibling::gmd:amendmentNumber/child::node()/text()) > 0">
-                    <xsl:value-of
-                        select="concat(' amendment:', normalize-space(following-sibling::gmd:amendmentNumber/child::node()/text()))"
-                    />
-                </xsl:if>
-                <xsl:text>"</xsl:text>
-
-                <!-- comma if there are more formats -->
-                <xsl:if
-                    test="parent::node()/parent::node()/following-sibling::node()/child::gmd:MD_Format/gmd:name"
-                    >, </xsl:if>
-            </xsl:for-each>
-
-            <xsl:if test="count($pfor/gmd:name) > 1">
-                <xsl:text>]</xsl:text>
-            </xsl:if>
-        </xsl:variable>
-        <xsl:variable name="distPublishDate" select="''"/>
-        <xsl:variable name="distIdentifier" select="$por/gmd:linkage/gmd:URL"/>
-        <xsl:variable name="distProvider">
-            <xsl:if test="count($prp/gmd:role) > 1">
-                <xsl:text>[&#10;</xsl:text>
-            </xsl:if>
-            <xsl:for-each select="$prp/self::node()">
-                <xsl:apply-templates select=".">
-                    <xsl:with-param name="role" select="'provider'"/>
-                </xsl:apply-templates>
-                <xsl:if
-                    test="not($por/ancestor::gmd:distributorTransferOptions) and ancestor::gmd:distributor/following-sibling::gmd:distributor//gmd:CI_ResponsibleParty">
-                    <xsl:text>,&#10;</xsl:text>
-                </xsl:if>
-            </xsl:for-each>
-
-            <xsl:if test="count($prp/gmd:role) > 1">
-                <xsl:text>]</xsl:text>
-            </xsl:if>
-        </xsl:variable>
-        <xsl:variable name="distName" select="$por/gmd:name/gco:CharacterString"/>
-        <xsl:variable name="distSize"
-            select="
-                concat($por/parent::node()/preceding-sibling::gmd:transferSize/gco:Real, ' ',
-                normalize-space($por/parent::node()/preceding-sibling::gmd:unitsOfDistribution/gco:CharacterString))"/>
-        <xsl:variable name="distDescription">
-            <!-- gather other useful content from the CI_OnlineResource element -->
-            <xsl:text>"</xsl:text>
-            <xsl:if
-                test="string-length(normalize-space($por/gmd:description/gco:CharacterString)) > 0">
-                <xsl:value-of select="normalize-space($por/gmd:description/gco:CharacterString)"/>
-                <xsl:text>.   </xsl:text>
-            </xsl:if>
-            <xsl:if test="string-length(normalize-space($por/gmd:protocol/gco:CharacterString)) > 0">
-                <xsl:text>Service Protocol: </xsl:text>
-                <xsl:value-of select="normalize-space($por/gmd:description/gco:CharacterString)"/>
-                <xsl:text>.   </xsl:text>
-            </xsl:if>
-            <xsl:if
-                test="string-length(normalize-space($por/gmd:applicationProfile/gco:CharacterString)) > 0">
-                <xsl:text>Application Profile: </xsl:text>
-                <xsl:value-of
-                    select="normalize-space($por/gmd:applicationProfile/gco:CharacterString)"/>
-                <xsl:text>.   </xsl:text>
-            </xsl:if>
-            <xsl:if test="string-length(normalize-space($por/gmd:function//@codeListValue)) > 0">
-                <xsl:text>Link Function: </xsl:text>
-                <xsl:value-of select="normalize-space($por/gmd:function//@codeListValue)"/>
-            </xsl:if>
-            <xsl:if
-                test="
-                    string-length(normalize-space($por/gmd:function/child::node()/text())) > 0
-                    and (normalize-space($por/gmd:function/child::node()/text()) != normalize-space($por/gmd:function//@codeListValue))">
-                <xsl:text>--   </xsl:text>
-                <xsl:value-of select="normalize-space($por/gmd:function/child::node()/text())"/>
-                <xsl:text>.   </xsl:text>
-            </xsl:if>
-            <xsl:text>"</xsl:text>
-        </xsl:variable>
-
-        <xsl:text>{&#10;</xsl:text>
-
-        <xsl:if test="$distIdentifier">
-            <xsl:text>      "@id": "</xsl:text>
-            <xsl:value-of select="$distIdentifier"/>
-            <xsl:text>",&#10;</xsl:text>
-        </xsl:if>
-
-        <xsl:text>    "@type": "DataDownload",&#10;    "additionalType": "http://www.w3.org/ns/dcat#Distribution",&#10;</xsl:text>
-
-        <xsl:text>      "http://www.w3.org/ns/dcat#accessURL": "</xsl:text>
-        <xsl:value-of select="$accessURL"/>
-        <xsl:text>",&#10;</xsl:text>
-
-        <xsl:text>      "url": "</xsl:text>
-        <xsl:value-of select="$accessURL"/>
-        <xsl:text>"</xsl:text>
-
-        <xsl:if test="string-length($distName) > 0">
-            <xsl:text>,&#10;      "name": "</xsl:text>
-            <xsl:value-of select="normalize-space($distName)"/>
-            <xsl:text>"</xsl:text>
-        </xsl:if>
-        <xsl:if test="string-length($distDescription) > 0">
-            <xsl:text>,&#10;      "description": </xsl:text>
-            <xsl:value-of select="normalize-space($distDescription)"/>
-        </xsl:if>
-
-        <xsl:if test="string-length(string($distProvider)) > 0">
-            <xsl:text>,&#10;      "provider": </xsl:text>
-            <xsl:value-of select="$distProvider"/>
-        </xsl:if>
-
-
-        <xsl:if test="string-length($distFormat) > 0">
-            <xsl:text>,&#10;      "fileFormat": </xsl:text>
-            <xsl:value-of select="$distFormat"/>
-        </xsl:if>
-        <xsl:if test="string-length(normalize-space($distSize)) > 0">
-            <xsl:text>,&#10;      "contentSize": "</xsl:text>
-            <xsl:value-of select="$distSize"/>
-            <xsl:text>"</xsl:text>
-        </xsl:if>
-
-        <xsl:if test="string-length($distPublishDate) > 0">
-            <xsl:text>,&#10;      "datePublished": "</xsl:text>
-            <xsl:value-of select="$distPublishDate"/>
-            <xsl:text>"</xsl:text>
-        </xsl:if>
-
-        <!-- more content might be available; insert here -->
-
-        <xsl:text>}&#10;</xsl:text>
-
-    </xsl:template>
-
-    <xsl:template match="gmd:geographicElement">
-        <!-- geographicElement can be boundingBox, 'polygon' which can have any geometry, or 
-        geographicDescription, which means there is a place identifier code
-        for now only handle point geometry in gmd:polygon element, other options get too complicated-->
-        <!-- returns JSON-LD Schema.org Place -->
-
-        <xsl:variable name="CRSvalue" select="''"/>
-        <xsl:variable name="placeIdentifier" select="*//gmd:geographicIdentifier"/>
-        <xsl:variable name="geoShapeBox">
-            <xsl:if test="gmd:EX_GeographicBoundingBox">
-                <xsl:value-of
-                    select="gmd:EX_GeographicBoundingBox/gmd:westBoundLongitude/gco:Decimal/text()"/>
-                <xsl:text>, </xsl:text>
-                <xsl:value-of
-                    select="gmd:EX_GeographicBoundingBox/gmd:southBoundLatitude/gco:Decimal/text()"/>
-                <xsl:text> </xsl:text>
-                <xsl:value-of
-                    select="gmd:EX_GeographicBoundingBox/gmd:eastBoundLongitude/gco:Decimal/text()"/>
-                <xsl:text>, </xsl:text>
-                <xsl:value-of
-                    select="gmd:EX_GeographicBoundingBox/gmd:northBoundLatitude/gco:Decimal/text()"
-                />
-            </xsl:if>
-        </xsl:variable>
-        <!-- gml representation of polygons too complex to deal with; not used much in metadata -->
-        <xsl:variable name="geoShapePolygon"/>
-        <xsl:variable name="geoPoint">
-            <!-- schema.org geoShape does not include a point element -->
-            <xsl:if test="*//gmd:polygon/gml:Point/gml:coordinates">
-                <xsl:text>      "longitude":"</xsl:text>
-                <xsl:value-of
-                    select="substring-after(string(//gmd:polygon/gml:Point/gml:coordinates), ' ')"/>
-                <xsl:text>",&#10;</xsl:text>
-                <xsl:text>      "latitude":"</xsl:text>
-                <xsl:value-of
-                    select="substring-before(string(//gmd:polygon/gml:Point/gml:coordinates), ' ')"/>
-                <xsl:text>"</xsl:text>
-            </xsl:if>
-        </xsl:variable>
-
-        <xsl:if test="string-length(concat($placeIdentifier, $geoPoint, $geoShapeBox)) > 0">
-            <xsl:text>{&#10;</xsl:text>
-            <xsl:text>"@type": "Place",&#10;</xsl:text>
-            <!-- if the Spatial referenc system is available... -->
-            <xsl:if test="$CRSvalue">
-                <xsl:text>     "additionalProperty": [{&#10;
-            "@type": "PropertyValue",&#10;
-            "alternateName": "CRS",&#10;
-            "name": "Coordinate Reference System", &#10;</xsl:text>
-                <xsl:text>"value": "</xsl:text>
-                <xsl:value-of select="$CRSvalue"/>
-                <xsl:text>"&#10;}],&#10;</xsl:text>
-            </xsl:if>
-            <!-- if there's a place name  -->
-            <xsl:if test="string-length($placeIdentifier) > 0">
-                <xsl:text>      "identifier": {&#10;</xsl:text>
-                <xsl:text>        "@type": "PropertyValue",&#10;</xsl:text>
-                <xsl:text>        "propertyID":"</xsl:text>
-                <xsl:choose>
-                    <xsl:when
-                        test="string-length(normalize-space($placeIdentifier//gmd:authority//gmd:title/gco:CharacterString)) > 0">
-                        <xsl:value-of
-                            select="normalize-space($placeIdentifier//gmd:authority//gmd:title/gco:CharacterString)"
-                        />
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:text>location identifier</xsl:text>
-                    </xsl:otherwise>
-                </xsl:choose>
-                <xsl:text>",&#10;</xsl:text>
-                <xsl:text>          "value":"</xsl:text>
-                <xsl:value-of
-                    select="normalize-space($placeIdentifier//gmd:code/gco:CharacterString)"/>
-                <xsl:text>"</xsl:text>
-                <xsl:text>}</xsl:text>
-            </xsl:if>
-            <xsl:if
-                test="
-                    string-length($placeIdentifier) > 0 and string-length(preceding-sibling::gmd:description/gco:CharacterString) > 0">
-                <xsl:text>,&#10;</xsl:text>
-            </xsl:if>
-            <xsl:if test="string-length(preceding-sibling::gmd:description/gco:CharacterString) > 0">
-                <xsl:text>&#10;    "description":"</xsl:text>
-                <xsl:value-of
-                    select="normalize-space(preceding-sibling::gmd:description/gco:CharacterString)"/>
-                <xsl:text>"</xsl:text>
-            </xsl:if>
-            <xsl:if
-                test="
-                    (string-length($geoPoint) + string-length($geoShapeBox) > 0) and
-                    (string-length($placeIdentifier) + string-length(preceding-sibling::gmd:description/gco:CharacterString) > 0)">
-                <xsl:text>,&#10;</xsl:text>
-            </xsl:if>
-            <!-- if there are coordinates... -->
-            <xsl:if test="string-length($geoPoint) + string-length($geoShapeBox) > 0">
-                <xsl:text>      "geo":{&#10;</xsl:text>
-                <xsl:if test="string-length(string($geoShapeBox)) > 0">
-                    <xsl:text> 			"@type": "GeoShape",&#10;</xsl:text>
-                    <xsl:text>      "box": "</xsl:text>
-                    <xsl:value-of select="$geoShapeBox"/>
-                    <xsl:text>"&#10;</xsl:text>
-                </xsl:if>
-
-                <xsl:if test="string-length($geoPoint) > 0">
-                    <xsl:text> 			"@type": "GeoCoordinates",&#10;</xsl:text>
-                    <xsl:text>      </xsl:text>
-                    <xsl:value-of select="$geoPoint"/>
-                </xsl:if>
-                <xsl:text>}&#10;</xsl:text>
-            </xsl:if>
-            <!-- more content might be available; insert here -->
-            <xsl:text>}&#10;</xsl:text>
-        </xsl:if>
-
-    </xsl:template>
-
-<!-- not implemented here -->
-    <xsl:template name="variableMeasured">
-        <xsl:param name="variableList"/>
-        <!-- returns JSON array of schema.org Person objects -->
-
-        <xsl:text>[</xsl:text>
-        <xsl:for-each select="$variableList/child::node()">
-            <!-- handle each person in the list -->
-            <xsl:variable name="variableID" select="'variableID'"/>
-            <xsl:variable name="varDescription" select="'distFormat'"/>
-            <xsl:variable name="varUnitsText" select="'distPublishDate'"/>
-            <xsl:variable name="varURL" select="'distIdentifier'"/>
-            <xsl:variable name="varName" select="'distIdentifier'"/>
-            <xsl:variable name="varValue" select="'distIdentifier'"/>
-
-            <xsl:text>{&#10;</xsl:text>
-
-            <xsl:if test="$variableID">
-                <xsl:text>      "@id": "</xsl:text>
-                <xsl:value-of select="$variableID"/>
-                <xsl:text>",&#10;</xsl:text>
-            </xsl:if>
-
-            <xsl:text>    "@type": "PropertyValue",&#10;    "additionalType": "earthcollab:Parameter",&#10;</xsl:text>
-
-            <xsl:if test="$varDescription">
-                <xsl:text>      "description": "</xsl:text>
-                <xsl:value-of select="$varDescription"/>
-                <xsl:text>",&#10;</xsl:text>
-            </xsl:if>
-
-            <xsl:text>      "unitText": "</xsl:text>
-            <xsl:value-of select="$varUnitsText"/>
-            <xsl:text>",&#10;</xsl:text>
-
-            <xsl:if test="$varURL">
-                <xsl:text>      "url": "</xsl:text>
-                <xsl:value-of select="$varURL"/>
-                <xsl:text>",&#10;</xsl:text>
-            </xsl:if>
-
-            <xsl:if test="$varValue">
-                <xsl:text>      "value": "</xsl:text>
-                <xsl:value-of select="$varValue"/>
-                <xsl:text>"&#10;</xsl:text>
-            </xsl:if>
-
-            <!-- more content might be available; insert here -->
-
-            <xsl:text>}&#10;</xsl:text>
-        </xsl:for-each>
-
-        <xsl:text>],&#10;</xsl:text>
-    </xsl:template>
-
-
-    <!--############################################################-->
-    <!--## Template to replace strings                           ##-->
-    <!--############################################################-->
-    <!-- template from https://stackoverflow.com/questions/3067113/xslt-string-replace/3067130 -->
-    <xsl:template name="string-replace-all">
-        <xsl:param name="text"/>
-        <xsl:param name="replace"/>
-        <xsl:param name="by"/>
-        <xsl:choose>
-            <xsl:when test="$text = '' or $replace = '' or not($replace)">
-                <!-- Prevent this routine from hanging -->
-                <xsl:value-of select="$text"/>
-            </xsl:when>
-            <xsl:when test="contains($text, $replace)">
-                <xsl:value-of select="substring-before($text, $replace)"/>
-                <xsl:value-of select="$by"/>
-                <xsl:call-template name="string-replace-all">
-                    <xsl:with-param name="text" select="substring-after($text, $replace)"/>
-                    <xsl:with-param name="replace" select="$replace"/>
-                    <xsl:with-param name="by" select="$by"/>
-                </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="$text"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-    <xsl:template match="gmd:MD_Metadata | gmi:MI_Metadata">
+<!--    <xsl:template match="//gmd:MD_Metadata | gmi:MI_Metadata"> -->
+       <xsl:template name="iso2sdo">
+           <xsl:param name="isopath"/>
         <!-- Define variables for content elements -->
         <xsl:variable name="additionalContexts">
             <xsl:text>"datacite": "http://purl.org/spar/datacite/",&#10;
@@ -730,7 +242,8 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
             </xsl:if>
             <xsl:text>]</xsl:text>
         </xsl:variable>
-        <xsl:variable name="name" select="//gmd:MD_DataIdentification[1]/gmd:citation//gmd:title/gco:CharacterString"/>
+        <xsl:variable name="name"
+            select="//gmd:MD_DataIdentification[1]/gmd:citation//gmd:title/gco:CharacterString"/>
         <xsl:variable name="alternateName">
             <xsl:if test="count(//gmd:citation//gmd:alternateTitle) > 1">
                 <xsl:text>[&#10;</xsl:text>
@@ -752,7 +265,7 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
 
         <xsl:variable name="citation">
             <!-- ISO19115 only allows one citation per gmd:MD_DataIdentification;  -->
-            <!-- ignore MD_DataIdentification in  -->
+            <!-- ignore MD_DataIdentification that are not in gmd:identificationInfo property -->
             <xsl:for-each
                 select="(//gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation)[1]">
                 <!-- this is just to set the context and make xpaths easier -->
@@ -866,7 +379,8 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
             </xsl:for-each>
         </xsl:variable>
         <xsl:variable name="description" select="//gmd:abstract[1]/gco:CharacterString"/>
-        <xsl:variable name="DataCatalogName" select="'Name of catalog source for record being transformed'"/>
+        <xsl:variable name="DataCatalogName"
+            select="'Name of catalog source for record being transformed'"/>
         <xsl:variable name="DataCatalogURL" select="'not defined'"/>
 
         <xsl:variable name="contributors">
@@ -989,8 +503,10 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
                     <xsl:choose>
                         <xsl:when test="gmd:MD_RestrictionCode">
                             <xsl:value-of select="gmd:MD_RestrictionCode/@codeListValue"/>
-                            <xsl:if test="string-length(gmd:MD_RestrictionCode) > 0 and 
-                                (normalize-space(gmd:MD_RestrictionCode)!= normalize-space(gmd:MD_RestrictionCode/@codeListValue))">
+                            <xsl:if
+                                test="
+                                    string-length(gmd:MD_RestrictionCode) > 0 and
+                                    (normalize-space(gmd:MD_RestrictionCode) != normalize-space(gmd:MD_RestrictionCode/@codeListValue))">
                                 <xsl:text>: </xsl:text>
                                 <xsl:value-of select="normalize-space(gmd:MD_RestrictionCode)"/>
 
@@ -1013,16 +529,24 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
                 <xsl:text>]</xsl:text>
             </xsl:if>
         </xsl:variable>
+
         <!-- default values to use in lieu of extracted provider; customize
       logic in format/profile-specific implementations to decide which to use-->
         <xsl:variable name="providerDefault" select="'default provider'"/>
         <xsl:variable name="publisherDefault" select="'default publisher'"/>
         <xsl:variable name="publishingPrinciplesDefault" select="'not defined yet'"/>
-        <xsl:variable name="provider" select="''"/> <!-- use distributor contact information for providers -->
+        <xsl:variable name="provider" select="''"/>
+        <!-- use distributor contact information for providers -->
         <xsl:variable name="publshingPrinciples" select="''"/>
 
+        <!-- pick up spatial extent that is a point location, a bounding box, or a geographic identifier -->
         <xsl:variable name="hasSpatial"
-            select="//gmd:extent//gmd:description or //gmd:geographicElement"/>
+            select="
+                count(//gmd:extent[count(descendant::*[local-name() = 'polygon']/*[local-name() = 'Point']) > 0 or
+                count(descendant::gmd:EX_GeographicBoundingBox) > 0 or
+                count(descendant::gmd:code) > 0]) > 0"/>
+
+
         <xsl:variable name="hasVariables" select="false()"/>
 
         <!-- construct the JSON with xsl text elements. &#10; is carriage return -->
@@ -1038,7 +562,7 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
         <xsl:value-of select="$datasetURI"/>
         <xsl:text>",&#10;</xsl:text>
         <xsl:text>  "@type": "Dataset",&#10;</xsl:text>
-        <xsl:text>  "additionalType": [&#10;    "http://schema.geolink.org/1.0/base/main#Dataset",&#10;    "vivo:Dataset"&#10;  ],&#10;</xsl:text>
+        <xsl:text>  "additionalType": [&#10;    "geolink:Dataset",&#10;    "vivo:Dataset"&#10;  ],&#10;</xsl:text>
 
         <xsl:text>  "name": "</xsl:text>
         <!-- escape (with '\') any double quotes (&#34;) that show up in  the name string -->
@@ -1051,7 +575,7 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
 
         <xsl:if test="string-length($alternateName) > 0">
             <xsl:text>  "alternateName": </xsl:text>
-            <xsl:value-of select="normalize-space($alternateName)"/> 
+            <xsl:value-of select="normalize-space($alternateName)"/>
             <xsl:text>,&#10;</xsl:text>
         </xsl:if>
 
@@ -1067,8 +591,9 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
         <xsl:text>  "creator":&#10;</xsl:text>
         <xsl:text>[</xsl:text>
         <xsl:for-each
-            select="//gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty[contains('editor,coAuthor,author,originator', *//gmd:CI_RoleCode/@codeListValue)
-            and *//gmd:CI_RoleCode]">
+            select="
+                //gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty[contains('editor,coAuthor,author,originator', *//gmd:CI_RoleCode/@codeListValue)
+                and *//gmd:CI_RoleCode]">
             <xsl:apply-templates select="gmd:CI_ResponsibleParty">
                 <xsl:with-param name="role">
                     <xsl:value-of select="'creator'"/>
@@ -1113,7 +638,28 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
         
         The formatting template will take a single CI_OnlineResource node, a set of MD_Format nodes, and a set of CI_ResponsibleParty nodes
         -->
-        <xsl:for-each select="//gmd:transferOptions//gmd:onLine/gmd:CI_OnlineResource">
+        
+        <!-- start with link to the full ISO metadata record for the resource; provisional, based on suggestion from
+        Dave Vieglais, for DataOne harvest-->
+          <xsl:if test="$isopath">
+           <xsl:text>{
+           "@type": "DataDownload",
+           "additionalType": "http://www.w3.org/ns/dcat#DataCatalog",
+           "encodingFormat": "text/xml",
+           "name": "ISO Metadata Document",
+           "url": "</xsl:text>
+              
+           <xsl:value-of select="$isopath"/><xsl:text>"}</xsl:text>
+           
+           <xsl:if
+               test="
+               //gmd:transferOptions//gmd:onLine/gmd:CI_OnlineResource or
+               //gmd:distributorTransferOptions//gmd:onLine/gmd:CI_OnlineResource">
+               <xsl:text>,&#10;  </xsl:text>
+           </xsl:if>
+          </xsl:if>
+           
+           <xsl:for-each select="//gmd:transferOptions//gmd:onLine/gmd:CI_OnlineResource">
             <xsl:variable name="onlineResource" select="."/>
             <xsl:variable name="format"
                 select="*/ancestor::node()/preceding-sibling::gmd:distributionFormat/gmd:MD_Format"/>
@@ -1125,9 +671,12 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
                 <xsl:with-param name="pfor" select="$format"/>
                 <xsl:with-param name="prp" select="$distributorContact"/>
             </xsl:call-template>
-            <xsl:if test="following::gmd:onLine">
+<!--            <xsl:if test="following::gmd:onLine">
                 <xsl:text>,&#10;</xsl:text>
-            </xsl:if>
+            </xsl:if>-->
+               <xsl:if test="position() != last()">
+                   <xsl:text>,&#10;</xsl:text>
+               </xsl:if>
         </xsl:for-each>
 
         <xsl:if
@@ -1149,8 +698,7 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
                 <xsl:with-param name="pfor" select="$format"/>
                 <xsl:with-param name="prp" select="$distributorContact"/>
             </xsl:call-template>
-            <xsl:if
-                test="following::gmd:distributorTransferOptions//gmd:onLine or parent::node()/following-sibling::gmd:onLine">
+            <xsl:if  test="position() != last()">
                 <xsl:text>,&#10;</xsl:text>
             </xsl:if>
         </xsl:for-each>
@@ -1195,7 +743,7 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
             <xsl:text>,&#10;</xsl:text>
         </xsl:if>
 
-        <xsl:if test="string-length($publisherDefault)>0 or count($publisher/child::node()) > 0">
+        <xsl:if test="string-length($publisherDefault) > 0 or count($publisher/child::node()) > 0">
             <xsl:text>  "publisher": </xsl:text>
             <xsl:choose>
                 <xsl:when test="count($publisher/child::node()) > 0">
@@ -1203,9 +751,7 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
                         <xsl:text>[&#10;</xsl:text>
                     </xsl:if>
                     <xsl:for-each select="$publisher/gmd:CI_ResponsibleParty">
-                        <xsl:apply-templates select=".">
-                            <xsl:with-param name="role" select="string('publisher')"/>
-                        </xsl:apply-templates>
+                        <xsl:apply-templates select="."/>
                         <xsl:if test="position() != last()">
                             <xsl:text>,&#10;</xsl:text>
                         </xsl:if>
@@ -1229,42 +775,160 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
 
         <xsl:if test="$hasSpatial">
             <xsl:text>  "spatialCoverage": </xsl:text>
-            <xsl:if test="count(//gmd:geographicElement) + count(//gmd:extent//gmd:description/gco:CharacterString) > 1">
+            <xsl:variable name="countSpatial"
+                select="
+                    count(//gmd:extent[count(descendant::*[local-name() = 'polygon']/*[local-name() = 'Point']) > 0 or
+                    count(descendant::gmd:EX_GeographicBoundingBox) > 0 or
+                    count(descendant::gmd:code) > 0])"/>
+
+            <xsl:if test="$countSpatial > 1">
+                <!-- make array of Places, one for each extent that has a geospatial location -->
                 <xsl:text>[&#10;</xsl:text>
             </xsl:if>
-            <!-- have to handle gmd:extent description(s) first, then geographicElements -->
-            <xsl:for-each select="//gmd:extent//gmd:description/gco:CharacterString">
+
+            <xsl:for-each
+                select="
+                    //gmd:extent[count(descendant::*[local-name() = 'polygon']/*[local-name() = 'Point']) > 0 or
+                    count(descendant::gmd:EX_GeographicBoundingBox) > 0 or
+                    count(descendant::gmd:code) > 0]">
                 <xsl:text>{&#10;</xsl:text>
-                <xsl:text>"@type": "Place",&#10;</xsl:text>
-                <xsl:text>"description": "</xsl:text>
-                <xsl:value-of select="normalize-space(string(.))"/>
-                <xsl:text>"}</xsl:text>
-                <xsl:if test="following::gmd:extent//gmd:description">
-                    <xsl:text>,&#10;</xsl:text>
+
+                <xsl:text>&#10;    "@type":"Place",&#10;</xsl:text>
+                <xsl:if test="string-length(gmd:EX_Extent/gmd:description/gco:CharacterString) > 0">
+
+                    <xsl:text>&#10;    "description":"</xsl:text>
+                    <xsl:value-of
+                        select="normalize-space(gmd:EX_Extent/gmd:description/gco:CharacterString)"/>
+                    <xsl:text>"</xsl:text>
                 </xsl:if>
-            </xsl:for-each>
-            
-            <xsl:if test="//gmd:geographicElement and //gmd:extent//gmd:description/gco:CharacterString">
-                <xsl:text>,&#10;</xsl:text>
-            </xsl:if>
-            
-            <xsl:for-each select="//gmd:geographicElement">
-                <xsl:variable name="thisElement">
-                    <xsl:apply-templates select="."/>
-                </xsl:variable>
-                <xsl:value-of select="$thisElement"/>
+
                 <xsl:if
                     test="
-                        string-length(string($thisElement)) > 0 and following::gmd:geographicElement">
+                        *//gmd:EX_GeographicDescription//gmd:code/gco:CharacterString or
+                        *//gmd:geographicElement/gmd:EX_BoundingPolygon[count(descendant::*[local-name() = 'polygon']/*[local-name() = 'Point']) > 0]
+                        or *//gmd:geographicElement/gmd:EX_GeographicBoundingBox">
                     <xsl:text>,&#10;</xsl:text>
                 </xsl:if>
+                <!-- geographicIdentifiers in array of alternateNames -->
+                <xsl:if
+                    test="*//gmd:geographicElement/gmd:EX_GeographicDescription//gmd:code/gco:CharacterString">
+                    <xsl:text>       "alternateName": </xsl:text>
+                    <xsl:if
+                        test="count(*//gmd:geographicElement/gmd:EX_GeographicDescription//gmd:code/gco:CharacterString) > 1">
+                        <xsl:text>[&#10;</xsl:text>
+                    </xsl:if>
+                    <xsl:for-each select="*//gmd:geographicElement/gmd:EX_GeographicDescription">
+
+                        <xsl:if test="string-length(*//gmd:code/gco:CharacterString) > 0">
+                            <xsl:text>"</xsl:text>
+                            <xsl:value-of
+                                select="normalize-space(string(*//gmd:code/gco:CharacterString))"/>
+                            <xsl:text>"</xsl:text>
+                        </xsl:if>
+                        <xsl:if
+                            test="parent::*/following-sibling::gmd:geographicElement[count(descendant::gmd:geographicIdentifier) > 0]">
+                            <xsl:text>,&#10;</xsl:text>
+                        </xsl:if>
+                    </xsl:for-each>
+                    <xsl:if
+                        test="count(*//gmd:geographicElement/gmd:EX_GeographicDescription//gmd:code/gco:CharacterString) > 1">
+                        <xsl:text>]</xsl:text>
+                    </xsl:if>
+                </xsl:if>
+
+                <xsl:if
+                    test="
+                        (*//gmd:geographicElement/gmd:EX_BoundingPolygon[count(descendant::*[local-name() = 'polygon']/*[local-name() = 'Point']) > 0]
+                        or *//gmd:geographicElement/gmd:EX_GeographicBoundingBox) and
+                        *//gmd:geographicElement/gmd:EX_GeographicDescription//gmd:code/gco:CharacterString">
+                    <xsl:text>,&#10;</xsl:text>
+                </xsl:if>
+
+                <xsl:if
+                    test="
+                        (*//*[count(descendant::*[local-name() = 'polygon']/*[local-name() = 'Point']) > 0]
+                        or *//gmd:EX_GeographicBoundingBox)">
+                    <xsl:text>      "geo":&#10;</xsl:text>
+                </xsl:if>
+                <xsl:if
+                    test="
+                        count(*//*[count(descendant::*[local-name() = 'polygon']/*[local-name() = 'Point']) > 0]) +
+                        count(*//gmd:EX_GeographicBoundingBox) > 1">
+                    <xsl:text>        [&#10;</xsl:text>
+                </xsl:if>
+
+
+                <xsl:for-each select="*//gmd:geographicElement/gmd:EX_GeographicBoundingBox">
+                    <!-- handle bounding boxes -->
+                    <xsl:text>        {&#10;       "@type": "GeoShape",&#10;          "box": "</xsl:text>
+                    <xsl:value-of select="gmd:westBoundLongitude/gco:Decimal/text()"/>
+                    <xsl:text>, </xsl:text>
+                    <xsl:value-of select="gmd:southBoundLatitude/gco:Decimal/text()"/>
+                    <xsl:text> </xsl:text>
+                    <xsl:value-of select="gmd:eastBoundLongitude/gco:Decimal/text()"/>
+                    <xsl:text>, </xsl:text>
+                    <xsl:value-of select="gmd:northBoundLatitude/gco:Decimal/text()"/>
+                    <xsl:text>"&#10;            }</xsl:text>
+
+                    <xsl:if test="position() != last()">
+                        <xsl:text>,&#10;            </xsl:text>
+                    </xsl:if>
+
+                </xsl:for-each>
+
+                <xsl:if
+                    test="*//gmd:geographicElement/gmd:EX_GeographicBoundingBox and *//*[count(descendant::*[local-name() = 'polygon']/*[local-name() = 'Point']) > 0]">
+                    <xsl:text>,</xsl:text>
+                </xsl:if>
+
+                <xsl:for-each
+                    select="*/descendant::*[local-name() = 'polygon']/*[local-name() = 'Point']">
+                    <!--  Handle point locations gml:polygon//gml:Point (point location, which can only be encoded
+                    in  as a polygon. Use Local names to avoid problems with gml namespaces. TBD: a gml:point might
+                    have an srs attribute that could be inserted here as well.-->
+                    <xsl:text>    { "@type": "GeoCoordinates",</xsl:text>
+                    <xsl:if test="*[(local-name() = 'description')]">
+                        <xsl:text>"description":"</xsl:text>
+                        <xsl:value-of
+                            select="normalize-space(string(*[local-name() = 'description']))"/>
+                        <xsl:text>",&#10;</xsl:text>
+                    </xsl:if>
+                    <xsl:text>"longitude": "</xsl:text>
+                    <xsl:value-of
+                        select="substring-after(string(*[(local-name() = 'coordinates') or (local-name() = 'pos')]), ' ')"/>
+                    <xsl:text>", "latitude": "</xsl:text>
+                    <xsl:value-of
+                        select="substring-before(string(*[(local-name() = 'coordinates') or (local-name() = 'pos')]), ' ')"/>
+                    <xsl:text>"}</xsl:text>
+
+                    <xsl:if test="position() != last()">
+                        <xsl:text>,&#10;            </xsl:text>
+                    </xsl:if>
+
+                </xsl:for-each>
+
+                <!-- close the geo: array if necessary -->
+                <xsl:if
+                    test="
+                        count(*//*[count(descendant::*[local-name() = 'polygon']/*[local-name() = 'Point']) > 0]) +
+                        count(*//gmd:EX_GeographicBoundingBox) > 1">
+                    <xsl:text>]&#10;</xsl:text>
+                </xsl:if>
+                <!-- close the @Place object -->
+                <xsl:text>}</xsl:text>
+                <xsl:if test="position() != last()">
+                    <xsl:text>,&#10;            </xsl:text>
+                </xsl:if>
             </xsl:for-each>
-            <xsl:if test="count(//gmd:geographicElement) + count(//gmd:extent//gmd:description) > 1">
+
+            <!-- close the places array in spatialCoverage -->
+            <xsl:if test="$countSpatial > 1">
                 <xsl:text>]</xsl:text>
             </xsl:if>
             <xsl:if test="$hasVariables">
                 <xsl:text>,&#10;</xsl:text>
             </xsl:if>
+
         </xsl:if>
 
 
@@ -1278,4 +942,371 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
         <xsl:text>}</xsl:text>
 
     </xsl:template>
+
+    <xsl:template match="gmd:CI_ResponsibleParty">
+        <xsl:param name="role"/>
+
+        <!-- input is a gmd:CI_ResponsibleParty element; should be filtered for role = -->
+        <!-- because of way that schema.org is handling roles, have to pass in the name
+        of the sdo element that contains this role because it gets repeated inside the content-->
+        <!-- returns JSON array of schema.org Role objects -->
+
+        <xsl:variable name="agentID">
+            <xsl:if test="@xlink:href">
+                <xsl:value-of select="@xlink:href"/>
+            </xsl:if>
+        </xsl:variable>
+        <xsl:variable name="personName">
+            <xsl:if test="string-length(gmd:individualName/gco:CharacterString) > 0">
+                <xsl:value-of
+                    select="normalize-space(string(gmd:individualName/gco:CharacterString))"/>
+            </xsl:if>
+        </xsl:variable>
+        <xsl:variable name="organisationName">
+            <xsl:if test="string-length(gmd:organisationName/gco:CharacterString) > 0">
+                <xsl:value-of
+                    select="normalize-space(string(gmd:organisationName/gco:CharacterString))"/>
+            </xsl:if>
+        </xsl:variable>
+        <xsl:variable name="agentRole">
+            <xsl:if test="string-length(normalize-space(gmd:positionName/gco:CharacterString)) > 0">
+                <xsl:value-of select="normalize-space(string(gmd:positionName/gco:CharacterString))"/>
+                <xsl:text>; </xsl:text>
+            </xsl:if>
+            <!-- test for non existant role code and skip if that's it (NGCD records) -->
+            <xsl:if test="string-length(gmd:role/gmd:CI_RoleCode/@codeListValue) > 0">
+                <xsl:value-of select="string(gmd:role/gmd:CI_RoleCode/@codeListValue)"/>
+            </xsl:if>
+            <xsl:if
+                test="
+                    string-length(gmd:role/gmd:CI_RoleCode/text()) > 0 and
+                    not(contains(normalize-space(gmd:role/gmd:CI_RoleCode/@codeListValue), normalize-space(gmd:role/gmd:CI_RoleCode/text())))">
+                <xsl:text>; </xsl:text>
+                <xsl:value-of select="normalize-space(gmd:role/gmd:CI_RoleCode/text())"/>
+            </xsl:if>
+        </xsl:variable>
+        <xsl:variable name="agentemail">
+            <xsl:if test="count(gmd:contactInfo//gmd:electronicMailAddress/gco:CharacterString) > 0"
+                > [ </xsl:if>
+            <xsl:for-each select="gmd:contactInfo//gmd:electronicMailAddress">
+                <xsl:if test="string-length(gco:CharacterString) > 0">
+                    <xsl:text>"</xsl:text>
+                    <xsl:value-of select="normalize-space(string(.))"/>
+                    <xsl:text>"</xsl:text>
+                    <xsl:if test="following-sibling::gmd:electronicMailAddress">
+                        <xsl:text>, </xsl:text>
+                    </xsl:if>
+                </xsl:if>
+            </xsl:for-each>
+            <xsl:if test="count(gmd:contactInfo//gmd:electronicMailAddress/gco:CharacterString) > 0"
+                > ] </xsl:if>
+        </xsl:variable>
+
+        <xsl:text>{&#10;    "@type":"Role",&#10;</xsl:text>
+        <xsl:text>      "roleName": "</xsl:text>
+        <xsl:value-of select="string($agentRole)"/>
+        <xsl:text>",&#10;</xsl:text>
+        <xsl:text>"</xsl:text>
+        <xsl:value-of select="string($role)"/>
+        <xsl:text>": {&#10;</xsl:text>
+
+        <xsl:choose>
+            <xsl:when
+                test="string-length(normalize-space($personName)) > 0 and string-length($organisationName) = 0">
+                <xsl:text>    "@type":"Person",&#10;      "additionalType": "geolink:Person",&#10;</xsl:text>
+                <xsl:if test="string-length($agentID) > 0">
+                    <xsl:text>      "@id": "</xsl:text>
+                    <xsl:value-of select="string($agentID)"/>
+                    <xsl:text>",&#10;</xsl:text>
+                </xsl:if>
+                <xsl:text>      "name": "</xsl:text>
+                <xsl:value-of select="string($personName)"/>
+                <xsl:text>"</xsl:text>
+                <!-- email address -->
+                <xsl:if test="string-length($agentemail) > 0">
+                    <xsl:text>,&#10;      "email": </xsl:text>
+                    <xsl:value-of select="normalize-space(string($agentemail))"/>
+                </xsl:if>
+                <xsl:text>&#10;      }</xsl:text>
+
+            </xsl:when>
+            <xsl:when test="string-length($organisationName) > 0 and string-length($personName) = 0">
+                <xsl:text>&#10;  "@type":"Organization",&#10;</xsl:text>
+                <xsl:if test="string-length($agentID) > 0">
+                    <xsl:text>      "@id": "</xsl:text>
+                    <xsl:value-of select="string($agentID)"/>
+                    <xsl:text>",&#10;</xsl:text>
+                </xsl:if>
+                <xsl:text>      "name": "</xsl:text>
+                <xsl:value-of select="string($organisationName)"/>
+                <xsl:text>"</xsl:text>
+                <!-- email address -->
+                <xsl:if test="string-length($agentemail) > 0">
+                    <xsl:text>,&#10;      "email": </xsl:text>
+                    <xsl:value-of select="normalize-space(string($agentemail))"/>
+                </xsl:if>
+                <xsl:text>&#10;      }</xsl:text>
+
+            </xsl:when>
+            <xsl:when test="string-length($organisationName) > 0 and string-length($personName) > 0">
+                <xsl:text>&#10;  "@type":"Person",&#10;</xsl:text>
+                <xsl:if test="string-length($agentID) > 0">
+                    <xsl:text>      "@id": "</xsl:text>
+                    <xsl:value-of select="string($agentID)"/>
+                    <xsl:text>",&#10;</xsl:text>
+                </xsl:if>
+                <xsl:text>      "name": "</xsl:text>
+                <xsl:value-of select="string($personName)"/>
+                <xsl:text>"</xsl:text>
+                <!-- email address -->
+                <xsl:if test="string-length($agentemail) > 0">
+                    <xsl:text>,&#10;      "email": </xsl:text>
+                    <xsl:value-of select="normalize-space(string($agentemail))"/>
+                </xsl:if>
+                <xsl:text>,&#10;     "affiliation": {&#10;</xsl:text>
+                <xsl:text>&#10;  "@type":"Organization",&#10;</xsl:text>
+                <xsl:text>      "name": "</xsl:text>
+                <xsl:value-of select="string($organisationName)"/>
+                <xsl:text>"}&#10;      }</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:text>&#10;  "@type": "Role",&#10;</xsl:text>
+                <xsl:text>      "roleName": "</xsl:text>
+                <xsl:value-of select="string($agentRole)"/>
+                <xsl:text>"&#10;</xsl:text>
+                <xsl:text>}&#10;</xsl:text>
+            </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>}</xsl:text>
+
+    </xsl:template>
+
+    <xsl:template name="distributions">
+        <!-- this template generates content for a DataDownload element -->
+        <xsl:param name="por"/>
+        <!-- CI_OnlineResource -->
+        <xsl:param name="pfor"/>
+        <!-- MD_Format -->
+        <xsl:param name="prp"/>
+        <!-- CI_ResponsibleParty -->
+        <!--distributorContacts map to provider. 
+            Formats to fileFormat,
+        CI_onlineResurce.linkage.URL to URL, except if the CI_OnLineFunctionCode is 'download' then it maps to contentURL. -->
+        <xsl:variable name="accessURL" select="$por/gmd:linkage/gmd:URL"/>
+        <xsl:variable name="distFormat">
+            <xsl:if test="count($pfor/gmd:name) > 1">
+                <xsl:text>[&#10;</xsl:text>
+            </xsl:if>
+            <xsl:for-each select="$pfor/gmd:name">
+                <xsl:text>"</xsl:text>
+                <xsl:if test="string-length(normalize-space(child::node()/text())) > 0">
+                    <xsl:value-of select="normalize-space(child::node()/text())"/>
+                </xsl:if>
+                <xsl:if
+                    test="string-length(following-sibling::gmd:version/child::node()/text()) > 0">
+                    <xsl:value-of
+                        select="concat(' v.', normalize-space(following-sibling::gmd:version/child::node()/text()))"/>
+                </xsl:if>
+                <xsl:if
+                    test="string-length(following-sibling::gmd:amendmentNumber/child::node()/text()) > 0">
+                    <xsl:value-of
+                        select="concat(' amendment:', normalize-space(following-sibling::gmd:amendmentNumber/child::node()/text()))"/>
+                </xsl:if>
+                <xsl:text>"</xsl:text>
+                <!-- comma if there are more formats -->
+                <xsl:if
+                    test="parent::node()/parent::node()/following-sibling::node()/child::gmd:MD_Format/gmd:name"
+                    >, </xsl:if>
+            </xsl:for-each>
+            <xsl:if test="count($pfor/gmd:name) > 1">
+                <xsl:text>]</xsl:text>
+            </xsl:if>
+        </xsl:variable>
+        <xsl:variable name="distPublishDate" select="''"/>
+        <xsl:variable name="distIdentifier" select="$por/gmd:linkage/gmd:URL"/>
+        <xsl:variable name="distProvider">
+            <xsl:if test="count($prp/gmd:role) > 1">
+                <xsl:text>[&#10;</xsl:text>
+            </xsl:if>
+            <xsl:for-each select="$prp/self::node()">
+                <xsl:apply-templates select=".">
+                    <xsl:with-param name="role" select="'provider'"/>
+                </xsl:apply-templates>
+                <xsl:if
+                    test="not($por/ancestor::gmd:distributorTransferOptions) and ancestor::gmd:distributor/following-sibling::gmd:distributor//gmd:CI_ResponsibleParty">
+                    <xsl:text>,&#10;</xsl:text>
+                </xsl:if>
+            </xsl:for-each>
+            <xsl:if test="count($prp/gmd:role) > 1">
+                <xsl:text>]</xsl:text>
+            </xsl:if>
+        </xsl:variable>
+        <xsl:variable name="distName" select="$por/gmd:name/gco:CharacterString"/>
+        <xsl:variable name="distSize"
+            select="
+                concat($por/parent::node()/preceding-sibling::gmd:transferSize/gco:Real, ' ',
+                normalize-space($por/parent::node()/preceding-sibling::gmd:unitsOfDistribution/gco:CharacterString))"/>
+        <xsl:variable name="distDescription">
+            <!-- gather other useful content from the CI_OnlineResource element -->
+            <xsl:text>"</xsl:text>
+            <xsl:if
+                test="string-length(normalize-space($por/gmd:description/gco:CharacterString)) > 0">
+                <xsl:value-of select="normalize-space($por/gmd:description/gco:CharacterString)"/>
+                <xsl:text>.   </xsl:text>
+            </xsl:if>
+            <xsl:if test="string-length(normalize-space($por/gmd:protocol/gco:CharacterString)) > 0">
+                <xsl:text>Service Protocol: </xsl:text>
+                <xsl:value-of select="normalize-space($por/gmd:description/gco:CharacterString)"/>
+                <xsl:text>.   </xsl:text>
+            </xsl:if>
+            <xsl:if
+                test="string-length(normalize-space($por/gmd:applicationProfile/gco:CharacterString)) > 0">
+                <xsl:text>Application Profile: </xsl:text>
+                <xsl:value-of
+                    select="normalize-space($por/gmd:applicationProfile/gco:CharacterString)"/>
+                <xsl:text>.   </xsl:text>
+            </xsl:if>
+            <xsl:if test="string-length(normalize-space($por/gmd:function//@codeListValue)) > 0">
+                <xsl:text>Link Function: </xsl:text>
+                <xsl:value-of select="normalize-space($por/gmd:function//@codeListValue)"/>
+            </xsl:if>
+            <xsl:if
+                test="
+                    string-length(normalize-space($por/gmd:function/child::node()/text())) > 0
+                    and (normalize-space($por/gmd:function/child::node()/text()) != normalize-space($por/gmd:function//@codeListValue))">
+                <xsl:text>--   </xsl:text>
+                <xsl:value-of select="normalize-space($por/gmd:function/child::node()/text())"/>
+                <xsl:text>.   </xsl:text>
+            </xsl:if>
+            <xsl:text>"</xsl:text>
+        </xsl:variable>
+        <xsl:text>{&#10;</xsl:text>
+        <xsl:if test="$distIdentifier">
+            <xsl:text>      "@id": "</xsl:text>
+            <xsl:value-of select="$distIdentifier"/>
+            <xsl:text>",&#10;</xsl:text>
+        </xsl:if>
+        <xsl:text>    "@type": "DataDownload",&#10;    "additionalType": "dcat:distribution",&#10;</xsl:text>
+        <xsl:text>      "dcat:accessURL": "</xsl:text>
+        <xsl:value-of select="$accessURL"/>
+        <xsl:text>",&#10;</xsl:text>
+        <xsl:text>      "url": "</xsl:text>
+        <xsl:value-of select="$accessURL"/>
+        <xsl:text>"</xsl:text>
+        <xsl:if test="string-length($distName) > 0">
+            <xsl:text>,&#10;      "name": "</xsl:text>
+            <xsl:value-of select="normalize-space($distName)"/>
+            <xsl:text>"</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length($distDescription) > 0">
+            <xsl:text>,&#10;      "description": </xsl:text>
+            <xsl:value-of select="normalize-space($distDescription)"/>
+        </xsl:if>
+        <xsl:if test="string-length(string($distProvider)) > 0">
+            <xsl:text>,&#10;      "provider": </xsl:text>
+            <xsl:value-of select="$distProvider"/>
+        </xsl:if>
+        <xsl:if test="string-length($distFormat) > 0">
+            <xsl:text>,&#10;      "fileFormat": </xsl:text>
+            <xsl:value-of select="$distFormat"/>
+        </xsl:if>
+        <xsl:if test="string-length(normalize-space($distSize)) > 0">
+            <xsl:text>,&#10;      "contentSize": "</xsl:text>
+            <xsl:value-of select="$distSize"/>
+            <xsl:text>"</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length($distPublishDate) > 0">
+            <xsl:text>,&#10;      "datePublished": "</xsl:text>
+            <xsl:value-of select="$distPublishDate"/>
+            <xsl:text>"</xsl:text>
+        </xsl:if>
+        <!-- more content might be available; insert here -->
+        <xsl:text>}&#10;</xsl:text>
+    </xsl:template>
+
+    <!--variableMeasured not implemented here -->
+    <xsl:template name="variableMeasured">
+        <xsl:param name="variableList"/>
+        <!-- returns JSON array of schema.org Person objects -->
+
+        <xsl:text>[</xsl:text>
+        <xsl:for-each select="$variableList/child::node()">
+            <!-- handle each person in the list -->
+            <xsl:variable name="variableID" select="'variableID'"/>
+            <xsl:variable name="varDescription" select="'distFormat'"/>
+            <xsl:variable name="varUnitsText" select="'distPublishDate'"/>
+            <xsl:variable name="varURL" select="'distIdentifier'"/>
+            <xsl:variable name="varName" select="'distIdentifier'"/>
+            <xsl:variable name="varValue" select="'distIdentifier'"/>
+
+            <xsl:text>{&#10;</xsl:text>
+
+            <xsl:if test="$variableID">
+                <xsl:text>      "@id": "</xsl:text>
+                <xsl:value-of select="$variableID"/>
+                <xsl:text>",&#10;</xsl:text>
+            </xsl:if>
+
+            <xsl:text>    "@type": "PropertyValue",&#10;    "additionalType": "earthcollab:Parameter",&#10;</xsl:text>
+
+            <xsl:if test="$varDescription">
+                <xsl:text>      "description": "</xsl:text>
+                <xsl:value-of select="$varDescription"/>
+                <xsl:text>",&#10;</xsl:text>
+            </xsl:if>
+
+            <xsl:text>      "unitText": "</xsl:text>
+            <xsl:value-of select="$varUnitsText"/>
+            <xsl:text>",&#10;</xsl:text>
+
+            <xsl:if test="$varURL">
+                <xsl:text>      "url": "</xsl:text>
+                <xsl:value-of select="$varURL"/>
+                <xsl:text>",&#10;</xsl:text>
+            </xsl:if>
+
+            <xsl:if test="$varValue">
+                <xsl:text>      "value": "</xsl:text>
+                <xsl:value-of select="$varValue"/>
+                <xsl:text>"&#10;</xsl:text>
+            </xsl:if>
+
+            <!-- more content might be available; insert here -->
+
+            <xsl:text>}&#10;</xsl:text>
+        </xsl:for-each>
+
+        <xsl:text>],&#10;</xsl:text>
+    </xsl:template>
+
+
+    <!--############################################################-->
+    <!--## Template to replace strings                           ##-->
+    <!--############################################################-->
+    <!-- template from https://stackoverflow.com/questions/3067113/xslt-string-replace/3067130 -->
+    <xsl:template name="string-replace-all">
+        <xsl:param name="text"/>
+        <xsl:param name="replace"/>
+        <xsl:param name="by"/>
+        <xsl:choose>
+            <xsl:when test="$text = '' or $replace = '' or not($replace)">
+                <!-- Prevent this routine from hanging -->
+                <xsl:value-of select="$text"/>
+            </xsl:when>
+            <xsl:when test="contains($text, $replace)">
+                <xsl:value-of select="substring-before($text, $replace)"/>
+                <xsl:value-of select="$by"/>
+                <xsl:call-template name="string-replace-all">
+                    <xsl:with-param name="text" select="substring-after($text, $replace)"/>
+                    <xsl:with-param name="replace" select="$replace"/>
+                    <xsl:with-param name="by" select="$by"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$text"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+
 </xsl:stylesheet>

@@ -36,7 +36,7 @@ G._metadataTypes =  {
         //identifier: "http://www.isotc211.org/2005/gmi",
         identifier: "CINERGI_ISO19115",
    //     detailsXslt: "metadata/details/iso-details/xml-to-html-ISO.xsl",
-        detailsXslt: "metadata/details/iso-details/ISO19139ToHTML.xsl",
+        detailsXslt: "metadata/details/iso-details/ISO19139ToHTMLwMap.xsl",
         xsdLocation: null,
         schematronXslt: null
     },
@@ -47,7 +47,7 @@ G._metadataTypes =  {
         evaluator: G.evaluators.iso,
         interrogationXPath: "//gmd:MD_Metadata",
         identifier: "http://www.isotc211.org/2005/gmd",
-        detailsXslt: "metadata/details/iso-details/ISO19139ToHTML.xsl",
+        detailsXslt: "metadata/details/iso-details/ISO19139ToHTMLwMap.xsl",
         xsdLocation: null,
         //schematronXslt: "metadata/schematron/Gemini2_R2r2-schematron.xslt",
         toKnownXslt: null
@@ -72,7 +72,7 @@ G._metadataTypes =  {
   evaluator: G.evaluators.iso, 
   interrogationXPath: "//gmi:MI_Metadata",
   identifier: "http://www.isotc211.org/2005/gmi",
-  detailsXslt: "metadata/details/iso-details/ISO19139ToHTML.xsl",
+  detailsXslt: "metadata/details/iso-details/ISO19139ToHTMLwMap.xsl",
   xsdLocation: null,
   schematronXslt: null
 }/*,
