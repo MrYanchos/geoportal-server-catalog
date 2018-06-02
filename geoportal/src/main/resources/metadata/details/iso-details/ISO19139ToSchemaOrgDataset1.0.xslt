@@ -23,6 +23,11 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
     
     2018-05-01 version 1.1 update spatialCoverage handling.  Only transforms geographicIdentifier,
     gml:polygon/gml:Point, and gmd:geographicBounding box; other gml geometries are ignored. 
+    2018-05-20 name template iso2sdo and add input parameter isopath, use these to inject a link
+    to the full iso record that is being trasformed as and additional distribution; following
+    recommendation from DataOne for harvest to DataOne coordinating node. To use as stand alone 
+    transform, comment out template definition with name and uncomment template definition with 
+    match (lines 38, 39).
  -->
 
     <xsl:output method="text" indent="yes" encoding="UTF-8"/>
@@ -30,7 +35,7 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
     <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
     <xsl:variable name="authorRoles" select="'editor,coAuthor,author,orginator'"/>
 
- <!--   <xsl:template match="//gmd:MD_Metadata | gmi:MI_Metadata"> -->
+<!--    <xsl:template match="//gmd:MD_Metadata | gmi:MI_Metadata"> -->
        <xsl:template name="iso2sdo">
            <xsl:param name="isopath"/>
         <!-- Define variables for content elements -->
@@ -666,9 +671,12 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
                 <xsl:with-param name="pfor" select="$format"/>
                 <xsl:with-param name="prp" select="$distributorContact"/>
             </xsl:call-template>
-            <xsl:if test="following::gmd:onLine">
+<!--            <xsl:if test="following::gmd:onLine">
                 <xsl:text>,&#10;</xsl:text>
-            </xsl:if>
+            </xsl:if>-->
+               <xsl:if test="position() != last()">
+                   <xsl:text>,&#10;</xsl:text>
+               </xsl:if>
         </xsl:for-each>
 
         <xsl:if
@@ -690,8 +698,7 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
                 <xsl:with-param name="pfor" select="$format"/>
                 <xsl:with-param name="prp" select="$distributorContact"/>
             </xsl:call-template>
-            <xsl:if
-                test="following::gmd:distributorTransferOptions//gmd:onLine or parent::node()/following-sibling::gmd:onLine">
+            <xsl:if  test="position() != last()">
                 <xsl:text>,&#10;</xsl:text>
             </xsl:if>
         </xsl:for-each>
@@ -1098,23 +1105,19 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
                 <xsl:if
                     test="string-length(following-sibling::gmd:version/child::node()/text()) > 0">
                     <xsl:value-of
-                        select="concat(' v.', normalize-space(following-sibling::gmd:version/child::node()/text()))"
-                    />
+                        select="concat(' v.', normalize-space(following-sibling::gmd:version/child::node()/text()))"/>
                 </xsl:if>
                 <xsl:if
                     test="string-length(following-sibling::gmd:amendmentNumber/child::node()/text()) > 0">
                     <xsl:value-of
-                        select="concat(' amendment:', normalize-space(following-sibling::gmd:amendmentNumber/child::node()/text()))"
-                    />
+                        select="concat(' amendment:', normalize-space(following-sibling::gmd:amendmentNumber/child::node()/text()))"/>
                 </xsl:if>
                 <xsl:text>"</xsl:text>
-
                 <!-- comma if there are more formats -->
                 <xsl:if
                     test="parent::node()/parent::node()/following-sibling::node()/child::gmd:MD_Format/gmd:name"
                     >, </xsl:if>
             </xsl:for-each>
-
             <xsl:if test="count($pfor/gmd:name) > 1">
                 <xsl:text>]</xsl:text>
             </xsl:if>
@@ -1134,7 +1137,6 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
                     <xsl:text>,&#10;</xsl:text>
                 </xsl:if>
             </xsl:for-each>
-
             <xsl:if test="count($prp/gmd:role) > 1">
                 <xsl:text>]</xsl:text>
             </xsl:if>
@@ -1178,25 +1180,19 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
             </xsl:if>
             <xsl:text>"</xsl:text>
         </xsl:variable>
-
         <xsl:text>{&#10;</xsl:text>
-
         <xsl:if test="$distIdentifier">
             <xsl:text>      "@id": "</xsl:text>
             <xsl:value-of select="$distIdentifier"/>
             <xsl:text>",&#10;</xsl:text>
         </xsl:if>
-
         <xsl:text>    "@type": "DataDownload",&#10;    "additionalType": "dcat:distribution",&#10;</xsl:text>
-
         <xsl:text>      "dcat:accessURL": "</xsl:text>
         <xsl:value-of select="$accessURL"/>
         <xsl:text>",&#10;</xsl:text>
-
         <xsl:text>      "url": "</xsl:text>
         <xsl:value-of select="$accessURL"/>
         <xsl:text>"</xsl:text>
-
         <xsl:if test="string-length($distName) > 0">
             <xsl:text>,&#10;      "name": "</xsl:text>
             <xsl:value-of select="normalize-space($distName)"/>
@@ -1206,13 +1202,10 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
             <xsl:text>,&#10;      "description": </xsl:text>
             <xsl:value-of select="normalize-space($distDescription)"/>
         </xsl:if>
-
         <xsl:if test="string-length(string($distProvider)) > 0">
             <xsl:text>,&#10;      "provider": </xsl:text>
             <xsl:value-of select="$distProvider"/>
         </xsl:if>
-
-
         <xsl:if test="string-length($distFormat) > 0">
             <xsl:text>,&#10;      "fileFormat": </xsl:text>
             <xsl:value-of select="$distFormat"/>
@@ -1222,17 +1215,13 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
             <xsl:value-of select="$distSize"/>
             <xsl:text>"</xsl:text>
         </xsl:if>
-
         <xsl:if test="string-length($distPublishDate) > 0">
             <xsl:text>,&#10;      "datePublished": "</xsl:text>
             <xsl:value-of select="$distPublishDate"/>
             <xsl:text>"</xsl:text>
         </xsl:if>
-
         <!-- more content might be available; insert here -->
-
         <xsl:text>}&#10;</xsl:text>
-
     </xsl:template>
 
     <!--variableMeasured not implemented here -->
