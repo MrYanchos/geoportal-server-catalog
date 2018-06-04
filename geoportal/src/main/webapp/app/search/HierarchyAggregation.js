@@ -130,7 +130,6 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
     processResults: function(searchResponse) {
       domConstruct.empty(this.categoryNode);
       var key = this.getAggregationKey();
-      this.treeData=[];
       var catStore = new Memory({
         data: this.treeData,
         getChildren: function (object) {
@@ -183,38 +182,30 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
     //});
 
 
-        try {
-        var catModel = new ObjectStoreModel({
+      var catModel = new ObjectStoreModel({
         store:  catStore,
         query: {id: this.rootTerm}
       });
-
-          var tree = new Tree({
-              model: catModel,
-              open: this.open,
-              showRoot: this.showRoot,
-              onClick: lang.hitch(this, function (item) {
-                  var query = {"term": {}};
-                  query.term[this.field] = item.key;
-                  var tip = item.key;
-                  var qClause = new QClause({
-                      label: item.key,
-                      tip: tip,
-                      parentQComponent: this,
-                      removable: true,
-                      scorable: true,
-                      query: query
-                  });
-                  this.pushQClause(qClause, true);
-              })
+      var tree = new Tree({
+        model: catModel,
+        open: this.open,
+        showRoot: this.showRoot,
+        onClick: lang.hitch(this,function(item) {
+          var query = {"term": {}};
+          query.term[this.field] = item.key;
+          var tip = item.key;
+          var qClause = new QClause({
+            label:  item.key,
+            tip: tip,
+            parentQComponent: this,
+            removable: true,
+            scorable: true,
+            query: query
           });
-
-          tree.placeAt(this.categoryNode);
-      }
-      catch (e) {
-          console.log( "tree warining. No items for base term")
-          this.setNodeText(this.categoryNode,"(No Items)");
-      }
+          this.pushQClause(qClause,true);
+        })
+      });
+      tree.placeAt( this.categoryNode);
 
      // tree.startup();
     }

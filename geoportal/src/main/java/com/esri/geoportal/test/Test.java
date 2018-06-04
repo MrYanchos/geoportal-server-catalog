@@ -21,9 +21,6 @@ import com.esri.geoportal.context.AppResponse;
 import com.esri.geoportal.context.AppUser;
 import com.esri.geoportal.context.GeoportalContext;
 import com.esri.geoportal.lib.elastic.ElasticContext;
-import com.esri.geoportal.lib.elastic.request.BulkChangeOwnerRequest;
-import com.esri.geoportal.lib.elastic.request.ChangeOwnerRequest;
-import com.esri.geoportal.lib.elastic.request.CswRequest;
 import com.esri.geoportal.lib.elastic.request.DeleteItemRequest;
 import com.esri.geoportal.lib.elastic.request.GetItemRequest;
 import com.esri.geoportal.lib.elastic.request.GetMetadataRequest;
@@ -86,21 +83,18 @@ public class Test {
   public static void main(String[] args) {
     AbstractApplicationContext context = null;
     try {
-      context = new ClassPathXmlApplicationContext("config/app-context.xml");
+      //context = new ClassPathXmlApplicationContext("config/app-context.xml");
       //org.apache.logging.log4j
-      
       
       //Test.test1();
       //Test.testPublishMetadata();
       //Test.testPublishJson();
       //Test.testGetItem();
       //Test.testGetMetadata();
-      //Test.testChangeOwner();
       //Test.testDeleteMetadata();
       //Test.testTransformMetadata();
       //Test.testValidateMetadata();
       //Test.testPython();
-      //Test.testOpensearch();
       //Test.testNashorn();
       //Test.testScroll2();
       //Test.testScroll3();
@@ -110,7 +104,7 @@ public class Test {
       //Test.testKvp();
       //Test.testDump();
       //Test.testLoad();
-      //Test.testBulkChangeOwner();
+      
     } catch (Throwable t) {
       LOGGER.error(t.getClass().getName());
       LOGGER.error("Exception",t);
@@ -228,29 +222,6 @@ public class Test {
     if (response.getEntity() != null) LOGGER.info(response.getEntity().toString());
   }
   
-  public static void testChangeOwner() throws Exception {
-    AppUser user = new AppUser("admin",true,true);
-    //user = new AppUser("publisher",false,true);
-    //user = null;
-    boolean pretty = true;
-    String newOwner = "publisher888";
-    newOwner = "publisher";
-    String id = "88884444";
-    //id = "3333";
-    //id = null;
-    
-     
-    //ChangeOwnerRequest request = new ChangeOwnerRequest(); 
-    
-    ChangeOwnerRequest request = GeoportalContext.getInstance().getBean(
-        "request.ChangeOwnerRequest",ChangeOwnerRequest.class);
-    request.init(user,pretty);
-    request.init(id,newOwner);
-    AppResponse response = request.execute();
-    LOGGER.info(response.getStatus().toString());
-    LOGGER.info(response.getEntity().toString());
-  }
-  
   public static void testDeleteMetadata() throws Exception {
     AppUser user = new AppUser("publisher",false,true);
     //user = new AppUser("user",false,false);
@@ -366,68 +337,6 @@ public class Test {
     //int exitCode = p.waitFor();
     //System.err.println("exitCode="+exitCode);
     
-  }
-  
-  public static void testOpensearch() throws Exception {
-    boolean pretty = true;
-    String q = null, filter = null;
-    //filter = "fileid:gov.noaa.nodc\\:0000720";
-    //filter = "fileid:\"gov.noaa.nodc:0000720\"";
-    //q = "(\"gov.noaa.nodc:0000720\")";
-    //int start = -1, num = -1;
-    //start = 21;
-    //num = 0;
-    //q = "*:*";
-    //pretty = false;
-    
-    //HttpServletRequest hsr;
-    
-    String body = "{\"query\": { \"bool\": { \"must\": [{\"match\":{\"title\":\"Temperature\"}}]}}}";
-    body = null;
-    //System.err.println(body);
-    
-    Map<String,String[]> params = new HashMap<String,String[]>();
-    //params.put("id",new String[]{"e5d10bc3269b496da3557e0964429ccd"});
-    //params.put("q",new String[]{"product"});
-    //params.put("q",new String[]{"*:*"});
-    //params.put("filter",new String[]{"fileid:\"gov.noaa.nodc:0000720\""});
-    //params.put("time",new String[]{"2006/2010"});
-    //params.put("bbox",new String[]{"-140,65,-70,30"});
-    //params.put("from",new String[]{"1"});
-    params.put("size",new String[]{"2"});
-    //params.put("fields",new String[0]);
-    //params.put("fields",new String[]{"title,fileid"});
-    //params.put("fields",new String[]{"apiso_TempExtent_begin_dt"});
-    //params.put("sort",new String[]{"apiso_TempExtent_begin_dt:desc"});
-    
-    //params.put("q",{"product"});
-    
-    params.put("f",new String[]{"json"});
-    params.put("f",new String[]{"atom"});
-    //params.put("f",new String[]{"application/atom+xml"});
-    //params.put("f",new String[]{"http://www.w3.org/2005/Atom"});
-    //params.put("f",new String[]{"csw"});
-    //params.put("f",new String[]{"csw3"});
-    //params.put("f",new String[]{"http://www.opengis.net/cat/csw/3.0"});
-    
-    //params.put("f",new String[]{"csw"});
-    params.put("service",new String[]{"csw"});
-    params.put("request",new String[]{"GetRecordById"});
-    params.put("request",new String[]{"GetRecords"});
-    params.put("elementSetName",new String[]{"brief"});
-    params.put("elementSetName",new String[]{"summary"});
-    params.put("elementSetName",new String[]{"full"});
-    
-    //OpensearchRequest request = GeoportalContext.getInstance().getBean("request.OpensearchRequest",OpensearchRequest.class);
-    CswRequest request = GeoportalContext.getInstance().getBean("request.CswRequest",CswRequest.class);
-    request.setBaseUrl("http://urbanm.esri.com:8080/geoportal2");
-    request.setPretty(pretty);
-    request.setParameterMap(params);
-    request.setBody(body);
-    AppResponse response = request.execute();
-    LOGGER.info(response.getStatus().toString());
-    LOGGER.info(response.getEntity().toString());
-    LOGGER.info(response.getMediaType().toString());
   }
   
   public static void testNashorn() throws Exception {
@@ -586,7 +495,7 @@ public class Test {
             ResponseEntity<String> responseEntity = rest.exchange(url,HttpMethod.PUT,requestEntity,String.class);
             String response = responseEntity.getBody();
             if (!responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-              LOGGER.warn(response);
+              //LOGGER.warn(response);
             }
           } catch (Exception e) {
             e.printStackTrace();
@@ -794,7 +703,7 @@ public class Test {
           ResponseEntity<String> responseEntity = rest.exchange(url,HttpMethod.PUT,requestEntity,String.class);
           String response = responseEntity.getBody();
           if (!responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-            LOGGER.warn(response);
+            //LOGGER.warn(response);
           }
         } catch (Exception e) {
           e.printStackTrace();
@@ -818,28 +727,5 @@ public class Test {
     String newOwner = null;
     req.add(ec.getTransportClient().prepareUpdate(index,type,id).setDoc(ownerField,newOwner));
   }
-  
-  public static void testBulkChangeOwner() throws Exception {
-    AppUser user = new AppUser("admin",true,true);
-    //user = new AppUser("publisher",false,true);
-    //user = null;
-    boolean pretty = true;
-    String currentOwner = "admin";
-    String newOwner = "publisher";
-    //currentOwner = null;
-    //newOwner = "";
-    
-    currentOwner = "publisher";
-    newOwner = "admin";
-    
-    BulkChangeOwnerRequest request = GeoportalContext.getInstance().getBeanIfDeclared(
-        "request.BulkChangeOwnerRequest",BulkChangeOwnerRequest.class, new BulkChangeOwnerRequest());
-    request.init(user,pretty);
-    request.init(currentOwner,newOwner);
-    AppResponse response = request.execute();
-    LOGGER.info(response.getStatus().toString());
-    LOGGER.info(response.getEntity().toString());
-  }
-
 
 }

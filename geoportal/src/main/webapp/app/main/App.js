@@ -22,12 +22,12 @@ define(["dojo/_base/declare",
         "app/etc/util",
         "app/main/SearchPanel",
         "app/main/MapPanel",
-
-        "app/main/WorkbenchPanel",
+        "app/main/ContributePanel",
+        "app/main/AboutPanel",
         "app/content/MetadataEditor",
         "app/content/UploadMetadata"], 
-function(declare, lang, topic, appTopics, Templated, template, i18n, util, SearchPanel, MapPanel
-    ,WorkbenchPanel,
+function(declare, lang, topic, appTopics, Templated, template, i18n, util, SearchPanel, MapPanel, AboutPanel,
+
     MetadataEditor, UploadMetadata) {
 
   var oThisClass = declare([Templated], {

@@ -1,7 +1,19 @@
 define([],function(){var obj={
 // .......................................................................................
-
-  allowBulkChangeOwner: true,
+  
+  edit: {
+    setField: {
+      allow: false,
+      adminOnly: false
+    }
+  },
+  
+  bulkEdit: {
+    allowByOwner: true,
+    allowBySourceUri: true,
+    allowByTaskRef: true,
+    allowByQuery: true
+  },
   
   search: {
     allowSettings: false,
@@ -23,7 +35,9 @@ define([],function(){var obj={
     showDate: true,
     showOwner: false,
     showThumbnails: true,
-    defaultSort: "title.sort:asc"
+    showAccess: true,
+    showApprovalStatus: true,
+    defaultSort: "sys_modified_dt:desc"
   },
   
   statusChecker: {

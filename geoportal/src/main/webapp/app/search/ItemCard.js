@@ -13,35 +13,44 @@
  * limitations under the License.
  */
 define(["dojo/_base/declare",
-        "dojo/_base/lang",
-        "dojo/_base/array",
-        "dojo/string",
-        "dojo/topic",
-        "dojo/request/xhr",
-        "app/context/app-topics",
-        "dojo/dom-class",
-        "dojo/dom-construct",
-        "dijit/_WidgetBase",
-        "dijit/_TemplatedMixin",
-        "dijit/_WidgetsInTemplateMixin",
-        "dijit/Tooltip",
-        "dojo/text!./templates/ItemCard.html",
-        "dojo/i18n!app/nls/resources",
-        "app/context/AppClient",
-        "app/etc/ServiceType",
-        "app/etc/util",
-        "app/common/ConfirmationDialog",
-        "app/content/ChangeOwner",
-        "app/content/MetadataEditor",
-        "app/context/metadata-editor",
-        "app/content/UploadMetadata",
+  "dojo/_base/lang",
+  "dojo/_base/array",
+  "dojo/string",
+  "dojo/topic",
+  "dojo/request/xhr",
+  "dojo/on",
+  "app/context/app-topics",
+  "dojo/dom-class",
+  "dojo/dom-construct",
+  "dijit/_WidgetBase",
+  "dijit/_TemplatedMixin",
+  "dijit/_WidgetsInTemplateMixin",
+  "dijit/Tooltip",
+  "dijit/TooltipDialog",
+  "dijit/popup",
+  "dojo/text!./templates/ItemCard.html",
+  "dojo/i18n!app/nls/resources",
+  "app/context/AppClient",
+  "app/etc/ServiceType",
+  "app/etc/util",
+  "app/common/ConfirmationDialog",
+  "app/content/ChangeOwner",
+  "app/content/DeleteItems",
+  "app/content/MetadataEditor",
+  "app/context/metadata-editor",
+  "app/content/SetAccess",
+  "app/content/SetApprovalStatus",
+  "app/content/SetField",
+  "app/content/UploadMetadata",
+  "app/preview/PreviewUtil",
+  "app/preview/PreviewPane",
     "app/prov/Prov"],
-function(declare, lang, array, string, topic, xhr, appTopics, domClass, domConstruct,
-    _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, Tooltip, template, i18n, 
-    AppClient, ServiceType, util, ConfirmationDialog, ChangeOwner, 
-    MetadataEditor, gxeConfig, UploadMetadata) {
-  
-  var oThisClass = declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domConstruct,
+  _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, Tooltip, TooltipDialog, popup, 
+  template, i18n, AppClient, ServiceType, util, ConfirmationDialog, ChangeOwner, DeleteItems,
+  MetadataEditor, gxeConfig, SetAccess, SetApprovalStatus, SetField, UploadMetadata, 
+  PreviewUtil, PreviewPane) {
+ var oThisClass = declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
  
     i18n: i18n,
     templateString: template,
@@ -66,11 +75,21 @@ function(declare, lang, array, string, topic, xhr, appTopics, domClass, domConst
     postCreate: function() {
       this.inherited(arguments);
       var self = this;
-      topic.subscribe(appTopics.ItemOwnerChanged,function(params){
+      this.own(topic.subscribe(appTopics.ItemOwnerChanged,function(params){
         if (self.item && self.item === params.item) {
           self._renderOwnerAndDate(self.item);
         }
-      });
+      }));
+      this.own(topic.subscribe(appTopics.ItemApprovalStatusChanged,function(params){
+        if (self.item && self.item === params.item) {
+          self._renderOwnerAndDate(self.item);
+        }
+      }));
+      this.own(topic.subscribe(appTopics.ItemAccessChanged,function(params){
+        if (self.item && self.item === params.item) {
+          self._renderOwnerAndDate(self.item);
+        }
+      }));
     },
     
     render: function(hit) {
@@ -78,18 +97,21 @@ function(declare, lang, array, string, topic, xhr, appTopics, domClass, domConst
       item._id = hit._id; 
       var links = this._uniqueLinks(item);
       util.setNodeText(this.titleNode,item.title);
-      //this._renderOwnerAndDate(item);
-      this._renderSourceAndDate(item);
-      //util.setNodeText(this.descriptionNode,item.description);
-      this._renderDescription(item);
+
+        //this._renderOwnerAndDate(item);
+        this._renderSourceAndDate(item);
+        //util.setNodeText(this.descriptionNode,item.description);
+        this._renderDescription(item);
+
       this._renderThumbnail(item);
       this._renderItemLinks(hit._id,item);
       this._renderLinksDropdown(item,links);
       this._renderOptionsDropdown(hit._id,item);
       this._renderAddToMap(item,links);
       this._renderServiceStatus(item);
-      this._renderWorkbenchLinksDropdown(item,links);
-       this._renderCinergiLinks(hit._id,item);
+
+        this._renderWorkbenchLinksDropdown(item,links);
+        this._renderCinergiLinks(hit._id,item);
     },
     
     _canEditMetadata: function(item,isOwner,isAdmin,isPublisher) {
@@ -154,11 +176,66 @@ function(declare, lang, array, string, topic, xhr, appTopics, domClass, domConst
       topic.publish(appTopics.OnMouseLeaveResultItem,{item:this.item});
     },
     
+    _renderPreview: function(actionsNode, serviceType) {
+      
+      // declare preview pane
+      var previewPane;
+      
+      // create preview area 
+      var previewArea = domConstruct.create("div");
+      var tooltipDialog = new TooltipDialog({
+          style: "width: 470px; height: 320px;",
+          content: previewArea,
+          
+          onBlur: function() {
+            // cause to hide dialog whenever user clicks outside the map
+            popup.close(tooltipDialog);
+          },
+          
+          onKeyPress: function(event) {
+            // cause to hide dialog whenever ESC key is being pressed
+            if (event.keyCode === 27) {
+              popup.close(tooltipDialog);
+            }
+          },
+          
+          onShow: function() {
+            // focus automatically
+            tooltipDialog.focus();
+            
+            // create new preview pane
+            previewPane = new PreviewPane({serviceType: serviceType}, previewArea);
+            previewPane.startup();
+          },
+          
+          onHide: function() {
+            // destroy preview pane
+            previewPane.destroy();
+            previewPane = null;
+          }
+      });
+      this.own(tooltipDialog);
+      
+      // create clickable link to launch preview dialog
+      var previewNode = domConstruct.create("a",{
+        href: "javascript:void(0)",
+        innerHTML: i18n.item.actions.preview
+      },actionsNode);
+      
+      // install 'onclick' event handler to show tooltip dialog
+      this.own(on(previewNode, "click", function() {
+        popup.open({
+          popup: tooltipDialog,
+          around: previewNode
+        });
+      }));
+    },
+    
     _renderAddToMap: function(item,links) {
       if (links.length === 0) return;
       var endsWith = function(v,sfx) {return (v.indexOf(sfx,(v.length-sfx.length)) !== -1);};
       var actionsNode = this.actionsNode;
-      array.some(links, function(u){
+      array.some(links, lang.hitch(this, function(u){
         var serviceType = new ServiceType();
         serviceType.checkUrl(u);
         //console.warn("serviceType",serviceType.isSet(),serviceType);
@@ -170,9 +247,15 @@ function(declare, lang, array, string, topic, xhr, appTopics, domClass, domConst
               topic.publish(appTopics.AddToMapClicked,serviceType);
             }
           },actionsNode);
+          
+          // create clickable 'Preview' link if allowes
+          if (PreviewUtil.canPreview(serviceType)) {
+            this._renderPreview(actionsNode, serviceType);
+          }
+          
           return true;
         }
-      });
+      }));
     },
     
     _renderItemLinks: function(itemId,item) {
@@ -188,11 +271,18 @@ function(declare, lang, array, string, topic, xhr, appTopics, domClass, domConst
         target: "_blank",
         innerHTML: i18n.item.actions.xml
       },actionsNode);
-      domConstruct.create("a",{
+      var jsonNode = domConstruct.create("a",{
         href: uri+"?pretty=true",
         target: "_blank",
         innerHTML: i18n.item.actions.json
       },actionsNode);
+      if (AppContext.geoportal.supportsApprovalStatus || 
+          AppContext.geoportal.supportsGroupBasedAccess) {
+        var client = new AppClient();
+        htmlNode.href = client.appendAccessToken(htmlNode.href); 
+        xmlNode.href = client.appendAccessToken(xmlNode.href);
+        jsonNode.href = client.appendAccessToken(jsonNode.href);
+      }
       var v = item.sys_metadatatype_s;
       if (typeof v === "string" && v === "json") {
         htmlNode.style.visibility = "hidden";
@@ -237,6 +327,8 @@ function(declare, lang, array, string, topic, xhr, appTopics, domClass, domConst
       var isOwner = this._isOwner(item);
       var isAdmin = AppContext.appUser.isAdmin();
       var isPublisher = AppContext.appUser.isPublisher();
+      var supportsApprovalStatus = AppContext.geoportal.supportsApprovalStatus;
+      var supportsGroupBasedAccess = AppContext.geoportal.supportsGroupBasedAccess;
       var links = [];
       
       if (this._canEditMetadata(item,isOwner,isAdmin,isPublisher)) {
@@ -251,8 +343,9 @@ function(declare, lang, array, string, topic, xhr, appTopics, domClass, domConst
         }));
       }
       
-      if ((isOwner && isPublisher) || isAdmin) {
-        
+      var canManage = ((isOwner && isPublisher) || isAdmin);
+      
+      if (canManage) {
         links.push(domConstruct.create("a",{
           "class": "small",
           href: "javascript:void(0)",
@@ -261,52 +354,104 @@ function(declare, lang, array, string, topic, xhr, appTopics, domClass, domConst
             (new UploadMetadata({itemId:itemId})).show();
           }
         }));
-        
-        links.push(domConstruct.create("a",{
-          "class": "small",
-          href: "javascript:void(0)",
-          innerHTML: i18n.item.actions.options.deleteItem,
-          onclick: function() {
-            var dialog = new ConfirmationDialog({
-              title: i18n.item.actions.options.deleteItem,
-              content: item.title,
-              okLabel: i18n.general.del,
-              status: "danger"
-            });
-            dialog.show().then(function(ok){
-              if (ok) {
-                dialog.okCancelBar.showWorking(i18n.general.deleting,false);
-                var client = new AppClient();
-                client.deleteItem(itemId).then(function(response){
-                  topic.publish(appTopics.ItemDeleted,{
-                    itemId: itemId,
-                    searchPane: self.searchPane
-                  });
-                  self.domNode.style.display = "none";
-                  dialog.hide();
-                }).otherwise(function(error){
-                  var msg = i18n.general.error;
-                  console.warn("deleteItem.error",error);
-                  dialog.okCancelBar.showError(msg,false);
-                });
-              }
-            });
-          }
-        }));
       }
       
       if (isAdmin) {
         links.push(domConstruct.create("a",{
           "class": "small",
           href: "javascript:void(0)",
-          innerHTML: i18n.item.actions.options.changeOwner,
+          innerHTML: i18n.content.changeOwner.caption,
           onclick: function() {
-            var dialog = new ChangeOwner({item:item});
+            var dialog = new ChangeOwner({item:item,itemCard:self});
             dialog.show();
           }
         }));
       }
       
+      if (supportsApprovalStatus && canManage) {
+        links.push(domConstruct.create("a",{
+          "class": "small",
+          href: "javascript:void(0)",
+          innerHTML: i18n.content.setApprovalStatus.caption,
+          onclick: function() {
+            var dialog = new SetApprovalStatus({item:item,itemCard:self});
+            dialog.show();
+          }
+        }));
+      }
+      
+      if (supportsGroupBasedAccess && canManage) {
+        links.push(domConstruct.create("a",{
+          "class": "small",
+          href: "javascript:void(0)",
+          innerHTML: i18n.content.setAccess.caption,
+          onclick: function() {
+            var dialog = new SetAccess({item:item,itemCard:self});
+            dialog.show();
+          }
+        }));
+      }
+      
+      if (canManage && AppContext.appConfig.edit && AppContext.appConfig.edit.setField && 
+          AppContext.appConfig.edit.setField.allow && 
+          (isAdmin || !AppContext.appConfig.edit.setField.adminOnly)) {
+        links.push(domConstruct.create("a",{
+          "class": "small",
+          href: "javascript:void(0)",
+          innerHTML: i18n.content.setField.caption,
+          onclick: function() {
+            var dialog = new SetField({item:item,itemCard:self});
+            dialog.show();
+          }
+        }));        
+      }
+      
+      if (canManage) {
+        links.push(domConstruct.create("a",{
+          "class": "small",
+          href: "javascript:void(0)",
+          innerHTML: i18n.content.deleteItems.caption,
+          onclick: function() {
+            var dialog = new DeleteItems({item:item,itemCard:self});
+            dialog.show();
+          }
+        }));
+      }
+      
+//      if (canManage) {
+//        links.push(domConstruct.create("a",{
+//          "class": "small",
+//          href: "javascript:void(0)",
+//          innerHTML: i18n.item.actions.options.deleteItem,
+//          onclick: function() {
+//            var dialog = new ConfirmationDialog({
+//              title: i18n.item.actions.options.deleteItem,
+//              content: item.title,
+//              okLabel: i18n.general.del,
+//              status: "danger"
+//            });
+//            dialog.show().then(function(ok){
+//              if (ok) {
+//                dialog.okCancelBar.showWorking(i18n.general.deleting,false);
+//                var client = new AppClient();
+//                client.deleteItem(itemId).then(function(response){
+//                  topic.publish(appTopics.ItemDeleted,{
+//                    itemId: itemId,
+//                    searchPane: self.searchPane
+//                  });
+//                  self.domNode.style.display = "none";
+//                  dialog.hide();
+//                }).otherwise(function(error){
+//                  var msg = i18n.general.error;
+//                  console.warn("deleteItem.error",error);
+//                  dialog.okCancelBar.showError(msg,false);
+//                });
+//              }
+//            });
+//          }
+//        }));        
+//      }
+
       if (links.length === 0) return;
       
       var dd = domConstruct.create("div",{
@@ -337,7 +482,7 @@ function(declare, lang, array, string, topic, xhr, appTopics, domClass, domConst
     _renderOwnerAndDate: function(item) {
       var owner = item.sys_owner_s;
       var date = item.sys_modified_dt;
-      var idx, text = "";
+      var idx, text = "", v;
       if (AppContext.appConfig.searchResults.showDate && typeof date === "string" && date.length > 0) {
         idx = date.indexOf("T");
         if (idx > 0) date =date.substring(0,idx);
@@ -347,6 +492,31 @@ function(declare, lang, array, string, topic, xhr, appTopics, domClass, domConst
         if (text.length > 0) text += " ";
         text += owner;
       }
+      
+      if (AppContext.appUser.isAdmin() || this._isOwner(item)) {
+        if (AppContext.appConfig.searchResults.showAccess && 
+            AppContext.geoportal.supportsGroupBasedAccess) {
+          v = item.sys_access_s;
+          if (text.length > 0) text += " - ";
+          if (v === "private") {
+            text += i18n.content.setAccess._private;
+          } else {
+            text += i18n.content.setAccess._public;
+          }
+        }
+        if (AppContext.appConfig.searchResults.showApprovalStatus && 
+            AppContext.geoportal.supportsApprovalStatus) {
+          v = item.sys_approval_status_s;
+          if (typeof v === "string" && v.length > 0) {
+            v = i18n.content.setApprovalStatus[v];
+          }
+          if (typeof v === "string" && v.length > 0) {
+            if (text.length > 0) text += " - ";
+            text += v;
+          }
+        }
+      }
+      
       if (text.length > 0) {
         util.setNodeText(this.ownerAndDateNode,text);
       }
@@ -378,19 +548,20 @@ function(declare, lang, array, string, topic, xhr, appTopics, domClass, domConst
     },
     
     _renderServiceStatus: function(item) {
+      var type;
       var authKey = AppContext.appConfig.statusChecker.authKey;
       if (authKey && string.trim(authKey).length>0) {
         if (item && item.resources_nst) {
           if (item.resources_nst.length) {
             for (var i=0; i<item.resources_nst.length; i++) {
-              var type = this._translateService(item.resources_nst[i].url_type_s);
+              type = this._translateService(item.resources_nst[i].url_type_s);
               if (type) {
                 this._checkService(item._id,type);
                 break;
               }
             }
           } else {
-            var type = this._translateService(item.resources_nst.url_type_s);
+            type = this._translateService(item.resources_nst.url_type_s);
             if (type) {
               this._checkService(item._id,type);
             }
@@ -473,6 +644,7 @@ function(declare, lang, array, string, topic, xhr, appTopics, domClass, domConst
         if (this.allowedServices[service]) {
           return this.allowedServices[service];
         }
+        
       }
       return null;
     },
@@ -515,15 +687,15 @@ function(declare, lang, array, string, topic, xhr, appTopics, domClass, domConst
               "class": "dropdown-menu",
           },dd);
           if (lang.isArray(item.services_nst)){
-          array.forEach(item.services_nst, function(u){
-              var ddli = domConstruct.create("li",{},ddul);
-              domConstruct.create("a",{
-                  "class": "small",
-                  href: u.url_s,
-                  target: "_blank",
-                  innerHTML: u.url_type_s
-              },ddli);
-          });
+              array.forEach(item.services_nst, function(u){
+                  var ddli = domConstruct.create("li",{},ddul);
+                  domConstruct.create("a",{
+                      "class": "small",
+                      href: u.url_s,
+                      target: "_blank",
+                      innerHTML: u.url_type_s
+                  },ddli);
+              });
           }
           this._mitigateDropdownClip(dd,ddul);
       },
@@ -531,29 +703,40 @@ function(declare, lang, array, string, topic, xhr, appTopics, domClass, domConst
           // if categories_cat exists, then these should exist
           if (item.categories_cat) {
 
-          var actionsNode = this.actionsNode;
-          var uri = "app/prov/templates/Prov.html?source=" + encodeURIComponent(item.fileid);
-          var htmlNode = domConstruct.create("a", {
-              href: uri + "&ttl=" + encodeURIComponent(item.title),
-              target: "_blank",
-              innerHTML: "Provenance"
-          }, actionsNode);
-          var uri2 = "http://mdeditor.usgin.org/?docId=" + encodeURIComponent(item.fileid);
-          var htmlNode = domConstruct.create("a", {
-              href: uri2,
-              target: "_blank",
-              innerHTML: "Edit"
-          }, actionsNode);
-      }
+            var actionsNode = this.actionsNode;
+              var uri = "app/prov/templates/Prov.html?source=" + encodeURIComponent(item.fileid);
+              var htmlNode = domConstruct.create("a", {
+                  href: uri + "&ttl=" + encodeURIComponent(item.title),
+                  target: "_blank",
+                  innerHTML: "Provenance"
+              }, actionsNode);
+              var uri2 = "http://mdeditor.usgin.org/?docId=" + encodeURIComponent(item.fileid);
+              var htmlNode = domConstruct.create("a", {
+                  href: uri2,
+                  target: "_blank",
+                  innerHTML: "Edit"
+              }, actionsNode);
+              var uri3 = "http://"+ "suave-jupyterhub.com" +
+                  "/user/zeppelin-v/notebooks/CinergiDispatch.ipynb"+
+                  "?documentId=" + encodeURIComponent(item._id);
+              var htmlNode = domConstruct.create("a", {
+                  href: uri3,
+                  target: "_blank",
+                  innerHTML: "Workbench Demo"
+              }, actionsNode);
+
+          }
 
       },
       _renderDescription: function (item) {
-      var desc = item.description;
-      if (desc && desc.indexOf("REQUIRED FIELD") > -1 ){
-        desc = "";
-      }
+          var desc = item.description;
+          if (desc && desc.indexOf("REQUIRED FIELD") > -1 ){
+              desc = "";
+          }
           util.setNodeText(this.descriptionNode,desc);
       }
+    
+
   });
   
   return oThisClass;

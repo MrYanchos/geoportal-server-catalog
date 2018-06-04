@@ -7,6 +7,7 @@
 	xmlns:gml="http://www.opengis.net/gml" 
 	xmlns:res="http://www.esri.com/metadata/res/"  
 	xmlns:xlink="http://www.w3.org/1999/xlink">
+
 	<!-- An XSLT template for displaying metadata that is stored in the ISO 19139 metadata format.
 
      Copyright (c) 2009-2010, Environmental Systems Research Institute, Inc. All rights reserved.
@@ -20,6 +21,7 @@
 	<!-- SMR 2017-10-03 add test for gmi:MI_Metadata as root elemenent. Doesn't display any other gmi elements if present. -->
 	
 	<xsl:import href = "generalwMap.xslt" />
+
 	<xsl:import href = "XML.xslt" />
 	<xsl:import href = "codelists.xslt" />
 	<xsl:import href = "auxLanguages.xslt" />
@@ -3450,6 +3452,7 @@
 					<xsl:value-of select="normalize-space(.)"/>
 				</xsl:otherwise>
 			</xsl:choose>
+
 		</xsl:for-each>
 	</xsl:template>
 	<!-- gco:Record -->

@@ -26,6 +26,7 @@ load("classpath:metadata/js/EvaluatorFor_DC.js");
 load("classpath:metadata/js/EvaluatorFor_FGDC.js");
 load("classpath:metadata/js/EvaluatorFor_ISO.js");
 load("classpath:metadata/js/EvaluatorFor_ISO_CINERGI.js");
+load("classpath:metadata/js/EvaluatorFor_OAIDC.js");
 
 G._metadataTypes =  {
     "iso19115-CINERGI": {
@@ -51,14 +52,14 @@ G._metadataTypes =  {
         xsdLocation: null,
         //schematronXslt: "metadata/schematron/Gemini2_R2r2-schematron.xslt",
         toKnownXslt: null
-    	
   },
+  
 /*  "iso19115-2": {
     key: "iso19115-2",
     evaluator: G.evaluators.cinergi, // we enhance these
     interrogationXPath: "/gmi:MI_Metadata",
     identifier: "http://www.isotc211.org/2005/gmi",
-    detailsXslt: "metadata/details/iso-details/xml-to-html-ISO.xsl",
+    detailsXslt: "metadata/details/iso-details/ISO19139ToHTML.xsl",
     xsdLocation: null,
     schematronXslt: null
   },*/

@@ -23,14 +23,17 @@ function(declare, lang, array, Templated, util, Tooltip) {
   var oThisClass = declare([Templated], {
   
     activeQClauses: null,
+    conditionallyDisabled: false,
     isSearchComponent: true,
     searchOptions: null,
     searchPane: null,
     extendedToolTip: null,
     
     postCreate: function() {
-        this.intializeToolTip();
-        this.inherited(arguments);
+      this.inherited(arguments);
+      if (this.conditionallyDisabled) {
+        if (this.domNode) this.domNode.style.display = "none";
+      }
 
     },
     
