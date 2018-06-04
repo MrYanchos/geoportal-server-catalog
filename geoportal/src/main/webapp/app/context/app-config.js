@@ -16,7 +16,7 @@ define([],function(){var obj={
   },
   
   search: {
-    allowSettings: true,
+    allowSettings: false,
     useSimpleQueryString: false
   },
   

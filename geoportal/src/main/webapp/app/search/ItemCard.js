@@ -675,7 +675,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
               "data-toggle": "dropdown",
               "aria-haspopup": true,
               "aria-expanded": true,
-              innerHTML: "Workbench"
+              innerHTML: "Named Links"
           },dd);
           domConstruct.create("span",{
               "class": "caret"
@@ -721,7 +721,16 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                   target: "_blank",
                   innerHTML: "Workbench Demo"
               }, actionsNode);
-
+              if (item.sys_metadatatype_s && item.sys_metadatatype_s.startsWith("iso") ) {
+                  var uri3 = "https://search.google.com/structured-data/testing-tool/u/0/#url=" +
+                      encodeURIComponent(
+                          "http://cinergi.sdsc.edu/geoportal/rest/metadata/item/" + item._id + "/html");
+                  var htmlNode = domConstruct.create("a", {
+                      href: uri3,
+                      target: "_blank",
+                      innerHTML: "Schema.Org"
+                  }, actionsNode);
+              }
           }
 
       },

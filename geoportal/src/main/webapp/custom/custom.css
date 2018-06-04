@@ -1,1 +1,52 @@
 /* Custom CSS */
+/* cinergi about and contribute */
+.aGrid {
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: 20px 300px auto 300px 20px ;
+    background-color: #fff;
+}
+
+.aBox {
+
+
+    border-radius: 5px;
+    padding: 20px;
+
+
+}
+
+.aaa {
+    grid-column: 1 / span 4;
+
+}
+
+.aa {
+    grid-column: 2 / span 2;
+    background-color: #ABCADE;
+
+}
+.dd {
+    grid-column: 2 ;
+    grid-row: 3 / span 2;
+}
+.bb {
+    grid-column: 4 ;
+    grid-row: 2 ;
+}
+.cc {
+    grid-column: 3 / span 2;
+    grid-row: 4 ;
+}
+
+.calcite .esriSimpleSlider div{width:32px;height:24px ;
+    border-width:0;border-style:none;color:#4c4c4c;
+    background-color:#fff;-moz-transition:all 0.25s ease;
+    -o-transition:all 0.25s ease;-webkit-transition:all 0.25s ease;
+    transition:all 0.25s ease;
+    -moz-user-select:-moz-none;-ms-user-select:none;-webkit-user-select:none;
+    user-select:none;-moz-box-sizing:border-box;
+    -webkit-box-sizing:border-box;box-sizing:border-box;cursor:pointer;
+    font-family:"CalciteWebCoreIcons";speak:none;
+    font-size:8px;
+    font-style:normal;font-weight:normal;font-variant:normal;text-transform:none;text-indent:0;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-size:12px;line-height:2.66667}
