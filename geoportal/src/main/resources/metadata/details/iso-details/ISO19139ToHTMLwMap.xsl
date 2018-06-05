@@ -18,12 +18,12 @@ generalwMap.xslt brings in the javascript to build the map
 iso19139usginwMap.xslt has handler (showMap template) to build the form and div element for the map.
 -->
 
-  <xsl:import href = "imports/generalwMap.xslt" />
-  <xsl:import href = "imports/iso19139usginwMap.xslt" />
-  <xsl:import href = "imports/XML.xslt"/>
-  <xsl:import href = "imports/codelists.xslt" />
-  <xsl:import href = "imports/auxCountries.xslt" />
-  <xsl:import href = "imports/auxUCUM.xslt" />
+  <xsl:import href = "Imports/generalwMap.xslt" />
+  <xsl:import href = "Imports/iso19139usginwMap.xslt" />
+  <xsl:import href = "Imports/XML.xslt"/>
+  <xsl:import href = "Imports/codelists.xslt" />
+  <xsl:import href = "Imports/auxCountries.xslt" />
+  <xsl:import href = "Imports/auxUCUM.xslt" />
 
 <!-- this file contains the iso2sdo transform, which is called by name -->
   <xsl:import href = "ISO19139ToSchemaOrgDataset1.0.xslt" />
