@@ -3,7 +3,11 @@
 	xmlns:gmi="http://www.isotc211.org/2005/gmi"
 	xmlns:srv="http://www.isotc211.org/2005/srv" 
 	xmlns:gco="http://www.isotc211.org/2005/gco" 
-	xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:gml="http://www.opengis.net/gml" xmlns:res="http://www.esri.com/metadata/res/">
+	xmlns:gts="http://www.isotc211.org/2005/gts" 
+	xmlns:gml="http://www.opengis.net/gml" 
+	xmlns:res="http://www.esri.com/metadata/res/"  
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+
 	<!-- An XSLT template for displaying metadata that is stored in the ISO 19139 metadata format.
 
      Copyright (c) 2009-2010, Environmental Systems Research Institute, Inc. All rights reserved.
@@ -16,7 +20,8 @@
 	<!-- SMR add imports 2012-09-07 -->
 	<!-- SMR 2017-10-03 add test for gmi:MI_Metadata as root elemenent. Doesn't display any other gmi elements if present. -->
 	
-	<xsl:import href = "general.xslt" />
+	<xsl:import href = "generalwMap.xslt" />
+
 	<xsl:import href = "XML.xslt" />
 	<xsl:import href = "codelists.xslt" />
 	<xsl:import href = "auxLanguages.xslt" />
@@ -3418,22 +3423,36 @@
 	<xsl:template name="Date_PropertyType">
 		<xsl:value-of select="(gco:Date | gco:DateTime)[1]"/>
 	</xsl:template>
-	<!-- gco:CharacterString , gco:FreeText -->
+	<!-- gco:CharacterString , gco:FreeText, gmx:Anchor -->
 	<xsl:template name="CharacterString">
 		<xsl:for-each select="*">
-			<xsl:if test="local-name(.) = 'CharacterString'">
-				<xsl:value-of select="normalize-space(.)"/>
-			</xsl:if>
-			<xsl:if test="local-name(.) = 'PT_FreeText'">
-				<!-- <b><xsl:value-of select="name(ancestor-or-self::*[2])" /></b> -->
-				<dl>
-					<dd>
-						<b>
-							<xsl:value-of select="gmd:textGroup/gmd:LocalisedCharacterString/@locale"/>
-						</b>&#x2002;<xsl:value-of select="gmd:textGroup/gmd:LocalisedCharacterString"/>
-					</dd>
-				</dl>
-			</xsl:if>
+			<xsl:choose>
+				<xsl:when test="local-name(.) = 'CharacterString'">
+					<xsl:value-of select="normalize-space(.)"/>
+				</xsl:when>
+				<xsl:when test="local-name(.) = 'PT_FreeText'">
+					<!-- <b><xsl:value-of select="name(ancestor-or-self::*[2])" /></b> -->
+					<dl>
+						<dd>
+							<b>
+								<xsl:value-of select="gmd:textGroup/gmd:LocalisedCharacterString/@locale"/>
+							</b>&#x2002;<xsl:value-of select="gmd:textGroup/gmd:LocalisedCharacterString"/>
+						</dd>
+					</dl>
+				</xsl:when>
+				<xsl:when test="local-name(.) = 'Anchor'">
+				<a>
+					<xsl:attribute name="href">
+						<xsl:value-of select="@xlink:href"/>
+					</xsl:attribute>
+					<xsl:value-of select="normalize-space(.)"/>
+				</a>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="normalize-space(.)"/>
+				</xsl:otherwise>
+			</xsl:choose>
+
 		</xsl:for-each>
 	</xsl:template>
 	<!-- gco:Record -->
