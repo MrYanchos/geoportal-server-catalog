@@ -109,7 +109,8 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
       this._renderAddToMap(item,links);
       this._renderServiceStatus(item);
         this._renderWorkbenchLinksDropdown(item,links);
-        this._renderCinergiLinks(hit._id,item);
+        this._renderCinergiLinks(hit._id,item),
+        this._renderSchemaOrg(item)
     },
     
     _canEditMetadata: function(item,isOwner,isAdmin,isPublisher) {
@@ -721,18 +722,22 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                   target: "_blank",
                   innerHTML: "Workbench Demo"
               }, actionsNode);
-              if (item.sys_metadatatype_s && item.sys_metadatatype_s.startsWith("iso") ) {
-                  var uri3 = "https://search.google.com/structured-data/testing-tool/u/0/#url=" +
-                      encodeURIComponent(
-                          "http://cinergi.sdsc.edu/geoportal/rest/metadata/item/" + item._id + "/html");
-                  var htmlNode = domConstruct.create("a", {
-                      href: uri3,
-                      target: "_blank",
-                      innerHTML: "Schema.Org"
-                  }, actionsNode);
-              }
+
           }
 
+      },
+      _renderSchemaOrg: function (item){
+          var actionsNode = this.actionsNode;
+          if (item.sys_metadatatype_s && item.sys_metadatatype_s.startsWith("iso19115") ) {
+              var uri3 = "https://search.google.com/structured-data/testing-tool/u/0/#url=" +
+                  encodeURIComponent(
+                      "http://cinergi.sdsc.edu/geoportal/rest/metadata/item/" + item._id + "/html");
+              var htmlNode = domConstruct.create("a", {
+                  href: uri3,
+                  target: "_blank",
+                  innerHTML: "Schema.Org"
+              }, actionsNode);
+          }
       },
       _renderDescription: function (item) {
           var desc = item.description;
@@ -741,7 +746,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
           }
           util.setNodeText(this.descriptionNode,desc);
       }
-    
+
   });
   
   return oThisClass;

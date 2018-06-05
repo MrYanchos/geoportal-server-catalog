@@ -804,13 +804,14 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
                     <xsl:text>"</xsl:text>
                 </xsl:if>
 
-                <xsl:if
+       <!--         <xsl:if
                     test="
                         *//gmd:EX_GeographicDescription//gmd:code/gco:CharacterString or
                         *//gmd:geographicElement/gmd:EX_BoundingPolygon[count(descendant::*[local-name() = 'polygon']/*[local-name() = 'Point']) > 0]
                         or *//gmd:geographicElement/gmd:EX_GeographicBoundingBox">
                     <xsl:text>,&#10;</xsl:text>
                 </xsl:if>
+                -->
                 <!-- geographicIdentifiers in array of alternateNames -->
                 <xsl:if
                     test="*//gmd:geographicElement/gmd:EX_GeographicDescription//gmd:code/gco:CharacterString">
