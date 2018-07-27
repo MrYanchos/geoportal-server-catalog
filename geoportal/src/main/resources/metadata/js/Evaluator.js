@@ -52,7 +52,7 @@ G._metadataTypes =  {
   },
   "iso19115-2": {
     key: "iso19115-2",
-    evaluator: G.evaluators.iso,
+    evaluator: G.evaluators.cinergi,
     interrogationXPath: "/gmi:MI_Metadata",
     identifier: "http://www.isotc211.org/2005/gmi",
     detailsXslt: "metadata/details/iso-details/ISO19139ToHTMLwMap.xsl",
@@ -72,6 +72,7 @@ G._metadataTypes =  {
     interrogationXPath: "/rdf:RDF/rdf:Description/dc:title",
     identifier: "http://purl.org/dc/elements/1.1/",
     detailsXslt: "metadata/details/rdf-details.xslt",
+    toKnownXslt: "metadata/xslt/qualifiedDCToISO19139v1.0.xslt"
   },
   "arcgis": {
     key: "arcgis",
@@ -86,6 +87,8 @@ G._metadataTypes =  {
         interrogationXPath: "/oai_dc:dc/dc:title",
         identifier: "http://www.openarchives.org/OAI/2.0/oai_dc/",
         //detailsXslt: "metadata/details/rdf-details.xslt",
+
+    toKnownXslt: "metadata/xslt/qualifiedDCToISO19139v1.0.xslt"
     }
 };
 

@@ -57,15 +57,18 @@
         <div data-dojo-type="app/search/HierarchyAggregation"
              data-dojo-props="field:'categories_cat',rootTerm:'science domain',
              label:'CINERGI Domain',props:{size:1000},
-            extendedToolTip:'CINERGI Keywords for Science Domain'">
+            extendedToolTip:'CINERGI Keywords for Science Domain'"
+        style="background-color: darkgrey">
         </div>
         <div data-dojo-type="app/search/HierarchyAggregation"
              data-dojo-props="field:'categories_cat',rootTerm:'material',
-             label:'CINERGI Material',props:{size:1000},showRoot: false">
+             label:'CINERGI Material',props:{size:1000},showRoot: false"
+             style="background-color: darkgrey">
         </div>
         <div data-dojo-type="app/search/HierarchyAggregation"
              data-dojo-props="field:'categories_cat',rootTerm:'property',
-             label:'CINERGI Parameter',props:{size:1000}">
+             label:'CINERGI Parameter',props:{size:1000}"
+             style="background-color: darkgrey">
         </div>
 
 
@@ -101,7 +104,8 @@
     </div>
     <div data-dojo-type="app/search/HierarchyAggregation"
          data-dojo-props="field:'hierarchies_cat',rootTerm:'category',
-             label:'All CINERGI Facets',props:{size:1000},showRoot: false">
+             label:'All CINERGI Facets',props:{size:1000},showRoot: false"
+         style="background-color: darkgrey">
     </div>
 
     <div >Metadata Properties</div>
@@ -140,7 +144,8 @@
       </div>
 
       <div data-dojo-type="app/search/TermsAggregation"
-        data-dojo-props="field:'src_source_name_s',label:'Metadata Collection',props:{size:20}">
+        data-dojo-props="field:'src_source_name_s',label:'Metadata Collection',props:{size:200}"
+           style="background-color: darkgrey">
       </div>
       <div data-dojo-type="app/search/TermsAggregation"
            data-dojo-props="field:'sys_owner_s',open:false,label:'Contributor'">
