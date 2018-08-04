@@ -741,9 +741,13 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                   target: "_blank",
                   innerHTML: "Edit"
               }, actionsNode);
-              var uri3 = "http://"+ "suave-jupyterhub.com" +
-                  "/user/zeppelin-v/notebooks/CinergiDispatch.ipynb"+
+              //https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/master?filepath=notebooks%2FCinergiDispatch.ipynb
+              var uri3 = "https://"+ "mybinder.org" +
+                  "/v2/gh/CINERGI/jupyter-cinergi.git/master?urlpath=%2Fnotebooks%2FCinergiDispatch.ipynb"+
                   "?documentId=" + encodeURIComponent(item._id);
+              // var uri3 = "http://"+ "suave-jupyterhub.com" +
+              //     "/user/zeppelin-v/notebooks/CinergiDispatch.ipynb"+
+              //     "?documentId=" + encodeURIComponent(item._id);
               var htmlNode = domConstruct.create("a", {
                   href: uri3,
                   target: "_blank",
