@@ -186,27 +186,29 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
         store:  catStore,
         query: {id: this.rootTerm}
       });
-      var tree = new Tree({
-        model: catModel,
-        open: this.open,
-        showRoot: this.showRoot,
-        onClick: lang.hitch(this,function(item) {
-          var query = {"term": {}};
-          query.term[this.field] = item.key;
-          var tip = item.key;
-          var qClause = new QClause({
-            label:  item.key,
-            tip: tip,
-            parentQComponent: this,
-            removable: true,
-            scorable: true,
-            query: query
+      if (catStore.data.length >0 ) {
+          var tree = new Tree({
+              model: catModel,
+              open: this.open,
+              showRoot: this.showRoot,
+              onClick: lang.hitch(this, function (item) {
+                  var query = {"term": {}};
+                  query.term[this.field] = item.key;
+                  var tip = item.key;
+                  var qClause = new QClause({
+                      label: item.key,
+                      tip: tip,
+                      parentQComponent: this,
+                      removable: true,
+                      scorable: true,
+                      query: query
+                  });
+                  this.pushQClause(qClause, true);
+              })
           });
-          this.pushQClause(qClause,true);
-        })
-      });
-      tree.placeAt( this.categoryNode);
-     // tree.startup();
+          tree.placeAt(this.categoryNode);
+          // tree.startup();
+      }
     }
     
   });
