@@ -67,7 +67,7 @@ G._metadataTypes =  {
     detailsXslt: "metadata/details/fgdc-details.xslt",
   },
   "dc": {
-    key: "dc",
+    key: "DublinCore",
     evaluator: G.evaluators.dc,
     interrogationXPath: "/rdf:RDF/rdf:Description/dc:title",
     identifier: "http://purl.org/dc/elements/1.1/",
@@ -82,7 +82,7 @@ G._metadataTypes =  {
     detailsXslt: "metadata/details/arcgis-details.xslt",
   },
     "oai_dc": {
-        key: "oai_dc",
+        key: "OAI_DublinCore",
         evaluator: G.evaluators.dc,
         interrogationXPath: "/oai_dc:dc/dc:title",
         identifier: "http://www.openarchives.org/OAI/2.0/oai_dc/",

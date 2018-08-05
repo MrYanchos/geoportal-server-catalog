@@ -19,13 +19,11 @@ import com.esri.geoportal.base.xml.XmlUtil;
 import com.esri.geoportal.base.xml.XsltTemplate;
 import com.esri.geoportal.base.xml.XsltTemplates;
 import com.esri.geoportal.context.GeoportalContext;
-
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 
 /** 
  * A metadata document. 
@@ -148,11 +146,21 @@ public class MetadataDocument {
    */
   public Document ensureDom() throws ParserConfigurationException, SAXException, IOException {
     if (this.getDom() == null) {
-      this.setDom(DomUtil.makeDom(this.getXml(),true));
+      this.updateDom();
     }
     return this.getDom();
   }
-  
+  /**
+   * Forces an update to the dom
+   * @return the dom
+   * @throws ParserConfigurationException
+   * @throws SAXException
+   * @throws IOException
+   */
+  public Document updateDom() throws ParserConfigurationException, SAXException, IOException {
+    this.setDom(DomUtil.makeDom(this.getXml(),true));
+    return this.getDom();
+  }
   /**
    * Ensures the the minimal components.
    */
@@ -204,8 +212,11 @@ public class MetadataDocument {
       if (toKnownXslt != null && toKnownXslt.length() > 0) {
         XsltTemplate xsltTemplate = XsltTemplates.getCompiledTemplate(toKnownXslt);
         String result = xsltTemplate.transform(getXml());
-        setXml(result);
-        interrogate();
+        this.setXml(result);
+        if (hasXml()) this.updateDom();;
+        this.interrogate();
+
+        //evaluator.interrogate(this);
       }
     } else {
       throw new UnrecognizedTypeException();

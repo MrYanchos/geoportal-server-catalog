@@ -222,7 +222,7 @@ define({
         html: "HTML",
         xml: "XML",
         json: "JSON",
-        links: "Links",
+        links: "Get Data",
         addToMap: "Add to Map",
         preview: "Preview",
         options: {

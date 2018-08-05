@@ -13,6 +13,13 @@
  * limitations under the License.
  */
 package com.esri.geoportal.base.xml;
+import com.esri.geoportal.base.util.ResourcePath;
+import com.esri.geoportal.context.GeoportalContext;
+
+import javax.xml.XMLConstants;
+import javax.xml.transform.*;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -21,20 +28,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.XMLConstants;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
-import com.esri.geoportal.base.util.ResourcePath;
-import com.esri.geoportal.context.GeoportalContext;
 
 /**
  * Represents a compiled XSLT transformation stylesheet.
@@ -111,7 +104,8 @@ public class XsltTemplate {
     TransformerFactory factory = TransformerFactory.newInstance();
     factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD,"");
     factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET,"file");
-    factory.setFeature("http://javax.xml.XMLConstants/feature/secure-processing",true);
+    //factory.setFeature("http://javax.xml.XMLConstants/feature/secure-processing",true);
+    factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, false);
     //factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
     setTemplates(factory.newTemplates(new StreamSource(getSystemId())));
   }

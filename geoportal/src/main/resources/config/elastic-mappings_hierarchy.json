@@ -31,13 +31,14 @@
         "category_analyzer": {
           "tokenizer": "category_tokenizer",
           "filter": [
-            "lowercase",
+            "trim",
             "hierarchy_stop"
           ]
         },
         "hierarchy_analyzer": {
           "tokenizer": "hierarchy_tokenizer",
           "filter": [
+            "trim",
             "hierarchy_stop"
           ]
         }

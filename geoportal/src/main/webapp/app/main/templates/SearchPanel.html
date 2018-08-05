@@ -55,20 +55,20 @@
         <!-- e.g. field:'category_cat',label:'Category',props:{size:20,min_doc_count:500} (names in app.nls.resources.js)-->
 
         <div data-dojo-type="app/search/HierarchyAggregation"
-             data-dojo-props="field:'categories_cat',rootTerm:'science domain',
+             data-dojo-props="field:'categories_cat',rootTerm:'Science Domain',
              label:'CINERGI Domain',props:{size:1000},
             extendedToolTip:'CINERGI Keywords for Science Domain'"
-        style="background-color: darkgrey">
+        style="font-weight: bold;">
         </div>
         <div data-dojo-type="app/search/HierarchyAggregation"
-             data-dojo-props="field:'categories_cat',rootTerm:'material',
+             data-dojo-props="field:'categories_cat',rootTerm:'Material',
              label:'CINERGI Material',props:{size:1000},showRoot: false"
-             style="background-color: darkgrey">
+             style="font-weight: bold;">
         </div>
         <div data-dojo-type="app/search/HierarchyAggregation"
-             data-dojo-props="field:'categories_cat',rootTerm:'property',
+             data-dojo-props="field:'categories_cat',rootTerm:'Property',
              label:'CINERGI Parameter',props:{size:1000}"
-             style="background-color: darkgrey">
+             style="font-weight: bold;">
         </div>
 
 
@@ -103,9 +103,9 @@
          data-dojo-props="field:'apiso_TopicCategory_s',open:false,label:'Topic Category (ISO)' ">
     </div>
     <div data-dojo-type="app/search/HierarchyAggregation"
-         data-dojo-props="field:'hierarchies_cat',rootTerm:'category',
+         data-dojo-props="field:'hierarchies_cat',rootTerm:'Category',
              label:'All CINERGI Facets',props:{size:1000},showRoot: false"
-         style="background-color: darkgrey">
+         style="font-weight: bold;">
     </div>
 
     <div >Metadata Properties</div>
@@ -145,7 +145,7 @@
 
       <div data-dojo-type="app/search/TermsAggregation"
         data-dojo-props="field:'src_source_name_s',label:'Metadata Collection',props:{size:200}"
-           style="background-color: darkgrey">
+           style="font-weight: bold;">
       </div>
       <div data-dojo-type="app/search/TermsAggregation"
            data-dojo-props="field:'sys_owner_s',open:false,label:'Contributor'">

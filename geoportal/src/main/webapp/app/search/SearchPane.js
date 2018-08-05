@@ -91,7 +91,13 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
     search: function() {
       var components = this.getSearchComponents();
       var self = this, params = {urlParams:{}};
-      array.forEach(components,function(component){
+        var uri = window.location.search;
+        var query = uri.substring(uri.indexOf("?") + 1, uri.length);
+        if (query != null && query.length >0) {
+            // ioQuery.queryToObject(query); // tried no reference error
+            //        params.urlParams = dojo.queryToObject(query);
+        }
+        array.forEach(components,function(component){
         component.appendQueryParams(params);
       });
       var url = "./elastic/"+AppContext.geoportal.metadataIndexName+"/item/_search";

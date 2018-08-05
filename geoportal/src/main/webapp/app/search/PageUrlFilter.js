@@ -32,7 +32,10 @@ function(declare, lang, array, ioQuery, SearchComponent) {
         var o = ioQuery.queryToObject(s);
         if (o && typeof o.filter === "string") {
           this._addQuery(o.filter);
-        } else if (o && lang.isArray(o.filter)) {
+        } else if (o && typeof o.fileid === "string")
+          {
+              this._addFileIdQuery(o.fileid)
+          }else if (o && lang.isArray(o.filter)) {
           array.forEach(o.filter,function(v){
             self._addQuery(v);
           });
@@ -51,6 +54,17 @@ function(declare, lang, array, ioQuery, SearchComponent) {
         }
       }
     },
+      _addFileIdQuery: function(v) {
+          if (typeof v === "string") {
+              v = lang.trim(v);
+              if (v.length > 0) {
+                  this.queries.push({"query_string": {
+                          "default_field": "fileid",
+                          "query": v
+                      }});
+              }
+          }
+      },
     
     /* SearchComponent API ============================================= */
     

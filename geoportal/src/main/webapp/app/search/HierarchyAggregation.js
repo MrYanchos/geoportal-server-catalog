@@ -41,7 +41,38 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
     treeData: [],
     rootTerm: '',
     selectedTerm:null,
+      stopTerms: {
+          "water body": "body of water"
 
+      },
+      stopTreeMatch: [
+          "Category > Property > Measure"
+          ,"Category > Resource Type"
+          , "Category > Resource Type > Document"
+          , "Category > Resource Type > Spatial Data > Topographic Maps"
+          , "Resource Type > Software > Category"
+          , "Category > Resource Type > Software > Category"
+          ,"Method > Method (Other)"
+          , "Property > Property (Other)"
+          , "Process > Process (Other)"
+          , "Material > Material (Other)"
+          ,"Category > Method (Other)"
+          , "Category > Property (Other)"
+          , "Category > Process (Other)"
+          , "Category > Material (Other)"
+          ,"Realm > Realm (Other)"
+          , "Category > Realm (Other)"
+          ,"Science Domain > Science Domain (Other)"
+          ,"Category > Science Domain (Other)"
+      ],
+      stopFullMatch: [
+          "Category > Organization > Tectonics and Structural Geology, Department of Earth and Ocean Sciences, University of South Carolina > Lamont Doherty Earth Observatory"
+          , "Category > Organization > Tectonics and Structural Geology, Department of Earth and Ocean Sciences, University of South Carolina"
+          , "Organization > Tectonics and Structural Geology, Department of Earth and Ocean Sciences, University of South Carolina"
+          , "Organization > Tectonics and Structural Geology, Department of Earth and Ocean Sciences, University of South Carolina > Lamont Doherty Earth Observatory"
+          , "Category > Property > Measure > Topographic"
+          , "Category > Resource Type > Spatial Data > Topographic Maps"
+      ],
     _initialSettings: null,
     
     postCreate: function() {
@@ -136,30 +167,81 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
           return this.query({parent: object.id})
         }
       });
-      if (searchResponse.aggregations) {
-        var data = searchResponse.aggregations[key];
-        if (data && data.buckets) {
-          
-          var v, missingVal = null;
-          if (this.props && typeof this.props.missing === "string") {
-            v = lang.trim(this.props.missing);
-            if (v.length > 0) missingVal = v;
-          }
-          array.forEach(data.buckets,function(entry){
-           // this.addEntry(entry.key,entry.doc_count,missingVal);
-            var split =entry.key.lastIndexOf(">");
-            var parent = null;
-            var term = entry.key.trim();
-            if (split > 0) {
-              parent = entry.key.substring(0, entry.key.lastIndexOf(">")).trim() ;
-              term = entry.key.substring(split+1).trim()
+        if (searchResponse.aggregations) {
+            var data = searchResponse.aggregations[key];
+            if (data && data.buckets) {
+
+                var v, missingVal = null;
+                if (this.props && typeof this.props.missing === "string") {
+                    v = lang.trim(this.props.missing);
+                    if (v.length > 0) missingVal = v;
+                }
+                array.forEach(data.buckets, function (entry) {
+                        // this.addEntry(entry.key,entry.doc_count,missingVal);
+                        if (this.stopFullMatch.includes(entry.key.trim())) {
+                            return;
+                        }
+                        var stop = array.filter(this.stopTreeMatch, function(item){
+                            return entry.key.trim().startsWith(item);
+                        });
+                        if (stop.length>0){
+                            return;
+                        }
+                        var split = entry.key.lastIndexOf(">");
+                        var parent = null;
+                        var term = entry.key.trim();
+
+                        if (split > 0) {
+                            parent = entry.key.substring(0, entry.key.lastIndexOf(">")).trim();
+                            term = entry.key.substring(split + 1).trim()
+                        }
+                        if (!this.stopTerms[term]) {
+                            var v = term + " (" + entry.doc_count + ")";
+                            var item = {
+                                id: entry.key.trim(),
+                                parent: parent,
+                                name: v,
+                                term: term,
+                                key: entry.key,
+                                type: 'cat',
+                                count: entry.doc_count,
+                                count_children: entry.doc_count
+                            };
+                            catStore.put(item);
+                        }
+                    }
+                    , this);
+
+                array.forEach(
+                    catStore.query(
+                        //null
+                        // ,{
+                        //     sort: function (a, b) {
+                        //         return a.id.length > b.id.length ? -1 : 1;
+                        //     }
+                        // }
+                    ),
+                    function (entry) {
+                        if (entry.parent) {
+                            var parent = array.filter(
+                                this.treeData,
+                                function(item){
+                                    return item.id == entry.parent;
+                                }
+                            );
+
+                            if (parent.length >0) {
+                                parent[0].count_children = parent[0].count_children + entry.count;
+                                var v = parent[0].term + " (" + parent[0].count + "/" + parent[0].count_children + ")";
+                                parent[0].name = v;
+                            }
+                        }
+
+
+                    }
+                    , this)
             }
-            var v = term+" ("+entry.doc_count+")";
-            var item = { id: entry.key.trim(), parent:parent, name:v , key:entry.key, type:'cat', count: entry.doc_count};
-            catStore.put(item);
-          },this);
         }
-      }
 
 
 
