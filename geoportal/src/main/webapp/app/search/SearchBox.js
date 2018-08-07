@@ -57,7 +57,10 @@ function(declare, lang, on, keys, domClass,
         } else {
           query = {"query_string": {
             "analyze_wildcard": true,
-            "query": v
+            "query": v,
+                  "analyzer": "snowball",
+                  "fields": ["title^5","*_cat^10","_all"],
+                  "default_operator": "and"
           }};
         }
         var qClause = new QClause({
