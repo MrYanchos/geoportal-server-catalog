@@ -59,7 +59,7 @@ function(declare, lang, on, keys, domClass,
             "analyze_wildcard": true,
             "query": v,
                   "analyzer": "snowball",
-                  "fields": ["title^5","*_cat^10","_all"],
+                  "fields": ["_source.title^5","_source.*_cat^10","_all"],
                   "default_operator": "and"
           }};
         }
