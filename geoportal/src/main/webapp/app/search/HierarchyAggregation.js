@@ -161,6 +161,7 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
     processResults: function(searchResponse) {
       domConstruct.empty(this.categoryNode);
       var key = this.getAggregationKey();
+      this.treeData = [];
       var catStore = new Memory({
         data: this.treeData,
         getChildren: function (object) {
