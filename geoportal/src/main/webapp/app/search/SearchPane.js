@@ -44,7 +44,8 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
     lastQuery: null,
     lastQueryCount: 0,
     lastQueryWasMyContent: false,
-    
+    highlightQuery: null,
+
     _dfd: null,
     
     postCreate: function() {
@@ -102,7 +103,9 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
       });
       var url = "./elastic/"+AppContext.geoportal.metadataIndexName+"/item/_search";
       var v, postData = null;
-
+        if (typeof this.highlightQuery === "undefined" || this.highlightQuery === null) {
+            this.highlightQuery = AppContext.appConfig.search.highlightQuery;
+        }
       if (AppContext.geoportal.supportsApprovalStatus || 
           AppContext.geoportal.supportsGroupBasedAccess) {
         var client = new AppClient();
@@ -133,6 +136,16 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
       if (params.queries && params.queries.length > 0) {
         if (postData === null) postData = {};
         postData.query = {"bool":{"must":params.queries}};
+        if (this.highlightQuery){
+            postData.highlight = {
+            "require_field_match": false,
+                "pre_tags" : ["<em>"],
+                "post_tags" : ["</em>"],
+                "fields" :  {
+                "*": {"require_field_match" : false} }
+
+          };
+        }
       } 
       if (params.aggregations) {
         if (postData === null) postData = {};
