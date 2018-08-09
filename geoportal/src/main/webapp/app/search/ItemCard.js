@@ -95,13 +95,16 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
     
     render: function(hit) {
       var item = this.item = hit._source;
+      var highlight = hit.highlight;
+
       item._id = hit._id; 
       var links = this._uniqueLinks(item);
-      util.setNodeText(this.titleNode,item.title);
+     // util.setNodeText(this.titleNode,item.title);
+        this._renderTitle(item, highlight);
         //this._renderOwnerAndDate(item);
         this._renderSourceAndDate(item);
         //util.setNodeText(this.descriptionNode,item.description);
-        this._renderDescription(item);
+        this._renderDescription(item,highlight);
       this._renderThumbnail(item);
       this._renderItemLinks(hit._id,item);
       this._renderLinksDropdown(item,links);
@@ -770,13 +773,36 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
               }, actionsNode);
           }
       },
-      _renderDescription: function (item) {
+      _renderDescription: function (item, highlight) {
           var desc = item.description;
-          if (desc && desc.indexOf("REQUIRED FIELD") > -1 ){
+          if (desc && desc.indexOf("REQUIRED FIELD") > -1 ) {
               desc = "";
           }
-          util.setNodeText(this.descriptionNode,desc);
-      }
+              if (typeof highlight != "undefined" )
+
+              if (typeof highlight.description != "undefined"){
+
+                  desc = highlight.description;
+                  util.setNodeHtml(this.descriptionNode,desc);
+              }
+
+           else {util.setNodeText(this.descriptionNode,desc);}
+
+      },
+      _renderTitle: function (item, highlight) {
+          var title = item.title;
+          if (typeof highlight != "undefined" ) {
+
+              if (typeof highlight.title != "undefined"){
+
+                  title = highlight.title;
+                  util.setNodeHtml(this.titleNode,title);
+              }} else
+                { util.setNodeText(this.titleNode,title);}
+
+
+      },
+
 
   });
   

@@ -35,8 +35,13 @@ function (lang) {
     setNodeText: function(nd,text) {
       nd.innerHTML = "";
       if (text) nd.appendChild(document.createTextNode(text));
-    }
-    
+    },
+      setNodeHtml: function(nd,text) {
+          nd.innerHTML = "";
+          if (text) {
+            nd.innerHTML = text;
+          }
+      }
   };
   
   return oThisObject;
