@@ -778,26 +778,26 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
           if (desc && desc.indexOf("REQUIRED FIELD") > -1 ) {
               desc = "";
           }
-              if (typeof highlight != "undefined" )
+              if (typeof highlight != "undefined" ) {
 
-              if (typeof highlight.description != "undefined"){
+                  if (typeof highlight.description != "undefined") {
 
-                  desc = highlight.description;
-                  util.setNodeHtml(this.descriptionNode,desc);
-              }
-
-           else {util.setNodeText(this.descriptionNode,desc);}
+                      desc = highlight.description;
+                      util.setNodeHtml(this.descriptionNode, desc);
+                  }
+              } else {util.setNodeText(this.descriptionNode,desc);}
 
       },
       _renderTitle: function (item, highlight) {
           var title = item.title;
-          if (typeof highlight != "undefined" ) {
+          if (typeof highlight != "undefined") {
 
-              if (typeof highlight.title != "undefined"){
+              if (typeof highlight.title != "undefined") {
 
                   title = highlight.title;
-                  util.setNodeHtml(this.titleNode,title);
-              }} else
+                  util.setNodeHtml(this.titleNode, title);
+              }
+          } else
                 { util.setNodeText(this.titleNode,title);}
 
 
