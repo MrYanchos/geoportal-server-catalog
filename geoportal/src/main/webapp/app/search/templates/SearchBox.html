@@ -1,8 +1,8 @@
-<div class="search-box">
-	<div class="input-group input-group-sm">
-		<input type="text" class="form-control"
+<div class="search-box  typeahead ">
+	<div class="input-group input-group-sm typeahead-wrapper">
+		<input type="text" class="form-control typeahead-text"
 			placeholder="${i18n.search.searchBox.search}..."
-			data-dojo-attach-point="searchTextBox"/> 
+			data-dojo-attach-point="searchTextBox" />
 		<span class="input-group-btn">
 			<button class="btn btn-success btn-sm" type="button"
 				data-dojo-attach-point="searchButton"
@@ -13,4 +13,10 @@
 			</button>
 		</span>
 	</div>
+<!-- <div data-dojo-type="dijit/Tooltip"
+		 data-dojo-attach-point="ToolTip"
+		 data-dojo-props="position:['below']">
+		Enter a search term or phrase. You can use 'OR'('|') 'AND' ('+'), or 'NOT' ('-')
+	</div>
+-->
 </div>

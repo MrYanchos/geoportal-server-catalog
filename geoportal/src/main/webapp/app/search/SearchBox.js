@@ -17,74 +17,89 @@ define(["dojo/_base/declare",
         "dojo/on",
         "dojo/keys",
         "dojo/dom-class",
+        "app/bootstrap/Typeahead",
         "dojo/text!./templates/SearchBox.html",
         "dojo/i18n!app/nls/resources",
         "app/search/SearchComponent",
-        "app/search/QClause"], 
-function(declare, lang, on, keys, domClass,
-         template, i18n, SearchComponent, QClause) {
-  
-  var oThisClass = declare([SearchComponent], {
+        "app/search/QClause",
+        "dijit/Tooltip"],
+function(declare, lang, on, keys, domClass,Typeahead,
+         template, i18n, SearchComponent, QClause,Tooltip) {
 
-    i18n: i18n,
-    templateString: template,
-    
-    useSimpleQueryString: null,
+    var oThisClass = declare([SearchComponent], {
 
-    postCreate: function() {
-      this.inherited(arguments);
-      this.own(on(this.searchTextBox,"keyup",lang.hitch(this,function(evt) {
-        if (evt.keyCode === keys.ENTER) this.search();
-      })));
-    },
-    
-    /* SearchComponent API ============================================= */
-    
-    appendQueryParams: function(params) {
-      var v = this.searchTextBox.value;
-      if (v !== null && lang.trim(v).length > 0) {
-        var tipPattern = i18n.search.appliedFilters.tipPattern;
-        var tip = tipPattern.replace("{type}",i18n.search.searchBox.search).replace("{value}",v);
-        var query = null, useSimpleQueryString = this.useSimpleQueryString;
-        if (typeof useSimpleQueryString === "undefined" || useSimpleQueryString === null) {
-          useSimpleQueryString = AppContext.appConfig.search.useSimpleQueryString;
-        }
-        if (useSimpleQueryString) {
-          query = {"simple_query_string": {
-            "analyze_wildcard": true,
-            "query": v
-          }};
-        } else {
-          query = {"query_string": {
-            "analyze_wildcard": true,
-            "query": v,
-                  "analyzer": "snowball",
-                  "fields": ["_source.title^5","_source.*_cat^10","_all"],
-                  "default_operator": "and"
-          }};
-        }
-        var qClause = new QClause({
-          label: v,
-          tip: tip,
-          parentQComponent: this,
-          removable: true,
-          scorable: true,
-          query: query
-        });
-        this.activeQClauses = [qClause];
-        this.appendQClauses(params);
-      } else {
-        this.activeQClauses = null;
-      }
-    },
-    
-    whenQClauseRemoved: function(qClause) {
-      if (this === qClause.parentQComponent) {
-        this.searchTextBox.value = "";
-      }
-    }
+        i18n: i18n,
+        templateString: template,
 
-  });
+        useSimpleQueryString: null,
+        sbTa: null,
+        dictUrl:null,
+        params: null,
+        taCol: null,
+        postCreate: function () {
+            this.inherited(arguments);
+
+            this.own(on(this.searchTextBox, "keyup", lang.hitch(this, function (evt) {
+                if (evt.keyCode === keys.ENTER) this.search();
+            })));
+
+
+        },
+
+        /* SearchComponent API ============================================= */
+
+        appendQueryParams: function (params) {
+            var v = this.searchTextBox.value;
+            if (v !== null && lang.trim(v).length > 0) {
+                var tipPattern = i18n.search.appliedFilters.tipPattern;
+                var tip = tipPattern.replace("{type}", i18n.search.searchBox.search).replace("{value}", v);
+                var query = null, useSimpleQueryString = this.useSimpleQueryString;
+                if (typeof useSimpleQueryString === "undefined" || useSimpleQueryString === null) {
+                    useSimpleQueryString = AppContext.appConfig.search.useSimpleQueryString;
+                }
+                if (useSimpleQueryString) {
+                    query = {
+                        "simple_query_string": {
+                            "analyze_wildcard": true,
+                            "query": v
+                        }
+                    };
+                } else {
+                    query = {
+                        "query_string": {
+                            "analyze_wildcard": true,
+                            "query": v,
+                            "analyzer": "snowball",
+                            "fields": [".title^5", "keywords_s^4", "*_cat^10", "_all"],
+                            "default_operator": "and"
+                        }
+                    };
+                }
+                var qClause = new QClause({
+                    label: v,
+                    tip: tip,
+                    parentQComponent: this,
+                    removable: true,
+                    scorable: true,
+                    query: query
+                });
+                this.activeQClauses = [qClause];
+                this.appendQClauses(params);
+            } else {
+                this.activeQClauses = null;
+            }
+        },
+
+        whenQClauseRemoved: function (qClause) {
+            if (this === qClause.parentQComponent) {
+                this.searchTextBox.value = "";
+            }
+        },
+
+
+
+
+});
 
   return oThisClass;
 });

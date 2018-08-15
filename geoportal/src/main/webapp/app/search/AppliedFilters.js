@@ -20,8 +20,9 @@ define(["dojo/_base/declare",
         "dojo/i18n!app/nls/resources",
         "app/search/SearchComponent",
         "app/search/DropPane",
-        "app/search/AppliedFilter"], 
-function(declare, lang, array, domConstruct, template, i18n, SearchComponent, DropPane, AppliedFilter) {
+        "app/search/AppliedFilter",
+        "dijit/Tooltip"],
+function(declare, lang, array, domConstruct, template, i18n, SearchComponent, DropPane, AppliedFilter,Tooltip) {
   
   var oThisClass = declare([SearchComponent], {
     

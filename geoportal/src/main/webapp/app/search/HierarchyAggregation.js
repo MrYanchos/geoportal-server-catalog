@@ -46,8 +46,7 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
 
       },
       stopTreeMatch: [
-          "Category > Property > Measure"
-          ,"Category > Resource Type"
+          "Category > Resource Type"
           , "Category > Resource Type > Document"
           , "Category > Resource Type > Spatial Data > Topographic Maps"
           , "Resource Type > Software > Category"

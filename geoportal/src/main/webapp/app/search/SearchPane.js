@@ -142,9 +142,14 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
                 "pre_tags" : ["<em>"],
                 "post_tags" : ["</em>"],
                 "fields" :  {
-                "*": {"require_field_match" : false} }
 
-          };
+
+                "*": {"fragment_size" : 200,"require_field_match" : false},
+                }
+
+
+
+                };
         }
       } 
       if (params.aggregations) {

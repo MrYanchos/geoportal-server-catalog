@@ -22,8 +22,9 @@ define(["dojo/_base/declare",
         "app/search/SearchComponent",
         "app/search/ItemCard",
         "app/search/DropPane",
-        "app/search/Paging"], 
-function(declare, lang, array, aspect, domConstruct, template, i18n, SearchComponent, ItemCard, DropPane, Paging) {
+        "app/search/Paging",
+        "dijit/Tooltip"],
+function(declare, lang, array, aspect, domConstruct, template, i18n, SearchComponent, ItemCard, DropPane, Paging,Tooltip) {
   
   var oThisClass = declare([SearchComponent], {
     

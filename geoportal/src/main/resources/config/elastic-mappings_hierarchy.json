@@ -102,13 +102,15 @@
             "sort": {
               "type": "keyword"
             }
-          }
+          },
+          "index_options" : "offsets"
         },
         "fileid": {
           "type": "keyword"
         },
         "description": {
-          "type": "text"
+          "type": "text",
+          "index_options" : "offsets"
         }
       },
       "dynamic_templates": [

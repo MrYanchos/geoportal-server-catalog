@@ -16,8 +16,9 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
         "app/common/Templated",
-        "app/etc/util"], 
-function(declare, lang, array, Templated, util) {
+        "app/etc/util",
+        "dijit/Tooltip"],
+function(declare, lang, array, Templated, util, Tooltip) {
   
   var oThisClass = declare([Templated], {
   
@@ -26,9 +27,11 @@ function(declare, lang, array, Templated, util) {
     isSearchComponent: true,
     searchOptions: null,
     searchPane: null,
-    
+      extendedToolTip: null,
+
     postCreate: function() {
-      this.inherited(arguments);
+        this.intializeToolTip();
+        this.inherited(arguments);
       if (this.conditionallyDisabled) {
         if (this.domNode) this.domNode.style.display = "none";
       }
@@ -74,7 +77,19 @@ function(declare, lang, array, Templated, util) {
       util.setNodeText(nd,text);
     },
     
-    whenQClauseRemoved: function(qClause) {}
+    whenQClauseRemoved: function(qClause) {},
+
+    intializeToolTip: function(){
+        if (this.ToolTip) {
+            var node = this;
+            //  var node = dom.byId('someNode');
+            this.ToolTip.set("connectId", [node]);
+            this.ToolTip.set("showDelay", 1000);
+            if (this.extendedToolTip) {
+                this.ToolTip.label = this.extendedToolTip + this.ToolTip.label;
+            }
+        }
+    }
   
   });
   

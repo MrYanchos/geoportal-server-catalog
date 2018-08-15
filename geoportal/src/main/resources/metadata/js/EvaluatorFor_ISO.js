@@ -52,7 +52,7 @@ G.evaluators.iso = {
     G.evalProps(task,item,iden,"apiso_AlternateTitle_txt","gmd:citation/gmd:CI_Citation/gmd:alternateTitle/gco:CharacterString");
     G.evalProp(task,item,iden,"apiso_Abstract_txt","gmd:abstract/gco:CharacterString");
     G.evalProp(task,item,iden,"apiso_BrowseGraphic_s","gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString");
-    G.evalProp(task,item,root,"apiso_OrganizationName_txt","gmd:contact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString");
+    G.evalProp(task,item,iden,"apiso_OrganizationName_txt","gmd:contact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString");
 
     /* subject */
     G.evalProps(task,item,root,"apiso_Subject_txt","//gmd:MD_TopicCategoryCode | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gmx:Anchor");
