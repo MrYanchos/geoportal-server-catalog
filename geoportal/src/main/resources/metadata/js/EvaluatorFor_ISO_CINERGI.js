@@ -34,14 +34,41 @@ G.evaluators.cinergi = {
 
         /* general */
         G.evalProp(task, item, root, "fileid", "gmd:fileIdentifier/gco:CharacterString");
-        G.evalProp(task, item, iden, "title", "gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString");
-        G.evalProp(task, item, iden, "description", "gmd:abstract/gco:CharacterString");
-        G.evalProps(task, item, root, "keywords_s", "//gmd:MD_TopicCategoryCode | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gmx:Anchor");
-        G.evalProps(task, item, root, "links_s", "//gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
-        G.evalProp(task, item, iden, "thumbnail_s", "gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString");
-        G.evalProps(task, item, root, "contact_organizations_s", "//gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString");
-        G.evalProps(task, item, root, "contact_people_s", "//gmd:CI_ResponsibleParty/gmd:individualName/gco:CharacterString");
+		
+	/* get title and alternateTitle */
+		G.evalProp(task,item,iden,"title","gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString | gmd:citation/gmd:CI_Citation/gmd:alternateTitle/gco:CharacterString");
+		
+	/*    G.evalProp(task,item,iden,"description","gmd:abstract/gco:CharacterString");
+			get abstract and other citation details */
+		G.evalProp(task,item,iden,"description","gmd:abstract/gco:CharacterString | gmd:citation/gmd:CI_Citation/gmd:otherCitationDetails[not(contains(gco:CharacterString,'elated publications'))]/gco:CharacterString");
+		
+	/* get any child text under gmd:keyword--CharacterString, Anchor etc. Same as apiso_Subject_txt*/
+		G.evalProps(task,item,root,"keywords_s","//gmd:MD_TopicCategoryCode | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/*/text()");
+		
+		G.evalProp(task, item, iden, "thumbnail_s", "gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString");	
+			
+			
+	/* include position name for individual, leave out 'missing', get only pointOf contact */
+		G.evalProps(task,item,root,"contact_people_s","//gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='pointOfContact']/gmd:individualName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString | //gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='pointOfContact']/gmd:positionName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+		
+	/* these are the points of contacts, for metadata, the resource, or distribution; no distinction made */
+		G.evalProps(task,item,root,"contact_organizations_s","//gmd:CI_RoleCode[contains(text(),'ontact') or contains(@codeListValue, 'ontact')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
 
+	/* ResponsibleParty who have role author, principal (or principle) Investigator, originator 
+	filter for responsible party in identification/citation	*/
+		G.evalProps(task, item, iden, "cited_individual_s", "gmd:citation//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'rincip')]/../../gmd:individualName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+		G.evalProps(task, item, iden, "cited_organization_s", "gmd:citation//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'rincip')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+
+	/* to generate facet for place names */
+		G.evalProps(task, item, root, "place_keywords_s", "//gmd:MD_KeywordTypeCode[contains(@codeListValue,'lace')]/../../gmd:keyword/*/text() | gmd:geographicIdentifier//gmd:code/gco:CharacterString");
+   
+	/* facet for all non-CINERGI controlled keywords, except place */ 
+		G.evalProps(task, item, root, "tags_s", "//gmd:MD_Keywords[not(descendant::*[contains(text(),'Cinergi')]) and //gmd:MD_KeywordTypeCode[not(contains(@codeListValue,'lace') )]]/gmd:keyword/*/text()");
+
+		G.evalProps(task, item, root, "distribution_links_s", "//gmd:distributionInfo//gmd:MD_DigitalTransferOptions//gmd:linkage/gmd:URL | //gmd:aggregationInfo//gmd:code[starts-with(gco:CharacterString/text(),'http')]/gco:CharacterString");
+
+
+ /* APISO elements */
         /* identification */
         G.evalProp(task, item, root, "apiso_Identifier_s", "gmd:fileIdentifier/gco:CharacterString");
         G.evalProp(task, item, root, "apiso_ParentIdentifier_s", "gmd:parentIdentifier/gco:CharacterString");
@@ -50,18 +77,31 @@ G.evaluators.cinergi = {
         G.evalProp(task, item, iden, "apiso_Abstract_txt", "gmd:abstract/gco:CharacterString");
         G.evalProp(task, item, iden, "apiso_BrowseGraphic_s", "gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString");
         G.evalProp(task, item, root, "apiso_OrganizationName_txt", "gmd:contact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString");
+		
+		/*Resource identifier */
+		G.evalProp(task,item,root,"apiso_ResourceIdentifier_s",	"//gmd:dataSetURI/*/text() |  //gmd:identificationInfo//gmd:citation//gmd:identifier//gmd:code/*/text()");
 
         /* subject */
-        G.evalProps(task, item, root, "apiso_Subject_txt", "//gmd:MD_TopicCategoryCode | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gmx:Anchor");
-        G.evalProps(task, item, root, "apiso_Format_s", "gmd:distributionInfo/gmd:MD_Distribution/gmd:distributionFormat/gmd:MD_Format/name/gco:CharacterString");
+        G.evalProps(task, item, root, "apiso_Subject_txt", "//gmd:MD_TopicCategoryCode | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/*/text()");
+		
+		
+       /* G.evalProps(task, item, root, "apiso_Format_s", "gmd:distributionInfo/gmd:MD_Distribution/gmd:distributionFormat/gmd:MD_Format/name/gco:CharacterString");  */
+		/*Format-- pick up all format name element values */
+		G.evalProps(task, item, root, "apiso_Format_s", "//gmd:MD_Format/gmd:name/*/text()");
+		
         G.evalProps(task, item, root, "apiso_TopicCategory_s", "//gmd:MD_TopicCategoryCode");
         G.evalProps(task, item, root, "apiso_KeywordType_s", "//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:type/gmd:MD_KeywordTypeCode/@codeListValue");
         G.evalCode(task, item, root, "apiso_Type_s", "gmd:hierarchyLevel/gmd:MD_ScopeCode");
 
         /* dates */
+		/*metadata modified */
         G.evalDate(task, item, root, "apiso_Modified_dt", "gmd:dateStamp/gco:Date | gmd:dateStamp/gco:DateTime");
+		
+		/*resource creation */
         G.evalDate(task, item, iden, "apiso_CreationDate_dt", "gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date[../../gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='creation'] | gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:DateTime[../../gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='creation']");
+		/*resource revision */
         G.evalDate(task, item, iden, "apiso_RevisionDate_dt", "gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date[../../gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='revision'] | gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:DateTime[../../gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='revision']");
+		/*resource publication */
         G.evalDate(task, item, iden, "apiso_PublicationDate_dt", "gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date[../../gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='publication'] | gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:DateTime[../../gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='publication']");
 
         /* language */
@@ -230,12 +270,13 @@ G.evaluators.cinergi = {
          1) if keyword node ia an anchor, and citation title contains > then treat is as a hierachy
          //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString[contains(.,'>')]
          //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString[contains(.,'C')]/../../../../gmd:keyword
-         //| //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gmx:Anchor
+                   | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gmx:Anchor
          md_keywords: //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString[contains(.,'C')]/../../../..
+		 
          2) if the title of a keyword viaf put in oranization
          */
 
-
+//construct hierarchical category string with thesaurus name and anchor value
         G.forEachNode(task, root, "//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString[contains(.,'>')]/../../../../gmd:keyword", function (node) {
             var cat = G.getString(task, node, "../gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString") + ' > ';
             var name = G.getString(task, node, "gmx:Anchor");
@@ -429,6 +470,7 @@ G.evaluators.cinergi = {
             }
         });
     },
+	
     checkWorkbenchLink: function(url) {
         var endsWith = function(v,sfx) {return (v.indexOf(sfx,(v.length-sfx.length)) !== -1);};
 
@@ -488,6 +530,7 @@ G.evaluators.cinergi = {
             return {linkType:linkType,linkUrl:linkUrl};
         }
     },
+	
     _analyzeTimePeriod: function(task,params) {
         //print("analyzeTimePeriod");
         if (!params) return;
@@ -543,6 +586,8 @@ G.evaluators.cinergi = {
             G.writeMultiProp(task.item,"timeperiod_nst",data);
         }
     },
+	
+	
     _limitDateRange: function(dateString){
         var validDate = true;
         if (dateString.startsWith("9999")) validDate = false;

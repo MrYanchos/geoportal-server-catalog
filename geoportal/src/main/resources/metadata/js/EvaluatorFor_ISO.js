@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
+ /*
+customizations by SMR 2018/08/15
+*/
 
 G.evaluators.iso = {
 
@@ -33,14 +37,45 @@ G.evaluators.iso = {
 
     /* general */
     G.evalProp(task,item,root,"fileid","gmd:fileIdentifier/gco:CharacterString");
-    G.evalProp(task,item,iden,"title","gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString");
-    G.evalProp(task,item,iden,"description","gmd:abstract/gco:CharacterString");
-    G.evalProps(task,item,root,"keywords_s","//gmd:MD_TopicCategoryCode | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gmx:Anchor");
+     /* get title and alternateTitle */
+    G.evalProp(task,item,iden,"title","gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString | gmd:citation/gmd:CI_Citation/gmd:alternateTitle/gco:CharacterString");
+	
+	    
+    /* 
+	    G.evalProp(task,item,iden,"description","gmd:abstract/gco:CharacterString");
+		get abstract and other citation details */
+    G.evalProp(task,item,iden,"description","gmd:abstract/gco:CharacterString | gmd:citation/gmd:CI_Citation/gmd:otherCitationDetails[not(contains(gco:CharacterString,'elated publications'))]/gco:CharacterString");
+	
+    /* get any child text under gmd:keyword--CharacterString, Anchor etc. */
+    G.evalProps(task,item,root,"keywords_s","//gmd:MD_TopicCategoryCode | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/*/text()");
+	
     G.evalProp(task,item,iden,"thumbnail_s","gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString");
-    G.evalProps(task,item,root,"contact_organizations_s","//gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString");
-    G.evalProps(task,item,root,"contact_people_s","//gmd:CI_ResponsibleParty/gmd:individualName/gco:CharacterString");
-    
-    /* links */
+	
+/* these are the points of contacts, for metadata, the resource, or distribution; no distinction made  */
+    G.evalProps(task,item,root,"contact_organizations_s","//gmd:CI_RoleCode[contains(text(),'ontact') or contains(@codeListValue, 'ontact')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+	
+/* include position name for individual, leave out 'missing', get only pointOf contact */
+    G.evalProps(task,item,root,"contact_people_s","//gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='pointOfContact']/gmd:individualName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString | //gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='pointOfContact']/gmd:positionName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+
+/* these ResponsibleParty who have role author, principal (or principle) Investigator, originator 
+filter for responsible party in identification/citation
+*/
+ G.evalProps(task, item, iden, "cited_individual_s", "gmd:citation//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'rincip')]/../../gmd:individualName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+ G.evalProps(task, item, iden, "cited_organization_s", "gmd:citation//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'rincip')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+
+/* to generate facet for place names */
+ G.evalProps(task, item, root, "place_keywords_s", "//gmd:MD_KeywordTypeCode[contains(@codeListValue,'lace')]/../../gmd:keyword/*/text() | gmd:geographicIdentifier//gmd:code/gco:CharacterString");
+ 
+ 
+/* facet for all non-CINERGI controlled keywords, except place */ 
+ 
+G.evalProps(task, item, root, "tags_s", "//gmd:MD_KeywordTypeCode[not(contains(@codeListValue,'lace') )]/../../gmd:keyword/*/text() | //gmd:MD_Keywords[not(gmd:type)]/gmd:keyword/*/text() |  //gmd:MD_KeywordTypeCode[text()='theme' or text()='']/../../gmd:keyword/*/text()");
+
+ G.evalProps(task, item, root, "distribution_links_s", "//gmd:distributionInfo//gmd:MD_DigitalTransferOptions//gmd:linkage/gmd:URL | //gmd:aggregationInfo//gmd:code[starts-with(gco:CharacterString/text(),'http')]/gco:CharacterString");
+
+
+
+ /* links */
     //G.evalProps(task,item,root,"links_s","//gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
     //G.evalProps(task,item,root,"links_s","//gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL | //srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL"); 
     G.evalProps(task,item,root,"links_s","//gmd:CI_OnlineResource/gmd:linkage/gmd:URL[not(ancestor::gmd:thesaurusName)]");    

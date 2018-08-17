@@ -30,31 +30,23 @@
           toField:'timeperiod_nst.end_dt',
           interval:'year',
           open:false,
-          label:'${i18n.search.criteria.timePeriod}'">
-        label:'Temporal Extent',
-        fieldsOperator: 'should'">
+          label:'Temporal Extent (slider)',
+          fieldsOperator: 'should'">
       </div>
-      <div data-dojo-type="app/search/TemporalFilter"
+      
+ <!--      <div data-dojo-type="app/search/TemporalFilter"
         data-dojo-props="
           field:'sys_modified_dt',
           interval:'day',
           open:false,
-          label:'${i18n.search.criteria.date}'">
-      </div>
-        <div data-dojo-type="app/search/TemporalFilter"
-             data-dojo-props="
-
-          field:'apiso_PublicationDate_dt',
-
-          interval:'year',
-          open:false,
-          label:'Publication Date',
-          fieldsOperator: 'must'">
-        </div>
+          label:'Metadata update date'">
+      </div>  -->
+      
+     
 
         <!-- e.g. field:'category_cat',label:'Category',props:{size:20,min_doc_count:500} (names in app.nls.resources.js)-->
 
-        <div data-dojo-type="app/search/HierarchyAggregation"
+<!--   <div data-dojo-type="app/search/HierarchyAggregation"
              data-dojo-props="field:'categories_cat',rootTerm:'Science Domain',
              label:'CINERGI Domain',props:{size:1000},
             extendedToolTip:'CINERGI Keywords for Science Domain'"
@@ -70,45 +62,61 @@
              label:'CINERGI Parameter',props:{size:1000}"
              style="font-weight: bold;">
         </div>
+  -->
 
-
-      <!--
-      <div data-dojo-type="app/search/NumericFilter"
-        data-dojo-props="
-          nestedPath:'timeperiod_nst',
-          field:'timeperiod_nst.begin_year_l',
-          interval:1000,
-          ticks:4,
-          places:0,
-          label:'Year (Paleo)'">
-      </div>
-      -->
-      <!--
-      <div data-dojo-type="app/search/DateFilter"
-        data-dojo-props="field:'sys_created_dt',interval:'day',allowHistogram:false,label:'Created'">
-      </div>
-      -->
     <!-- e.g. field:'keywords_s',label:'Keywords',props:{size:20,min_doc_count:500} -->
     <div data-dojo-type="app/search/TermsAggregation"
-         data-dojo-props="field:'keywords_s',label:'Original Keywords',props:{size:200}">
+         data-dojo-props="
+         field:'tags_s',
+         label:'Original Keywords',
+         props:{size:200},
+         tooltip: 'Keywords from source metadata'">
     </div>
+    
     <div data-dojo-type="app/search/TermsAggregation"
-         data-dojo-props="field:'contact_organizations_s',label:'${i18n.search.criteria.organizations}'">
+         data-dojo-props="
+         field:'contact_people_s',
+         label:'Cited individuals',
+         props:{size:2000,order:{_term:'asc'}},
+         tooltip: 'Author, Originator, Principal investigator'">
     </div>
+    
     <div data-dojo-type="app/search/TermsAggregation"
-         data-dojo-props="field:'contact_people_s',label:'People',props:{size:1000},
-            extendedToolTip:'People presently includes metadata publishers which bubble to the top of the list'">
+         data-dojo-props="
+         field:'cited_organization_s',
+         label:'Cited organization',
+         props:{size:2000,order:{_term:'asc'}},">
     </div>
-    <div data-dojo-type="app/search/TermsAggregation"
-         data-dojo-props="field:'apiso_TopicCategory_s',open:false,label:'Topic Category (ISO)' ">
-    </div>
+    
+ <div data-dojo-type="app/search/TermsAggregation"
+         data-dojo-props="
+         field:'place_keywords_s',
+         open:false,
+         props:{size:1000},
+         label:'Place keywords' ">
+    </div> 
+    
     <div data-dojo-type="app/search/HierarchyAggregation"
-         data-dojo-props="field:'hierarchies_cat',rootTerm:'Category',
-             label:'All CINERGI Facets',props:{size:1000},showRoot: false"
-         style="font-weight: bold;">
+         data-dojo-props="
+         field:'hierarchies_cat',
+         rootTerm:'Category',
+         label:'CINERGI facet keywords',
+         props:{size:1000,order:{_term:'asc'}},
+         showRoot: false,
+         tooltip: 'Keywords added by CINERGI keyword enhancer'">
     </div>
 
-    <div >Metadata Properties</div>
+    <div>Metadata Properties</div>
+    
+     <div data-dojo-type="app/search/TemporalFilter"
+             data-dojo-props="
+          field:'apiso_PublicationDate_dt',
+          interval:'year',
+          open:false,
+          label:'Publication Date',
+          fieldsOperator: 'must'">
+        </div>
+        
     <div data-dojo-type="app/search/TemporalFilter"
          data-dojo-props="
           field:'sys_modified_dt',
@@ -116,40 +124,29 @@
           open:false,
           label:'Metadata Added'">
     </div>
-    <!--
-     <div data-dojo-type="app/search/NumericFilter"
-       data-dojo-props="
-         nestedPath:'timeperiod_nst',
-         field:'timeperiod_nst.begin_year_l',
-         interval:1000,
-         ticks:4,
-         places:0,
-         label:'Year (Paleo)'">
-     </div>
-     -->
-    <!--
-    <div data-dojo-type="app/search/DateFilter"
-      data-dojo-props="field:'sys_created_dt',interval:'day',allowHistogram:false,label:'Created'">
-    </div>
-    -->
-    <!--   <div data-dojo-type="app/search/TermsAggregation"
-         data-dojo-props="field:'sys_owner_s',open:false,label:'${i18n.search.criteria.owner}'">
-       </div>
-       -->
-
-
 
       <div data-dojo-type="app/search/TermsAggregation"
-        data-dojo-props="field:'sys_metadatatype_s',label:'${i18n.search.criteria.metadataType}'">
+        data-dojo-props="
+        field:'sys_metadatatype_s',
+        label:'${i18n.search.criteria.metadataType}',
+        props:{size:20,order:{_term:'asc'}}">
       </div>
 
       <div data-dojo-type="app/search/TermsAggregation"
-        data-dojo-props="field:'src_source_name_s',label:'Metadata Collection',props:{size:200}"
-           style="font-weight: bold;">
+        data-dojo-props="
+        field:'src_source_name_s',
+        label:'Metadata Collection',
+        props:{size:200,order:{_term:'asc'}}">
       </div>
-      <div data-dojo-type="app/search/TermsAggregation"
-           data-dojo-props="field:'sys_owner_s',open:false,label:'Contributor'">
-      </div>
+<!--  <div data-dojo-type="app/search/TermsAggregation"
+           data-dojo-props="
+           field:'sys_owner_s',
+           open:false,
+           label:'Contributor',
+        	props:{size:200,order:{_term:'asc'}}">
+      </div> -->
+      
+ <!--  conditional display, not used by CINERGI -->     
       <div data-dojo-type="app/search/TermsAggregation"
         data-dojo-props="
           conditionallyDisabled: !AppContext.geoportal.supportsApprovalStatus,
@@ -169,6 +166,8 @@
           label:'${i18n.search.criteria.accessGroups}'">
       </div>  
     </div>
+    
+    
     <div class="g-search-pane-right">
       <div data-dojo-type="app/search/AppliedFilters" data-dojo-props="autoExpand:true"></div>
       <div data-dojo-type="app/search/ResultsPane"></div>
