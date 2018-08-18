@@ -54,13 +54,14 @@ G.evaluators.cinergi = {
 	/* these are the points of contacts, for metadata, the resource, or distribution; no distinction made */
 		G.evalProps(task,item,root,"contact_organizations_s","//gmd:CI_RoleCode[contains(text(),'ontact') or contains(@codeListValue, 'ontact')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
 
-	/* ResponsibleParty who have role author, principal (or principle) Investigator, originator 
-	filter for responsible party in identification/citation	*/
-		G.evalProps(task, item, iden, "cited_individual_s", "gmd:citation//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'rincip')]/../../gmd:individualName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
-		G.evalProps(task, item, iden, "cited_organization_s", "gmd:citation//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'rincip')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+	/* ResponsibleParty who have role author, creator, principal (or principle) Investigator, originator
+	filter for responsible party in identification; sometimes the author is put in identificationInformation
+		point of contact */
+		G.evalProps(task, item, iden, "cited_individual_s", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:individualName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+		G.evalProps(task, item, iden, "cited_organization_s", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
 
 	/* to generate facet for place names */
-		G.evalProps(task, item, root, "place_keywords_s", "//gmd:MD_KeywordTypeCode[contains(@codeListValue,'lace')]/../../gmd:keyword/*/text() | gmd:geographicIdentifier//gmd:code/gco:CharacterString");
+		G.evalProps(task, item, root, "place_keywords_s", "//gmd:MD_KeywordTypeCode[contains(@codeListValue,'lace')]/../../gmd:keyword/*/text() | //gmd:geographicIdentifier//gmd:code/*/text()");
    
 	/* facet for all non-CINERGI controlled keywords, except place */ 
 		G.evalProps(task, item, root, "tags_s", "//gmd:MD_Keywords[not(descendant::*[contains(text(),'Cinergi')]) and //gmd:MD_KeywordTypeCode[not(contains(@codeListValue,'lace') )]]/gmd:keyword/*/text()");
