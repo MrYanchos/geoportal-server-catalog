@@ -40,9 +40,11 @@ G._metadataTypes =  {
 //      xsdLocation: "https://www.ngdc.noaa.gov/metadata/published/xsd/schema.xsd",
 //     schematronXslt: null
 },
+
+//smr change to cinergi evaluator so all ISO processing is consistent
   "iso19115": {
     key: "iso19115",
-    evaluator: G.evaluators.iso,
+    evaluator: G.evaluators.cinergi,
     interrogationXPath: "/gmd:MD_Metadata",
     identifier: "http://www.isotc211.org/2005/gmd",
     detailsXslt: "metadata/details/iso-details/ISO19139ToHTMLwMap.xsl",
@@ -87,8 +89,7 @@ G._metadataTypes =  {
         interrogationXPath: "/oai_dc:dc/dc:title",
         identifier: "http://www.openarchives.org/OAI/2.0/oai_dc/",
         //detailsXslt: "metadata/details/rdf-details.xslt",
-
-    toKnownXslt: "metadata/xslt/qualifiedDCToISO19139v1.0.xslt"
+        toKnownXslt: "metadata/xslt/qualifiedDCToISO19139v1.0.xslt"
     }
 };
 
