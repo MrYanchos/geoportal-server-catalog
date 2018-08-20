@@ -13,9 +13,18 @@
  * limitations under the License.
  */
 
+ /*
+ SMR 2018-08-18 update xpaths as noted in comments,
+    add index key for place keywords
+    add index key for cited individual and organization (author, originator, creator
+	remove some commented out code in evalWorkbenchLinks; 
+	add SV_Operations in evalResourceLinks and distribution_links_s; 
+	update version to v1.2.cinergi
+ */
+
 G.evaluators.cinergi = {
 
-    version: "iso.v1.cinergi",
+    version: "iso.v1.2.cinergi",
 
     evaluate: function (task) {
         this.evalBase(task);
@@ -66,7 +75,7 @@ G.evaluators.cinergi = {
 	/* facet for all non-CINERGI controlled keywords, except place */ 
 		G.evalProps(task, item, root, "tags_s", "//gmd:MD_Keywords[not(descendant::*[contains(text(),'Cinergi')]) and //gmd:MD_KeywordTypeCode[not(contains(@codeListValue,'lace') )]]/gmd:keyword/*/text()");
 
-		G.evalProps(task, item, root, "distribution_links_s", "//gmd:distributionInfo//gmd:MD_DigitalTransferOptions//gmd:linkage/gmd:URL | //gmd:aggregationInfo//gmd:code[starts-with(gco:CharacterString/text(),'http')]/gco:CharacterString");
+		G.evalProps(task, item, root, "distribution_links_s", "//gmd:distributionInfo//gmd:MD_DigitalTransferOptions//gmd:linkage/gmd:URL | gmd:identificationInfo//srv:SV_OperationMetadata//gmd:linkage/gmd:URL | //gmd:aggregationInfo//gmd:code[starts-with(gco:CharacterString/text(),'http')]/gco:CharacterString");
 
 
  /* APISO elements */
@@ -155,9 +164,10 @@ G.evaluators.cinergi = {
         G.evalProps(task, item, root, "apiso_OperatesOnName_s", "//gmd:identificationInfo/srv:SV_ServiceIdentification/srv:coupledResource/srv:SV_CoupledResource/srv:operationName");
         G.evalProps(task, item, root, "apiso_CouplingType_s", "//gmd:identificationInfo/srv:SV_ServiceIdentification/srv:couplingType/srv:SV_CouplingType/@codeListValue");
 
-        G.evalResourceLinks(task, item, root, "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL | gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
-        this.evalResourceLinks(task, item, root, "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL | gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
+       // G.evalResourceLinks(task, item, root, "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL | gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
+        this.evalResourceLinks(task, item, root, "gmd:distributionInfo//gmd:MD_DigitalTransferOptions//gmd:linkage/gmd:URL | gmd:identificationInfo//srv:SV_OperationMetadata//gmd:linkage/gmd:URL");
         this.evalWorkbenchLinks(task, item, root, "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine");
+        this.evalDistributionLinks(task, item, root, "gmd:distributionInfo//gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource | gmd:identificationInfo//srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource");
     },
 
     evalSpatial: function (task) {
@@ -439,38 +449,25 @@ G.evaluators.cinergi = {
     },
     // //gmd:transferOptions
     evalWorkbenchLinks: function(task,item,root,xpathExpression) {
-        if (!root) return;
-        var self = this, urls = [], name = "services_nst";
-       // print(xpathExpression);
-        G.forEachNode(task,root,xpathExpression,function(node){
-            //CUAHSI WaterOneFlow SOAP service
-            // /gmd:MD_Metadata/gmd:distributionInfo[1]/gmd:MD_Distribution[1]/gmd:distributionFormat[1]/gmd:MD_Format[1]/gmd:name[1]/gco:CharacterString[1]
-         //   print (node);
-            var linkName = G.getString(task, node,"../../../gmd:distributionFormat/gmd:MD_Format/gmd:name/gco:CharacterString");
-           // print(name);
-            // /gmd:MD_Metadata/gmd:distributionInfo[1]/gmd:MD_Distribution[1]/gmd:transferOptions[1]/gmd:MD_DigitalTransferOptions[1]/gmd:onLine[1]/gmd:CI_OnlineResource[1]/gmd:linkage[1]/gmd:URL[1]
-
-            var url = G.getString(task, node,"gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
-           // print ("url"+ url);
-            // /gmd:MD_Metadata/gmd:distributionInfo[1]/gmd:MD_Distribution[1]/gmd:transferOptions[1]/gmd:MD_DigitalTransferOptions[1]/gmd:onLine[1]/gmd:CI_OnlineResource[1]/gmd:name[1]/gco:CharacterString[1]
-
-             var type = G.getString(task, node,"gmd:CI_OnlineResource/gmd:name/gco:CharacterString");
-           // print("type" + type);
-            //var info = self.checkResourceLink(url);
-            // /gmd:MD_Metadata/gmd:distributionInfo[1]/gmd:MD_Distribution[1]/gmd:transferOptions[1]/gmd:MD_DigitalTransferOptions[1]/gmd:onLine[1]/gmd:CI_OnlineResource[1]
-
-            if (linkName && url && type) {
-                if (urls.indexOf(url) === -1) {
-                    urls.push(url);
-                    G.writeMultiProp(item,name,{
-                        "url_s": url,
-                        "url_type_s": type,
-                        "url_name_s": linkName
-                    });
-                }
-            }
-        });
-    },
+              if (!root) return;
+              var self = this, urls = [], name = "services_nst";
+             // print(xpathExpression);
+              G.forEachNode(task,root,xpathExpression,function(node){
+                  var linkName = G.getString(task, node,"../../../gmd:distributionFormat/gmd:MD_Format/gmd:name/gco:CharacterString");
+                  var url = G.getString(task, node,"gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
+                  var type = G.getString(task, node,"gmd:CI_OnlineResource/gmd:name/gco:CharacterString");
+                  if (linkName && url && type) {
+                      if (urls.indexOf(url) === -1) {
+                          urls.push(url);
+                          G.writeMultiProp(item,name,{
+                              "url_s": url,
+                              "url_type_s": type,
+                              "url_name_s": linkName
+                          });
+                      }
+                  }
+              });
+          },
 	
     checkWorkbenchLink: function(url) {
         var endsWith = function(v,sfx) {return (v.indexOf(sfx,(v.length-sfx.length)) !== -1);};
@@ -530,6 +527,49 @@ G.evaluators.cinergi = {
         if (linkType !== null && (isHttp || isFtp)) {
             return {linkType:linkType,linkUrl:linkUrl};
         }
+    },
+
+    evalDistributionLinks: function(task,item,root,xpathExpression) {
+    //root is a CI_OnlineResource
+        if (!root) return;
+        var self = this, urls = [], name = "dist_link_nst";
+       // print(xpathExpression);
+        G.forEachNode(task,root,xpathExpression,function(node){
+            var linkName = G.getString(task, node,"gmd:name/*/text()");
+            if (linkName == undefined) {
+                linkName = "link";
+                }
+            var url = G.getString(task, node,"gmd:linkage/gmd:URL");
+            var funct = G.getString(task, node,"gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue");
+            if (funct == undefined) {
+                funct = "";
+                }
+            var appProfile = G.getString(task, node,"gmd:applicationProfile/*/text()");
+            if (appProfile == undefined) {
+                appProfile = "";
+                }
+            var description = G.getString(task, node,"gmd:description/*/text()");
+            if (description == undefined) {
+                description = "";
+                }
+            var protocol = G.getString(task, node,"gmd:protocol/*/text()");
+            if (protocol == undefined) {
+                protocol = "";
+                }
+            if (linkName && url) {
+                if (urls.indexOf(url) === -1) {
+                    urls.push(url);
+                    G.writeMultiProp(item,name,{
+                        "url_s": url,
+                        "url_name_s": linkName,
+                        "url_appprof_s": appProfile,
+                        "url_function_s": funct,
+                        "url_protocol_s": protocol,
+                        "url_desc_s": description
+                    });
+                }
+            }
+        });
     },
 	
     _analyzeTimePeriod: function(task,params) {
