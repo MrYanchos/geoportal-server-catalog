@@ -1,5 +1,12 @@
 <div data-dojo-attach-point="contentNode">
-  <div class="g-search-pane" data-dojo-type="app/search/SearchPane">
+
+    <!-- Change Log:
+SMR 2018-08-18  rearrange facets, sort several of them alphabetically
+NOte-- don't put comment at start of template
+https://stackoverflow.com/questions/13883902/dijit-why-am-i-getting-an-uncaught-error-invalid-template
+-->
+
+    <div class="g-search-pane" data-dojo-type="app/search/SearchPane">
     <div class="g-search-pane-left">
       <div data-dojo-type="app/search/PageUrlFilter"></div>
       <div data-dojo-type="app/search/SearchBox"></div>
@@ -33,96 +40,66 @@
           label:'Temporal Extent (slider)',
           fieldsOperator: 'should'">
       </div>
-      
- <!--      <div data-dojo-type="app/search/TemporalFilter"
-        data-dojo-props="
-          field:'sys_modified_dt',
-          interval:'day',
-          open:false,
-          label:'Metadata update date'">
-      </div>  -->
-      
-     
-
-        <!-- e.g. field:'category_cat',label:'Category',props:{size:20,min_doc_count:500} (names in app.nls.resources.js)-->
-
-<!--   <div data-dojo-type="app/search/HierarchyAggregation"
-             data-dojo-props="field:'categories_cat',rootTerm:'Science Domain',
-             label:'CINERGI Domain',props:{size:1000},
-            extendedToolTip:'CINERGI Keywords for Science Domain'"
-        style="font-weight: bold;">
-        </div>
-        <div data-dojo-type="app/search/HierarchyAggregation"
-             data-dojo-props="field:'categories_cat',rootTerm:'Material',
-             label:'CINERGI Material',props:{size:1000},showRoot: false"
-             style="font-weight: bold;">
-        </div>
-        <div data-dojo-type="app/search/HierarchyAggregation"
-             data-dojo-props="field:'categories_cat',rootTerm:'Property',
-             label:'CINERGI Parameter',props:{size:1000}"
-             style="font-weight: bold;">
-        </div>
-  -->
 
     <!-- e.g. field:'keywords_s',label:'Keywords',props:{size:20,min_doc_count:500} -->
-    <div data-dojo-type="app/search/TermsAggregation"
-         data-dojo-props="
-         field:'tags_s',
-         label:'Original Keywords',
-         props:{size:200},
-         tooltip: 'Keywords from source metadata'">
-    </div>
-    
-    <div data-dojo-type="app/search/TermsAggregation"
-         data-dojo-props="
-         field:'contact_people_s',
-         label:'Cited individuals',
-         props:{size:2000,order:{_term:'asc'}},
-         tooltip: 'Author, Originator, Principal investigator'">
-    </div>
-    
-    <div data-dojo-type="app/search/TermsAggregation"
-         data-dojo-props="
-         field:'cited_organization_s',
-         label:'Cited organization',
-         props:{size:2000,order:{_term:'asc'}},">
-    </div>
-    
- <div data-dojo-type="app/search/TermsAggregation"
-         data-dojo-props="
-         field:'place_keywords_s',
-         open:false,
-         props:{size:1000},
-         label:'Place keywords' ">
-    </div> 
-    
-    <div data-dojo-type="app/search/HierarchyAggregation"
-         data-dojo-props="
-         field:'hierarchies_cat',
-         rootTerm:'Category',
-         label:'CINERGI facet keywords',
-         props:{size:1000,order:{_term:'asc'}},
-         showRoot: false,
-         tooltip: 'Keywords added by CINERGI keyword enhancer'">
-    </div>
+      <div data-dojo-type="app/search/TermsAggregation"
+             data-dojo-props="
+             field:'tags_s',
+             label:'Original Keywords',
+             props:{size:200},
+             tooltip: 'Keywords from source metadata'">
+        </div>
 
-    <div>Metadata Properties</div>
+      <div data-dojo-type="app/search/TermsAggregation"
+             data-dojo-props="
+             field:'cited_individual_s',
+             label:'Cited individual',
+             props:{size:2000,order:{_term:'asc'}},
+             tooltip: 'Author, Originator, Principal investigator'">
+        </div>
+
+      <div data-dojo-type="app/search/TermsAggregation"
+             data-dojo-props="
+             field:'cited_organization_s',
+             label:'Cited organization',
+             props:{size:2000,order:{_term:'asc'}},">
+        </div>
+
+      <div data-dojo-type="app/search/TermsAggregation"
+             data-dojo-props="
+             field:'place_keywords_s',
+             open:false,
+             props:{size:1000},
+             label:'Place keywords' ">
+        </div>
+
+      <div data-dojo-type="app/search/HierarchyAggregation"
+             data-dojo-props="
+             field:'hierarchies_cat',
+             rootTerm:'Category',
+             label:'CINERGI facet keywords',
+             props:{size:1000,order:{_term:'asc'}},
+             showRoot: false,
+             tooltip: 'Keywords added by CINERGI keyword enhancer'">
+        </div>
+
+      <div>Metadata Properties</div>
     
-     <div data-dojo-type="app/search/TemporalFilter"
+      <div data-dojo-type="app/search/TemporalFilter"
              data-dojo-props="
           field:'apiso_PublicationDate_dt',
           interval:'year',
           open:false,
           label:'Publication Date',
           fieldsOperator: 'must'">
-        </div>
+     </div>
         
-    <div data-dojo-type="app/search/TemporalFilter"
+      <div data-dojo-type="app/search/TemporalFilter"
          data-dojo-props="
           field:'sys_modified_dt',
           interval:'day',
           open:false,
-          label:'Metadata Added'">
+          label:'Metadata Updated'">
     </div>
 
       <div data-dojo-type="app/search/TermsAggregation"
