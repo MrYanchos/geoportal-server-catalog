@@ -5,9 +5,10 @@
 	    <li class="nav-item active">
 	      <a class="nav-link" href="#searchPanel" data-toggle="tab">${i18n.nav.search} <span class="sr-only">(current)</span></a>
 	    </li>
-	    <li class="nav-item">
+<!--	    <li class="nav-item">
 	      <a class="nav-link" href="#mapPanel" data-toggle="tab">${i18n.nav.map}</a>
 	    </li>
+-->
 		  <li class="nav-item">
 			  <a class="nav-link" href="#contributePanel" data-toggle="tab">Contribute</a>
 		  </li>
@@ -18,14 +19,23 @@
 	  
 	  <div class="g-tools pull-right">
 	    <span class="g-username" data-dojo-attach-point="usernameNode"></span>
-	    <a class="g-signin" href="#"
+<!--	    <a class="g-signin" href="#"
 	      data-dojo-attach-point="signInNode" 
 	      data-dojo-attach-event="onclick: signInClicked"
 	      >${i18n.nav.signIn}</a>
+-->
 		  <div id="idAppDropdown" class="dropdown pull-right g-options">
 		    <a href="#" class="dropdown-toggle" data-toggle="dropdown"
 		      ><span class="glyphicon glyphicon-menu-hamburger"></span></a>
 	      <ul class="dropdown-menu">
+<!-- SMR 2018-08-20 move sign in link into the menu-hamburger -->
+			  <li  data-dojo-attach-point="signInNode">
+				  <a href="#" class="g-signin" data-dojo-attach-event="onclick: signInClicked">
+					  ${i18n.nav.signIn}
+				  </a>
+			  </li>
+			  <!--  end sign in fix -->
+
 	         <li class="divider"></li>
            <li data-role="publisher" data-dojo-attach-point="createMetadataNode">
              <a href="#" class="small" data-dojo-attach-event="onclick: createMetadataClicked">
