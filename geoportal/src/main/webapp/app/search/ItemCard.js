@@ -11,7 +11,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+
+  Change log
+  SMR2018-08-18
+  uniqueLinks looks at distribution_links_s
  */
+
 define(["dojo/_base/declare",
   "dojo/_base/lang",
   "dojo/_base/array",
@@ -268,12 +273,12 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
         var htmlNode = domConstruct.create("a",{
           href: uri+"/html",
           target: "_blank",
-          innerHTML: i18n.item.actions.html
+          innerHTML: "Full metadata record"
         },actionsNode);
         var xmlNode = domConstruct.create("a",{
           href: uri+"/xml",
           target: "_blank",
-          innerHTML: i18n.item.actions.xml
+          innerHTML: "ISO XML"
         },actionsNode);
         var jsonNode = domConstruct.create("a",{
           href: uri+"?pretty=true",
@@ -294,7 +299,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
         }
       }
     },
-    
+
     _renderLinksDropdown: function(item,links) {
       if (links.length === 0) return;
       var dd = domConstruct.create("div",{
@@ -315,18 +320,48 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
       var ddul = domConstruct.create("ul",{
         "class": "dropdown-menu",
       },dd);
+
+     /*
+      use the dist_links_nst to get more link information
+      */
+      var dist_links=item.dist_link_nst;
+
+      function getdistname (url) {
+          //console.log("getdistname");
+          result="";
+          if (lang.isArray(dist_links)) {
+            array.forEach(dist_links, function(alink){
+               //console.log(alink);
+               if (typeof alink.url_s === "string" &&
+                        alink.url_s === url) {
+                   if (typeof alink.url_name_s === "string"){
+                        result = alink.url_name_s;
+                      }
+                    }
+               }
+            );
+          }
+          if (result === ""){
+            return url;
+            } else {
+            return result;
+            }
+      };
+
       array.forEach(links, function(u){
         var ddli = domConstruct.create("li",{},ddul);
+        thelabel = getdistname(u);
+
         domConstruct.create("a",{
           "class": "small",
           href: u,
           target: "_blank",
-          innerHTML: u
+          innerHTML: thelabel
         },ddli);
       });
       this._mitigateDropdownClip(dd,ddul);
     },
-    
+
     _renderOptionsDropdown: function(itemId,item) {
       var self = this;
       var isOwner = this._isOwner(item);
@@ -542,10 +577,11 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
     
     _uniqueLinks: function(item) {
       var links = [];
-      if (typeof item.links_s === "string") {
-        links = [item.links_s];
-      } else if (lang.isArray(item.links_s)) {
-        array.forEach(item.links_s, function(u){
+      //smr 2018-08-18 update to use distribution_links_s
+      if (typeof item.distribution_links_s === "string") {
+        links = [item.distribution_links_s];
+      } else if (lang.isArray(item.distribution_links_s)) {
+        array.forEach(item.distribution_links_s, function(u){
           if (links.indexOf(u) === -1) links.push(u);
         });
       }
@@ -676,7 +712,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
         }, actionsNode);
       }
     },
-      _renderSourceAndDate: function(item) {
+    _renderSourceAndDate: function(item) {
           var owner = item.src_source_name_s;
           var date = item.sys_modified_dt;
           var idx, text = "";
@@ -693,7 +729,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
               util.setNodeText(this.ownerAndDateNode,text);
           }
       },
-      _renderWorkbenchLinksDropdown: function(item,links) {
+    _renderWorkbenchLinksDropdown: function(item,links) {
           if ( ! Array.isArray(item.services_nst)) return;
           if( item.services_nst.length === 0) return;
           var dd = domConstruct.create("div",{
@@ -727,7 +763,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
           }
           this._mitigateDropdownClip(dd,ddul);
       },
-      _renderCinergiLinks: function(itemId,item) {
+    _renderCinergiLinks: function(itemId,item) {
           // if categories_cat exists, then these should exist
           if (item.categories_cat) {
 
@@ -760,7 +796,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
           }
 
       },
-      _renderSchemaOrg: function (item){
+    _renderSchemaOrg: function (item){
           var actionsNode = this.actionsNode;
           if (item.sys_metadatatype_s && item.sys_metadatatype_s.startsWith("iso19115") ) {
               var uri3 = "https://search.google.com/structured-data/testing-tool/u/0/#url=" +
@@ -773,7 +809,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
               }, actionsNode);
           }
       },
-      _renderDescription: function (item, highlight) {
+    _renderDescription: function (item, highlight) {
           var desc = item.description;
           if (desc && desc.indexOf("REQUIRED FIELD") > -1 ) {
               desc = "";
@@ -789,7 +825,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
            else {util.setNodeText(this.descriptionNode,desc);}
 
       },
-      _renderTitle: function (item, highlight) {
+    _renderTitle: function (item, highlight) {
           var title = item.title;
           if (typeof highlight != "undefined" ) {
 
