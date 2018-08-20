@@ -340,6 +340,13 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                     }
                }
             );
+          } else if (lang.isObject(dist_links)) {
+            if (typeof dist_links.url_s === "string" &&
+                  dist_links.url_s === url) {
+             if (typeof dist_links.url_name_s === "string"){
+                  result = dist_links.url_name_s;
+                }
+              };
           }
           if (result === ""){
             return url;
