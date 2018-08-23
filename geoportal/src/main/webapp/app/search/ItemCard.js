@@ -874,34 +874,49 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
               }, actionsNode);
           }
       },
+      /*
 
-    _renderDescription: function (item, highlight) {
+           DVW 2018-80-23 Restore Logic to allow for highlighting of HTML.
+           */
+      _renderDescription: function (item, highlight) {
           var desc = item.description;
-
-          if (typeof highlight != "undefined"
-             && typeof highlight.description != "undefined"
-             && highlight.description.length > 0){
-              desc = highlight.description;
-          } else if (typeof desc === "undefined"
-             || desc.indexOf("REQUIRED FIELD") > -1
-             || desc.length === 0) {
-               desc = "No abstract provided";
+          if (desc && desc.indexOf("REQUIRED FIELD") > -1 ) {
+              desc = "";
           }
-          util.setNodeText(this.descriptionNode,desc);
+          if (typeof highlight != "undefined" ) {
+
+              if (typeof highlight.description != "undefined") {
+
+                  desc = highlight.description;
+                  util.setNodeHtml(this.descriptionNode, desc);
+              } else {
+                  util.setNodeText(this.descriptionNode,desc);
+              }
+          } else {util.setNodeText(this.descriptionNode,desc);}
+
       },
       /*
       SMR 2018-08-20 adjust logic to always render something
+      DVW 2018-80-23 Restore Logic to allow for highlighting of HTML.
       */
-    _renderTitle: function (item, highlight) {
+      _renderTitle: function (item, highlight) {
           var title = item.title;
-          if (typeof title === "undefined"){
-            title = "Title not provided";
-          } else {
-            if (typeof highlight != "undefined" && typeof highlight.title != "undefined"){
-                  title = highlight.title;
-            };
+          if (!title || 0 === title.length){
+            title = "Title Not Provided. Identifier: " + item._id;
           }
-          util.setNodeText(this.titleNode,title);
+          if (typeof highlight != "undefined") {
+
+              if (typeof highlight.title != "undefined") {
+
+                  title = highlight.title;
+                  util.setNodeHtml(this.titleNode, title);
+              } else {
+                  util.setNodeText(this.titleNode,title);
+              }
+          } else
+          { util.setNodeText(this.titleNode,title);}
+
+
       },
   });
   

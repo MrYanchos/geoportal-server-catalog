@@ -108,7 +108,7 @@ public class MetadataCLI{
         try {
             context = new ClassPathXmlApplicationContext("config/cli-context.xml"
 
-                    ,"**/app-factory.xml"
+                    ,"**/cli-app-factory.xml"
                 );
             // parse the command line arguments
             CommandLine line = parser.parse(options, args);

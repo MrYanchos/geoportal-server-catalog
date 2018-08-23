@@ -23,8 +23,8 @@
 	</beans:bean>
 
 	<beans:bean id="elasticContext" class="com.esri.geoportal.lib.elastic.ElasticContext">
-		<beans:property name="clusterName" value="gptLocal" />
-		<beans:property name="indexName" value="metadatarev" />
+		<beans:property name="clusterName" value="${es_cluster:elasticsearch}" />
+		<beans:property name="indexName" value="metadata" />
 		<beans:property name="indexNameIsAlias" value="true" />
 		<beans:property name="autoCreateIndex" value="true" />
 		<beans:property name="allowFileId" value="false" />
@@ -49,7 +49,7 @@
 		<beans:property name="nodes">
 			<!-- The list of host names within the Elasticsearch cluster, one value element per host -->
 			<beans:list>
-				<beans:value>localhost</beans:value>
+				<beans:value>${es_node:localhost}</beans:value>
 			</beans:list>
 		</beans:property>
 	</beans:bean>
@@ -58,7 +58,7 @@
 		<beans:property name="nodes">
 			<!-- The list of host names within the Harvester cluster, one value element per host -->
 			<beans:list>
-				<beans:value>localhost</beans:value>
+				<beans:value>${harvester_node:}</beans:value>
 			</beans:list>
 		</beans:property>
 	</beans:bean>

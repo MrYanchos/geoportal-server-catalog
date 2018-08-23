@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<!--[if gt IE 8]><p> IE Not supported !<![endif]-->  
+<head>
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<!-- <script src="http://mdeditor.usgin.org/js/typeahead.bundle.js"></script> -->
+    <script src="./lib/typeahead.js"></script>
+    <!-- <script src="http://mdeditor.usgin.org/js/typeahead.bundle.js"></script> -->
+    <script src="./custom/bloodhound.js"></script>
+<style>
+tt-query, /* UPDATE: newer versions use tt-input instead of tt-query */
+.tt-hint {
+    width: 396px;
+    height: 16px;
+    padding: 2px 2px;
+    font-size: 12px;
+    line-height: 14px;
+    border: 2px solid #ccc;
+    border-radius: 2px;
+    outline: none;
+}
+
+.tt-query { /* UPDATE: newer versions use tt-input instead of tt-query */
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.tt-hint {
+    color: #999;
+}
+
+.tt-menu { /* UPDATE: newer versions use tt-menu instead of tt-dropdown-menu */
+    width: 422px;
+    margin-top: 2px;
+    padding: 2px 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+    box-shadow: 0 2px 2px rgba(0,0,0,.2);
+}
+
+.tt-suggestion {
+    padding: 3px 3px;
+    font-size: 12px;
+    line-height: 14px;
+}
+
+.tt-suggestion.tt-is-under-cursor { /* UPDATE: newer versions use .tt-suggestion.tt-cursor */
+    color: #fff;
+    background-color: #0097cf;
+
+}
+
+.tt-suggestion p {
+    margin: 0;
+}
+
+.typeahead container {
+        width: 300px;
+        margin: 5px auto;
+         font-family: arial, sans-serif;
+      }
+
+      .typeahead-wrapper {
+        color:#333333;
+        display: block;
+         background-color: #fff;
+         background: #f8f8f8;
+        margin: 5px 0;
+         font-family: arial, sans-serif;
+          font-size: 12px;
+      }
+
+      .tt-dropdown-menu {
+        color:#333333; 
+        background-color: #fff;
+         background: #f8f8f8;
+        border: 1px solid #000;
+        font-family: arial, sans-serif;
+        font-size: 14px;
+      }
+
+      .tt-suggestion.tt-cursor {
+        color:#333333;
+        background-color: #ccc;
+         background: #f8f8f8;
+         font-family: arial, sans-serif;
+         font-size: 14px;
+      }
+
+      .triggered-events {
+        color:#333333;
+          background-color: #ccc;
+        float: right;
+        width: 500px;
+        height: 300px;
+         font-family: arial, sans-serif;
+         font-size: 11px;
+      }
+
+      .typeahead-text {
+        color:#333333;
+          background-color: #ccc;
+           background: #f8f8f8;
+          width: 300px;
+      }
+      
+
+
+</style>
+</head>
+<script>
+
+	 $(document).ready(function() {
+		var dictUrl= "http://ec-scigraph.sdsc.edu:9000/scigraph/vocabulary/autocomplete/%QUERY?limit=20&searchSynonyms=false&searchAbbreviations=false&searchAcronyms=false&includeDeprecated=false";
+		var params = {"query": "%QUERY","limit":"20" };
+	 	
+		var taCol = new Bloodhound({
+              datumTokenizer: function(datum) {
+                return Bloodhound.tokenizers.whitespace(datum.value);
+              },
+              queryTokenizer: Bloodhound.tokenizers.whitespace,
+              remote: {
+                wildcard: params.query,
+                url: dictUrl,
+                prepare: function(query, settings) {
+                  gPre = query;
+                  taPick = false;
+                  var surl = settings.url.replace('%QUERY',query);
+                 
+                  settings.url = surl;
+                  return settings;
+                },
+                transform: function(response) {
+                   console.log(JSON.stringify(response));
+                  // Map the remote source JSON array to a JavaScript object array
+                  
+					if ( response.suggestions ) {
+						var mr = response.suggestions;
+					} else  { 
+						mr = response;
+					}
+
+					var zed = $.map(mr, function(taObj) {
+						console.log(JSON.stringify(taObj));
+						
+						if ( taObj.text ){
+								return {
+								   value: taObj.text,
+								   magicKey: taObj.magicKey
+								};
+				   
+						} else if ( typeof(taObj.concept) !== "undefined" && Array.isArray(taObj.concept.categories) ) {
+							
+							for (z = 0; z < taObj.concept.categories.length; z++) {
+								 return {
+								  uri: taObj.concept.uri,
+								  categories: taObj.concept.categories[z],
+								  value: taObj.completion
+								 };
+							 }
+							 
+				  
+						} else {                 
+							return {
+							  uri: taObj.concept.uri,
+							  categories: '',
+							  value: taObj.completion                
+							};
+						}
+					});
+					
+					return zed;
+               }
+              }    
+			});
+		
+		var taDone = function () {
+			// Instantiate the Typeahead UI
+			$('.typeahead-text').typeahead({ hint: true, highlight: true }, {
+			  displayKey: 'value',
+			  source: taCol,
+			  templates: { suggestion: function (data) {
+				  var conCat = '';
+		
+				  if ( data.categories ) {  
+					conCat = '<p><strong>' + data.value + '</strong></br>' + data.categories + '</br>' + data.uri + '</p>';
+				  } else {
+					 conCat = '<p><strong>' + data.value + '</strong></p>';
+				  }
+				  
+				  console.log('ta ' + JSON.stringify(conCat)); 
+				  return conCat;
+			  }}
+			}).on('typeahead:selected', function (obj, datum) {
+					taPick = true;
+					rexedit = datum.value;
+					if ( datum.magicKey ) {
+					  gBBMagicKey = datum.magicKey 
+					}   
+			   }).focus( function () {
+				 console.log('typeahead focus');
+			   });
+		};
+			
+		taDone();
+		  
+});	
+		 
+		  
+</script>						
+<body>
+<div class="typeahead container">
+<div class="typeahead-wrapper">
+<input class="typeahead-text" name="contentModel" type="text" placeholder="Term Typeahead" value="">
+</div></div>
+</body>

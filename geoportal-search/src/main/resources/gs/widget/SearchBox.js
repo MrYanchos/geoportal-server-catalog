@@ -33,6 +33,11 @@ function(declare, lang, on, keys, SearchComponent, template) {
           self.search();
         }
       }));
+        this.own(on(this.searchTextBox,"keyup",function(evt) {
+            if (evt.keyCode === keys.ENTER) {
+                self.search();
+            }
+        }));
     },
 
     searchButtonClicked: function() {
