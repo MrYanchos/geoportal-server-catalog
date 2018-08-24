@@ -165,9 +165,9 @@ G.evaluators.cinergi = {
         G.evalProps(task, item, root, "apiso_CouplingType_s", "//gmd:identificationInfo/srv:SV_ServiceIdentification/srv:couplingType/srv:SV_CouplingType/@codeListValue");
 
        // G.evalResourceLinks(task, item, root, "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL | gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
-        this.evalResourceLinks(task, item, root, "gmd:distributionInfo//gmd:MD_DigitalTransferOptions//gmd:linkage/gmd:URL | gmd:identificationInfo//srv:SV_OperationMetadata//gmd:linkage/gmd:URL");
+        this.evalResourceLinks(task, item, root, "gmd:distributionInfo/gmd:MD_DigitalTransferOptions/gmd:linkage/gmd:URL | gmd:identificationInfo/srv:SV_OperationMetadata//gmd:linkage/gmd:URL | gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource");
         this.evalWorkbenchLinks(task, item, root, "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine");
-        this.evalDistributionLinks(task, item, root, "gmd:distributionInfo//gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource | gmd:identificationInfo//srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource");
+        this.evalDistributionLinks(task, item, root, "gmd:distributionInfo/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource | gmd:identificationInfo/srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource | gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource ");
     },
 
     evalSpatial: function (task) {
