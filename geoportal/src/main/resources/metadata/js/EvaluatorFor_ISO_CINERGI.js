@@ -13,197 +13,115 @@
  * limitations under the License.
  */
 
- /*
- SMR 2018-08-18 update xpaths as noted in comments,
-    add index key for place keywords
-    add index key for cited individual and organization (author, originator, creator
-	remove some commented out code in evalWorkbenchLinks; 
-	add SV_Operations in evalResourceLinks and distribution_links_s; 
-	update version to v1.2.cinergi
- */
-
+/*
+SMR 2018-08-18 update xpaths as noted in comments,
+   add index key for place keywords
+   add index key for cited individual and organization (author, originator, creator
+   remove some commented out code in evalWorkbenchLinks;
+   add SV_Operations in evalResourceLinks and distribution_links_s;
+   update version to v1.2.cinergi
+*/
+/*
+dwv 2018-08-27 extend, from EvaluatorForISO.js
+   update version to v1.3.cinergi
+*/
 G.evaluators.cinergi = {
 
-    version: "iso.v1.2.cinergi",
+    version: "iso.v1.3.cinergi",
 
     evaluate: function (task) {
-        this.evalBase(task);
-        this.evalService(task);
-        this.evalSpatial(task);
-        this.evalTemporal(task);
-        this.evalInspire(task);
-        this.evalOther(task);
+        var metadataType = G._metadataTypes["iso19115base"];
+        if (metadataType && metadataType.evaluator) {
+            metadataType.evaluator.evaluate(task);
+        }
+
+        this.evalBaseCinergi(task);
+        this.evalServiceCinergi(task);
+ ;
+        this.evalTemporalCinergi(task);
+
         this.evalCinergi(task);
         this.evalCallHierarchy(task);
     },
 
-    evalBase: function (task) {
+    evalBaseCinergi: function (task) {
         var item = task.item, root = task.root;
         var iden = G.getNode(task, root, "gmd:identificationInfo/gmd:MD_DataIdentification | gmd:identificationInfo/srv:SV_ServiceIdentification");
 
-        /* general */
-        G.evalProp(task, item, root, "fileid", "gmd:fileIdentifier/gco:CharacterString");
-		
-	/* get title and alternateTitle */
-		G.evalProp(task,item,iden,"title","gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString | gmd:citation/gmd:CI_Citation/gmd:alternateTitle/gco:CharacterString");
-		
-	/*    G.evalProp(task,item,iden,"description","gmd:abstract/gco:CharacterString");
-			get abstract and other citation details */
-		G.evalProp(task,item,iden,"description","gmd:abstract/gco:CharacterString | gmd:citation/gmd:CI_Citation/gmd:otherCitationDetails[not(contains(gco:CharacterString,'elated publications'))]/gco:CharacterString");
-		
-	/* get any child text under gmd:keyword--CharacterString, Anchor etc. Same as apiso_Subject_txt*/
-		G.evalProps(task,item,root,"keywords_s","//gmd:MD_TopicCategoryCode | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/*/text()");
-		
-		G.evalProp(task, item, iden, "thumbnail_s", "gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString");	
-			
-			
-	/* include position name for individual, leave out 'missing', get only pointOf contact */
-		G.evalProps(task,item,root,"contact_people_s","//gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='pointOfContact']/gmd:individualName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString | //gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='pointOfContact']/gmd:positionName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
-		
-	/* these are the points of contacts, for metadata, the resource, or distribution; no distinction made */
-		G.evalProps(task,item,root,"contact_organizations_s","//gmd:CI_RoleCode[contains(text(),'ontact') or contains(@codeListValue, 'ontact')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+        /* get title and alternateTitle */
+        G.evalProp(task, item, iden, "title", "gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString | gmd:citation/gmd:CI_Citation/gmd:alternateTitle/gco:CharacterString");
 
-	/* ResponsibleParty who have role author, creator, principal (or principle) Investigator, originator
-	filter for responsible party in identification; sometimes the author is put in identificationInformation
-		point of contact */
-		G.evalProps(task, item, iden, "cited_individual_s", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:individualName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
-		G.evalProps(task, item, iden, "cited_organization_s", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+        /*    G.evalProp(task,item,iden,"description","gmd:abstract/gco:CharacterString");
+                get abstract and other citation details */
+        G.evalProp(task, item, iden, "description", "gmd:abstract/gco:CharacterString | gmd:citation/gmd:CI_Citation/gmd:otherCitationDetails[not(contains(gco:CharacterString,'elated publications'))]/gco:CharacterString");
 
-	/* to generate facet for place names */
-		G.evalProps(task, item, root, "place_keywords_s", "//gmd:MD_KeywordTypeCode[contains(@codeListValue,'lace')]/../../gmd:keyword/*/text() | //gmd:geographicIdentifier//gmd:code/*/text()");
-   
-	/* facet for all non-CINERGI controlled keywords, except place */ 
-		G.evalProps(task, item, root, "tags_s", "//gmd:MD_Keywords[not(descendant::*[contains(text(),'Cinergi')]) and //gmd:MD_KeywordTypeCode[not(contains(@codeListValue,'lace') )]]/gmd:keyword/*/text()");
-
-		G.evalProps(task, item, root, "distribution_links_s", "//gmd:distributionInfo//gmd:MD_DigitalTransferOptions//gmd:linkage/gmd:URL | gmd:identificationInfo//srv:SV_OperationMetadata//gmd:linkage/gmd:URL | //gmd:aggregationInfo//gmd:code[starts-with(gco:CharacterString/text(),'http')]/gco:CharacterString");
+        /* get any child text under gmd:keyword--CharacterString, Anchor etc. Same as apiso_Subject_txt*/
+        this.clearProps(task,"keywords_s");
+        G.evalProps(task, item, root, "keywords_s", "//gmd:MD_TopicCategoryCode | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/*/text()");
 
 
- /* APISO elements */
-        /* identification */
-        G.evalProp(task, item, root, "apiso_Identifier_s", "gmd:fileIdentifier/gco:CharacterString");
-        G.evalProp(task, item, root, "apiso_ParentIdentifier_s", "gmd:parentIdentifier/gco:CharacterString");
-        G.evalProp(task, item, iden, "apiso_Title_txt", "gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString");
-        G.evalProps(task, item, iden, "apiso_AlternateTitle_txt", "gmd:citation/gmd:CI_Citation/gmd:alternateTitle/gco:CharacterString");
-        G.evalProp(task, item, iden, "apiso_Abstract_txt", "gmd:abstract/gco:CharacterString");
-        G.evalProp(task, item, iden, "apiso_BrowseGraphic_s", "gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString");
-        G.evalProp(task, item, root, "apiso_OrganizationName_txt", "gmd:contact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString");
-		
-		/*Resource identifier */
-		G.evalProp(task,item,root,"apiso_ResourceIdentifier_s",	"//gmd:dataSetURI/*/text() |  //gmd:identificationInfo//gmd:citation//gmd:identifier//gmd:code/*/text()");
+        G.evalProp(task, item, iden, "thumbnail_s", "gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString");
+
+
+        /* include position name for individual, leave out 'missing', get only pointOf contact */
+        this.clearProps(task,"contact_people_s");
+        G.evalProps(task, item, root, "contact_people_s", "//gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='pointOfContact']/gmd:individualName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString | //gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='pointOfContact']/gmd:positionName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+
+        /* these are the points of contacts, for metadata, the resource, or distribution; no distinction made */
+        this.clearProps(task,"contact_organizations_s");
+        G.evalProps(task, item, root, "contact_organizations_s", "//gmd:CI_RoleCode[contains(text(),'ontact') or contains(@codeListValue, 'ontact')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+
+        /* ResponsibleParty who have role author, creator, principal (or principle) Investigator, originator
+        filter for responsible party in identification; sometimes the author is put in identificationInformation
+            point of contact */
+        this.clearProps(task,"cited_individual_s");
+        G.evalProps(task, item, iden, "cited_individual_s", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:individualName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+        this.clearProps(task,"cited_organization_s");
+        G.evalProps(task, item, iden, "cited_organization_s", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+
+        /* to generate facet for place names */
+        this.clearProps(task,"place_keywords_s");
+        G.evalProps(task, item, root, "place_keywords_s", "//gmd:MD_KeywordTypeCode[contains(@codeListValue,'lace')]/../../gmd:keyword/*/text() | //gmd:geographicIdentifier//gmd:code/*/text()");
+
+        /* facet for all non-CINERGI controlled keywords, except place */
+        this.clearProps(task,"tags_s");
+        G.evalProps(task, item, root, "tags_s", "//gmd:MD_Keywords[not(descendant::*[contains(text(),'Cinergi')]) and //gmd:MD_KeywordTypeCode[not(contains(@codeListValue,'lace') )]]/gmd:keyword/*/text()");
+
+        this.clearProps(task,"distribution_links_s");
+        G.evalProps(task, item, root, "distribution_links_s", "/gmd:distributionInfo//gmd:MD_DigitalTransferOptions//gmd:linkage/gmd:URL | gmd:identificationInfo//srv:SV_OperationMetadata//gmd:linkage/gmd:URL | //gmd:aggregationInfo//gmd:code[starts-with(gco:CharacterString/text(),'http')]/gco:CharacterString");
+
+
+        /*Resource identifier */
+        this.clearProps(task,"apiso_ResourceIdentifier_s");
+        G.evalProp(task, item, root, "apiso_ResourceIdentifier_s", "//gmd:dataSetURI/*/text() |  //gmd:identificationInfo//gmd:citation//gmd:identifier//gmd:code/*/text()");
 
         /* subject */
+        this.clearProps(task,"apiso_Subject_txt");
         G.evalProps(task, item, root, "apiso_Subject_txt", "//gmd:MD_TopicCategoryCode | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/*/text()");
-		
-		
-       /* G.evalProps(task, item, root, "apiso_Format_s", "gmd:distributionInfo/gmd:MD_Distribution/gmd:distributionFormat/gmd:MD_Format/name/gco:CharacterString");  */
-		/*Format-- pick up all format name element values */
-		G.evalProps(task, item, root, "apiso_Format_s", "//gmd:MD_Format/gmd:name/*/text()");
-		
-        G.evalProps(task, item, root, "apiso_TopicCategory_s", "//gmd:MD_TopicCategoryCode");
-        G.evalProps(task, item, root, "apiso_KeywordType_s", "//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:type/gmd:MD_KeywordTypeCode/@codeListValue");
-        G.evalCode(task, item, root, "apiso_Type_s", "gmd:hierarchyLevel/gmd:MD_ScopeCode");
 
-        /* dates */
-		/*metadata modified */
-        G.evalDate(task, item, root, "apiso_Modified_dt", "gmd:dateStamp/gco:Date | gmd:dateStamp/gco:DateTime");
-		
-		/*resource creation */
-        G.evalDate(task, item, iden, "apiso_CreationDate_dt", "gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date[../../gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='creation'] | gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:DateTime[../../gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='creation']");
-		/*resource revision */
-        G.evalDate(task, item, iden, "apiso_RevisionDate_dt", "gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date[../../gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='revision'] | gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:DateTime[../../gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='revision']");
-		/*resource publication */
-        G.evalDate(task, item, iden, "apiso_PublicationDate_dt", "gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date[../../gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='publication'] | gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:DateTime[../../gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='publication']");
 
-        /* language */
-        G.evalCode(task, item, root, "apiso_Language_s", "gmd:language/gmd:LanguageCode");
-        G.evalCode(task, item, iden, "apiso_ResourceLanguage_s", "gmd:language/gmd:LanguageCode");
+        /* G.evalProps(task, item, root, "apiso_Format_s", "gmd:distributionInfo/gmd:MD_Distribution/gmd:distributionFormat/gmd:MD_Format/name/gco:CharacterString");  */
+        /*Format-- pick up all format name element values */
+        this.clearProps(task,"apiso_Format_s");
+        G.evalProps(task, item, root, "apiso_Format_s", "//gmd:MD_Format/gmd:name/*/text()");
 
-        /* constraints */
-        G.evalProps(task, item, root, "apiso_AccessConstraints_s", "//gmd:resourceConstraints/gmd:MD_Constraints/gmd:useLimitation/gco:CharacterString");
-        G.evalProps(task, item, root, "apiso_OtherConstraints_s", "//gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints/gco:CharacterString");
-        G.evalProps(task, item, root, "apiso_Classification_s", "//gmd:resourceConstraints/gmd:MD_SecurityConstraints/gmd:classification/gmd:MD_ClassificationCode/@codeListValue");
-        G.writeProp(item, "apiso_HasSecurityConstraints_b", G.hasNode(task, root, "//gmd:resourceConstraints"));
+
     },
 
-    evalInspire: function (task) {
-        var item = task.item, root = task.root;
-        G.evalProps(task, item, root, "apiso_InspireSpatialDataThemes_s", "//gmd:title[gco:CharacterString='GEMET - INSPIRE themes, version 1.0']/../../../gmd:keyword/gco:CharacterString");
-        G.evalProps(task, item, root, "apiso_Degree_b", "//gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:pass/gco:Boolean");
-        G.evalProps(task, item, root, "apiso_Lineage_txt", "//gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:lineage/gmd:LI_Lineage/gmd:statement/gco:CharacterString");
-        G.evalProps(task, item, root, "apiso_ConditionApplyingToAccessAndUse_txt", "//gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints/gco:CharacterString");
-        G.evalCode(task, item, root, "apiso_ResponsiblePartyRole_txt", "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty/gmd:role/gmd:CI_RoleCode");
-        G.evalProps(task, item, root, "apiso_SpecificationTitle_txt", "//gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation/gmd:title/gco:CharacterString");
-        G.evalDates(task, item, root, "apiso_SpecificationDate_dt", "//gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/date/gco:Date");
-        G.evalProps(task, item, root, "apiso_SpecificationDateType_txt", "//gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue");
-    },
 
-    evalOther: function (task) {
+
+    evalServiceCinergi: function (task) {
         var item = task.item, root = task.root;
 
-        /* band */
-        G.evalProps(task, item, root, "apiso_mdband_name_s", "//gmd:MD_Band/gmd:sequenceIdentifier/gco:MemberName/gco:aName/gco:CharacterString");
-        G.evalProps(task, item, root, "apiso_mdband_attrtype_s", "//gmd:MD_Band/gmd:sequenceIdentifier/gco:MemberName/gco:attributeType/gco:TypeName/gco:aName/gco:CharacterString");
-        G.evalProps(task, item, root, "apiso_mdband_desc_s", "//gmd:MD_Band/gmd:descriptor/gco:CharacterString");
-        G.evalProps(task, item, root, "apiso_mdband_units_s", "//gmd:MD_Band/gmd:units/@xlink:href");
-
-        /* grid */
-        G.evalProps(task, item, root, "apiso_grid_dimensions_num_i", "//gmd:MD_GridSpatialRepresentation/gmd:numberOfDimensions/gco:Integer");
-        G.evalProps(task, item, root, "apiso_grid_dimension_name_s", "//gmd:MD_GridSpatialRepresentation/gmd:axisDimensionProperties/gmd:MD_Dimension/gco:Integer/gmd:dimensionName/gmd:MD_DimensionNameTypeCode");
-        G.evalProps(task, item, root, "apiso_grid_dimension_size_i", "//gmd:MD_GridSpatialRepresentation/gmd:axisDimensionProperties/gmd:MD_Dimension/gco:Integer/gmd:dimensionSize/gco:Integer");
-        G.evalProps(task, item, root, "apiso_grid_cell_geometry_s", "//gmd:MD_GridSpatialRepresentation/gmd:cellGeometry/gmd:MD_CellGeometryCode/@codeListValue");
-    },
-
-    evalService: function (task) {
-        var item = task.item, root = task.root;
-
-        G.evalProps(task, item, root, "apiso_ServiceType_s", "//gmd:identificationInfo/srv:SV_ServiceIdentification/srv:serviceType/gco:LocalName");
-        G.evalProps(task, item, root, "apiso_ServiceTypeVersion_s", "//gmd:identificationInfo/srv:SV_ServiceIdentification/srv:serviceTypeVersion/gco:CharacterString");
-        G.evalProps(task, item, root, "apiso_Operation_s", "//gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata/srv:operationName/gco:CharacterStrin");
-        G.evalProps(task, item, root, "apiso_OperatesOn_s", "//gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn/@uuidref | //gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn/@xlink:href");
-        G.evalProps(task, item, root, "apiso_OperatesOnIdentifier_s", "//gmd:identificationInfo/srv:SV_ServiceIdentification/srv:coupledResource/srv:SV_CoupledResource/srv:identifier");
-        G.evalProps(task, item, root, "apiso_OperatesOnName_s", "//gmd:identificationInfo/srv:SV_ServiceIdentification/srv:coupledResource/srv:SV_CoupledResource/srv:operationName");
-        G.evalProps(task, item, root, "apiso_CouplingType_s", "//gmd:identificationInfo/srv:SV_ServiceIdentification/srv:couplingType/srv:SV_CouplingType/@codeListValue");
-
-       // G.evalResourceLinks(task, item, root, "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL | gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
-        this.evalResourceLinks(task, item, root, "gmd:distributionInfo/gmd:MD_DigitalTransferOptions/gmd:linkage/gmd:URL | gmd:identificationInfo/srv:SV_OperationMetadata//gmd:linkage/gmd:URL | gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource");
+        // G.evalResourceLinks(task, item, root, "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL | gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
+        this.evalResourceLinks(task, item, root, "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL | gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
         this.evalWorkbenchLinks(task, item, root, "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine");
-        this.evalDistributionLinks(task, item, root, "gmd:distributionInfo/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource | gmd:identificationInfo/srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource | gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource ");
+        this.evalDistributionLinks(task, item, root, "gmd:distributionInfo//gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource | gmd:identificationInfo//srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource");
     },
 
-    evalSpatial: function (task) {
-        var item = task.item, root = task.root;
-        G.forEachNode(task, root, "//gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox", function (node) {
-            var xmin = G.Val.chkDbl(G.getString(task, node, "gmd:westBoundLongitude/gco:Decimal"), null);
-            var ymin = G.Val.chkDbl(G.getString(task, node, "gmd:southBoundLatitude/gco:Decimal"), null);
-            var xmax = G.Val.chkDbl(G.getString(task, node, "gmd:eastBoundLongitude/gco:Decimal"), null);
-            var ymax = G.Val.chkDbl(G.getString(task, node, "gmd:northBoundLatitude/gco:Decimal"), null);
-            //print("xmin="+xmin+ "ymin="+ymin+ "xmax="+xmax+ "ymax="+ymax);
-            var result = G.makeEnvelope(xmin, ymin, xmax, ymax);
-            if (result && result.envelope) {
-                G.writeMultiProp(task.item, "envelope_geo", result.envelope);
-                if (result.center) {
-                    G.writeMultiProp(task.item, "envelope_cen_pt", result.center);
-                }
-            }
-        });
-        G.forEachNode(task, root, "gmd:referenceSystemInfo/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier", function (node) {
-            var crsId = G.getString(task, node, "gmd:code/gco:CharacterString");
-            var crsAuth = G.getString(task, node, "gmd:authority/gmd:CI_Citation/gmd:title/gco:CharacterString");
-            var crsVer = G.getString(task, node, "gmd:version/gco:CharacterString");
-            if (crsId !== null && crsId.length > 0) {
-                var crs = {"id_s": crsId};
-                if (crsAuth !== null && crsAuth.length > 0) crs["authority_s"] = crsAuth;
-                if (crsVer !== null && crsVer.length > 0) crs["version_s"] = crsVer;
-                item["apiso_CRS"] = crs;
-            }
-        });
-        G.evalProps(task, item, root, "apiso_GeographicDescriptionCode_s", "//gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code");
-        G.evalProp(task, item, root, "apiso_Denominator_i", "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale/gmd:MD_RepresentativeFraction/gmd:denominator/gco:Integer");
-        G.evalProp(task, item, root, "apiso_DistanceValue_d", "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gmd:distance/gco:Distance");
-        G.evalProp(task, item, root, "apiso_DistanceUOM_s", "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gmd:distance/gco:Distance/@uom");
-    },
 
-    evalTemporal: function (task) {
+
+    evalTemporalCinergi: function (task) {
         var self = this;
         var item = task.item, root = task.root;
         G.forEachNode(task, root, "//gmd:EX_TemporalExtent/gmd:extent", function (node) {
@@ -360,7 +278,7 @@ G.evaluators.cinergi = {
 
         } catch (e) {
             print("INFO: Cinergi.ISO: No CINEGI hierarchy for:", fileid);
-          //  print(e.message);
+            //  print(e.message);
         }
         //G.forEachNode(task,root,"//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString[contains(.,'>')]/../../../../gmd:keyword",function(node){
         //  var cat = G.getString(task,node,"../gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString") + '>';
@@ -449,26 +367,26 @@ G.evaluators.cinergi = {
     },
     // //gmd:transferOptions
     evalWorkbenchLinks: function(task,item,root,xpathExpression) {
-              if (!root) return;
-              var self = this, urls = [], name = "services_nst";
-             // print(xpathExpression);
-              G.forEachNode(task,root,xpathExpression,function(node){
-                  var linkName = G.getString(task, node,"../../../gmd:distributionFormat/gmd:MD_Format/gmd:name/gco:CharacterString");
-                  var url = G.getString(task, node,"gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
-                  var type = G.getString(task, node,"gmd:CI_OnlineResource/gmd:name/gco:CharacterString");
-                  if (linkName && url && type) {
-                      if (urls.indexOf(url) === -1) {
-                          urls.push(url);
-                          G.writeMultiProp(item,name,{
-                              "url_s": url,
-                              "url_type_s": type,
-                              "url_name_s": linkName
-                          });
-                      }
-                  }
-              });
-          },
-	
+        if (!root) return;
+        var self = this, urls = [], name = "services_nst";
+        // print(xpathExpression);
+        G.forEachNode(task,root,xpathExpression,function(node){
+            var linkName = G.getString(task, node,"../../../gmd:distributionFormat/gmd:MD_Format/gmd:name/gco:CharacterString");
+            var url = G.getString(task, node,"gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
+            var type = G.getString(task, node,"gmd:CI_OnlineResource/gmd:name/gco:CharacterString");
+            if (linkName && url && type) {
+                if (urls.indexOf(url) === -1) {
+                    urls.push(url);
+                    G.writeMultiProp(item,name,{
+                        "url_s": url,
+                        "url_type_s": type,
+                        "url_name_s": linkName
+                    });
+                }
+            }
+        });
+    },
+
     checkWorkbenchLink: function(url) {
         var endsWith = function(v,sfx) {return (v.indexOf(sfx,(v.length-sfx.length)) !== -1);};
 
@@ -530,32 +448,32 @@ G.evaluators.cinergi = {
     },
 
     evalDistributionLinks: function(task,item,root,xpathExpression) {
-    //root is a CI_OnlineResource
+        //root is a CI_OnlineResource
         if (!root) return;
         var self = this, urls = [], name = "dist_link_nst";
-       // print(xpathExpression);
+        // print(xpathExpression);
         G.forEachNode(task,root,xpathExpression,function(node){
             var linkName = G.getString(task, node,"gmd:name/*/text()");
             if (linkName == undefined) {
                 linkName = "link";
-                }
+            }
             var url = G.getString(task, node,"gmd:linkage/gmd:URL");
             var funct = G.getString(task, node,"gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue");
             if (funct == undefined) {
                 funct = "";
-                }
+            }
             var appProfile = G.getString(task, node,"gmd:applicationProfile/*/text()");
             if (appProfile == undefined) {
                 appProfile = "";
-                }
+            }
             var description = G.getString(task, node,"gmd:description/*/text()");
             if (description == undefined) {
                 description = "";
-                }
+            }
             var protocol = G.getString(task, node,"gmd:protocol/*/text()");
             if (protocol == undefined) {
                 protocol = "";
-                }
+            }
             if (linkName && url) {
                 if (urls.indexOf(url) === -1) {
                     urls.push(url);
@@ -571,7 +489,7 @@ G.evaluators.cinergi = {
             }
         });
     },
-	
+
     _analyzeTimePeriod: function(task,params) {
         //print("analyzeTimePeriod");
         if (!params) return;
@@ -599,7 +517,7 @@ G.evaluators.cinergi = {
         }
         if (params.begin) {
             if (typeof params.begin.date === "string" && !params.begin.date.startsWith("9999")
-            && this._limitDateRange(params.begin.date )
+                && this._limitDateRange(params.begin.date )
             ) {
                 data["begin_dt"] = G.DateUtil.checkIsoDateTime(params.begin.date,false);
             }
@@ -627,8 +545,8 @@ G.evaluators.cinergi = {
             G.writeMultiProp(task.item,"timeperiod_nst",data);
         }
     },
-	
-	
+
+
     _limitDateRange: function(dateString){
         var validDate = true;
         if (dateString.startsWith("9999")) validDate = false;
@@ -646,6 +564,13 @@ G.evaluators.cinergi = {
         }
         return validDate;
     },
+
+    clearProps: function(obj, name) {
+        if (obj[name]){
+            obj[name] = undefined;
+        }
+
+    }
 };
 //var getJSON = function(url, callback) {
 //  var xhr = new XMLHttpRequest();

@@ -42,7 +42,17 @@ G._metadataTypes =  {
 },
 
 //smr change to cinergi evaluator so all ISO processing is consistent
-  "iso19115": {
+    "iso19115base": {
+        key: "iso19115base",
+        evaluator: G.evaluators.iso,
+        interrogationXPath: "",
+        identifier: "http://www.isotc211.org/2005/gmd",
+        detailsXslt: "metadata/details/iso-details/ISO19139ToHTMLwMap.xsl",
+        //xsdLocation: "http://www.ngdc.noaa.gov/metadata/published/xsd/schema.xsd",
+        //schematronXslt: "metadata/schematron/Gemini2_R2r2-schematron.xslt",
+        toKnownXslt: null
+    },
+    "iso19115": {
     key: "iso19115",
     evaluator: G.evaluators.cinergi,
     interrogationXPath: "/gmd:MD_Metadata",
