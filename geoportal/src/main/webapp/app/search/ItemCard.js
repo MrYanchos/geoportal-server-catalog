@@ -882,73 +882,76 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
           }
 
       },
-      _renderWorkbenchLinksDropdown: function(itemId,item) {
-          // var uri = "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/master?urlpath=%2Fnotebooks%2FDispatchTesting%2FCinergiDispatch-UseMetadata.ipynb?documentId="+encodeURIComponent(itemId);
-          //
-          // uri = "http://suave-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb?documentId=" +encodeURIComponent(itemId);
-          //
-          // uri = "http://suave-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb?documentId=" +encodeURIComponent(itemId);
+      _renderWorkbenchLinksDropdown: function(item,
+                                              links) {
+        if (links.length >0 ) {
+            // var uri = "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/master?urlpath=%2Fnotebooks%2FDispatchTesting%2FCinergiDispatch-UseMetadata.ipynb?documentId="+encodeURIComponent(itemId);
+            //
+            // uri = "http://sua
+            // ve-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb?documentId=" +encodeURIComponent(itemId);
+            //
+            // uri = "http://suave-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb?documentId=" +encodeURIComponent(itemId);
 
 
+            var dd = domConstruct.create("div", {
+                "class": "dropdown",
+                "style": "display:inline-block;"
+            }, this.actionsNode);
+            var ddbtn = domConstruct.create("a", {
+                "class": "dropdown-toggle",
+                "href": "#",
+                "data-toggle": "dropdown",
+                "aria-haspopup": true,
+                "aria-expanded": true,
+                innerHTML: "Data Discovery Studio"
+            }, dd);
+            domConstruct.create("span", {
+                "class": "caret"
+            }, ddbtn);
+            var ddul = domConstruct.create("ul", {
+                "class": "dropdown-menu",
+            }, dd);
 
-          var dd = domConstruct.create("div",{
-              "class": "dropdown",
-              "style": "display:inline-block;"
-          },this.actionsNode);
-          var ddbtn = domConstruct.create("a",{
-              "class": "dropdown-toggle",
-              "href": "#",
-              "data-toggle": "dropdown",
-              "aria-haspopup": true,
-              "aria-expanded": true,
-              innerHTML: "Data Discovery Studio"
-          },dd);
-          domConstruct.create("span",{
-              "class": "caret"
-          },ddbtn);
-          var ddul = domConstruct.create("ul",{
-              "class": "dropdown-menu",
-          },dd);
+            uri = "http://suave-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb?documentId=" + encodeURIComponent(item);
+            uriTitle = "suave-jupyterhub.com (local authentication required)"
+            var ddli2 = domConstruct.create("li", {}, ddul);
+            domConstruct.create("a", {
+                "class": "small",
+                href: uri,
+                target: "_blank",
+                innerHTML: uriTitle
+            }, ddli2);
+            var uri = "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/stable?urlpath=%2Fnotebooks%2FCinergiDispatch.ipynb?documentId=" + encodeURIComponent(item);
+            var uriTitle = "MyBinder-Stable";
+            var ddli = domConstruct.create("li", {}, ddul);
+            domConstruct.create("a", {
+                "class": "small",
+                href: uri,
+                target: "_blank",
+                innerHTML: uriTitle
+            }, ddli);
+            var uri = "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/master?urlpath=%2Fnotebooks%2FDispatchTesting%2FCinergiDispatch-UseMetadata.ipynb?documentId=" + encodeURIComponent(item);
+            var uriTitle = "MyBinder-Development";
+            var ddli0 = domConstruct.create("li", {}, ddul);
+            domConstruct.create("a", {
+                "class": "small",
+                href: uri,
+                target: "_blank",
+                innerHTML: uriTitle
+            }, ddli0);
 
-          uri = "http://suave-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb?documentId=" +encodeURIComponent(itemId);
-          uriTitle = "suave-jupyterhub.com (local authentication required)"
-          var ddli2 = domConstruct.create("li",{},ddul);
-          domConstruct.create("a",{
-              "class": "small",
-              href: uri,
-              target: "_blank",
-              innerHTML: uriTitle
-          },ddli2);
-          var uri = "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/stable?urlpath=%2Fnotebooks%2FCinergiDispatch.ipynb?documentId="+encodeURIComponent(itemId);
-          var uriTitle = "MyBinder-Stable";
-          var ddli = domConstruct.create("li",{},ddul);
-          domConstruct.create("a",{
-              "class": "small",
-              href: uri,
-              target: "_blank",
-              innerHTML: uriTitle
-          },ddli);
-          var uri = "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/master?urlpath=%2Fnotebooks%2FDispatchTesting%2FCinergiDispatch-UseMetadata.ipynb?documentId="+encodeURIComponent(itemId);
-          var uriTitle = "MyBinder-Development";
-          var ddli0 = domConstruct.create("li",{},ddul);
-          domConstruct.create("a",{
-              "class": "small",
-              href: uri,
-              target: "_blank",
-              innerHTML: uriTitle
-          },ddli0);
+            uri = "https://suave-jupyter.nautilus.optiputer.net/?documentId=" + encodeURIComponent(item);
+            uriTitle = "Optiputer (google authentication required)"
 
-          uri = "https://suave-jupyter.nautilus.optiputer.net/?documentId=" +encodeURIComponent(itemId);
-          uriTitle = "Optiputer (google authentication required)"
-
-          var ddli3 = domConstruct.create("li",{},ddul);
-          domConstruct.create("a",{
-              "class": "small",
-              href: uri,
-              target: "_blank",
-              innerHTML: uriTitle
-          },ddli3);
-          this._mitigateDropdownClip(dd,ddul);
+            var ddli3 = domConstruct.create("li", {}, ddul);
+            domConstruct.create("a", {
+                "class": "small",
+                href: uri,
+                target: "_blank",
+                innerHTML: uriTitle
+            }, ddli3);
+            this._mitigateDropdownClip(dd, ddul);
+        }
       },
     _renderSchemaOrg: function (item){
           var actionsNode = this.actionsNode;
