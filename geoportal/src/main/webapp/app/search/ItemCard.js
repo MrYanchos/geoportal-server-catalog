@@ -331,9 +331,10 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
 
       function getdistname (url) {
           //console.log("getdistname");
-          result="";
-          if (lang.isArray(dist_links)) {
-            array.forEach(dist_links, function(alink){
+          var result="";
+
+          if (lang.isArray(url)) {
+            array.forEach(url, function(alink){
                //console.log(alink);
                if (typeof alink.url_s === "string" ) {
                    if (typeof alink.url_name_s === "string"){
@@ -344,13 +345,13 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                }
                }
             );
-          } else if (lang.isObject(dist_links)) {
-            if (typeof dist_links.url_s === "string" ) {
-             if (typeof dist_links.url_name_s === "string"){
-                  result = dist_links.url_name_s;
+          } else if (lang.isObject(url)) {
+            if (typeof url.url_s === "string" ) {
+             if (typeof url.url_name_s === "string"){
+                  result = url.url_name_s;
                 }
                 else {
-                  url = dist_links.url_s;
+                  url = url.url_s;
              }
               };
           }
@@ -363,11 +364,15 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
 
       array.forEach(links, function(u){
         var ddli = domConstruct.create("li",{},ddul);
-        thelabel = getdistname(u);
-
+        var thelabel = getdistname(u);
+        var url ;
+        if (lang.isObject(u)){
+          if (u.url_s) url = u.url_s;
+        } else if (typeof u === "string")
+        { url = u;}
         domConstruct.create("a",{
           "class": "small",
-          href: u,
+          href: url,
           target: "_blank",
           innerHTML: thelabel
         },ddli);
