@@ -79,7 +79,9 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
     },
     
     postCreate: function() {
+      this.intializeToolTip();
       this.inherited(arguments);
+
       var self = this;
       this.own(topic.subscribe(appTopics.ItemOwnerChanged,function(params){
         if (self.item && self.item === params.item) {
@@ -117,6 +119,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
       this._renderAddToMap(item,links);
       this._renderServiceStatus(item);
       this._renderUrlLinks(item);
+
         this._renderWorkbenchLinksDropdown(item,links);
         this._renderCinergiLinks(hit._id,item),
         this._renderSchemaOrg(item)
@@ -332,20 +335,23 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
           if (lang.isArray(dist_links)) {
             array.forEach(dist_links, function(alink){
                //console.log(alink);
-               if (typeof alink.url_s === "string" &&
-                        alink.url_s === url) {
+               if (typeof alink.url_s === "string" ) {
                    if (typeof alink.url_name_s === "string"){
                         result = alink.url_name_s;
                       }
-                    }
+                    } else {
+                   url = alink.url_s;
+               }
                }
             );
           } else if (lang.isObject(dist_links)) {
-            if (typeof dist_links.url_s === "string" &&
-                  dist_links.url_s === url) {
+            if (typeof dist_links.url_s === "string" ) {
              if (typeof dist_links.url_name_s === "string"){
                   result = dist_links.url_name_s;
                 }
+                else {
+                  url = dist_links.url_s;
+             }
               };
           }
           if (result === ""){
@@ -585,12 +591,23 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
     _uniqueLinks: function(item) {
       var links = [];
       //smr 2018-08-18 update to use distribution_links_s
-      if (typeof item.distribution_links_s === "string") {
-        links = [item.distribution_links_s];
-      } else if (lang.isArray(item.distribution_links_s)) {
-        array.forEach(item.distribution_links_s, function(u){
+      if (lang.isArray(item.dist_link_nst)) {
+        array.forEach(item.dist_link_nst, function(u){
           if (links.indexOf(u) === -1) links.push(u);
         });
+      } else if ( item.dist_link_nst) // there is one
+       // (typeof item.dist_link_nst === "string"  )
+        {
+            links = [item.dist_link_nst];
+      }
+      else if  (item.links_s) {
+          if (typeof item.links_s === "string") {
+              links = [item.links_s];
+          } else if (lang.isArray(item.links_s)) {
+              array.forEach(item.links_s, function(u){
+                  if (links.indexOf(u) === -1) links.push(u);
+              });
+          }
       }
       return links;
     },
@@ -793,8 +810,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
           }
    */
       },
-
-    _renderWorkbenchLinksDropdown: function(item,links) {
+     _renderWorkbenchLinksDropdown: function(item,links) {
           if ( ! Array.isArray(item.services_nst)) return;
           if( item.services_nst.length === 0) return;
           var dd = domConstruct.create("div",{
@@ -852,14 +868,82 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
               // var uri3 = "http://"+ "suave-jupyterhub.com" +
               //     "/user/zeppelin-v/notebooks/CinergiDispatch.ipynb"+
               //     "?documentId=" + encodeURIComponent(item._id);
-              var htmlNode = domConstruct.create("a", {
-                  href: uri3,
-                  target: "_blank",
-                  innerHTML: "Workbench Demo"
-              }, actionsNode);
+              // var htmlNode = domConstruct.create("a", {
+              //     href: uri3,
+              //     target: "_blank",
+              //     innerHTML: "Workbench Demo"
+              // }, actionsNode);
 
           }
 
+      },
+      _renderWorkbenchLinksDropdown: function(itemId,item) {
+          // var uri = "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/master?urlpath=%2Fnotebooks%2FDispatchTesting%2FCinergiDispatch-UseMetadata.ipynb?documentId="+encodeURIComponent(itemId);
+          //
+          // uri = "http://suave-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb?documentId=" +encodeURIComponent(itemId);
+          //
+          // uri = "http://suave-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb?documentId=" +encodeURIComponent(itemId);
+
+
+
+          var dd = domConstruct.create("div",{
+              "class": "dropdown",
+              "style": "display:inline-block;"
+          },this.actionsNode);
+          var ddbtn = domConstruct.create("a",{
+              "class": "dropdown-toggle",
+              "href": "#",
+              "data-toggle": "dropdown",
+              "aria-haspopup": true,
+              "aria-expanded": true,
+              innerHTML: "Data Discovery Studio"
+          },dd);
+          domConstruct.create("span",{
+              "class": "caret"
+          },ddbtn);
+          var ddul = domConstruct.create("ul",{
+              "class": "dropdown-menu",
+          },dd);
+
+          uri = "http://suave-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb?documentId=" +encodeURIComponent(itemId);
+          uriTitle = "suave-jupyterhub.com (local authentication required)"
+          var ddli2 = domConstruct.create("li",{},ddul);
+          domConstruct.create("a",{
+              "class": "small",
+              href: uri,
+              target: "_blank",
+              innerHTML: uriTitle
+          },ddli2);
+          var uri = "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/stable?urlpath=%2Fnotebooks%2FCinergiDispatch.ipynb?documentId="+encodeURIComponent(itemId);
+          var uriTitle = "MyBinder-Stable";
+          var ddli = domConstruct.create("li",{},ddul);
+          domConstruct.create("a",{
+              "class": "small",
+              href: uri,
+              target: "_blank",
+              innerHTML: uriTitle
+          },ddli);
+          var uri = "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/master?urlpath=%2Fnotebooks%2FDispatchTesting%2FCinergiDispatch-UseMetadata.ipynb?documentId="+encodeURIComponent(itemId);
+          var uriTitle = "MyBinder-Development";
+          var ddli0 = domConstruct.create("li",{},ddul);
+          domConstruct.create("a",{
+              "class": "small",
+              href: uri,
+              target: "_blank",
+              innerHTML: uriTitle
+          },ddli0);
+
+          uri = "https://suave-jupyter.nautilus.optiputer.net/?documentId=" +encodeURIComponent(itemId);
+          uriTitle = "Optiputer (google authentication required)"
+
+          var ddli3 = domConstruct.create("li",{},ddul);
+          domConstruct.create("a",{
+              "class": "small",
+              href: uri,
+              target: "_blank",
+              innerHTML: uriTitle
+          },ddli3);
+          this._mitigateDropdownClip(dd,ddul);
       },
     _renderSchemaOrg: function (item){
           var actionsNode = this.actionsNode;
@@ -918,6 +1002,17 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
 
 
       },
+      intializeToolTip: function() {
+        if (this.ToolTip) {
+            var node = this;
+            //  var node = dom.byId('someNode');
+            this.ToolTip.set("connectId", [node]);
+            this.ToolTip.set("showDelay", 1000);
+            if (this.extendedToolTip) {
+                this.ToolTip.label = this.extendedToolTip + this.ToolTip.label;
+            }
+        }
+    }
   });
   
   return oThisClass;

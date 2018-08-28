@@ -33,6 +33,7 @@ G.evaluators.cinergi = {
         var metadataType = G._metadataTypes["iso19115base"];
         if (metadataType && metadataType.evaluator) {
             metadataType.evaluator.evaluate(task);
+            print("evaluated iso19115base")
         }
 
         this.evalBaseCinergi(task);
@@ -79,9 +80,12 @@ G.evaluators.cinergi = {
         this.clearProps(task,"cited_organization_s");
         G.evalProps(task, item, iden, "cited_organization_s", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
 
-        /* to generate facet for place names */
+        /* to generate facet for place names
+         * dwv 2018-08-28 add named places */
         this.clearProps(task,"place_keywords_s");
-        G.evalProps(task, item, root, "place_keywords_s", "//gmd:MD_KeywordTypeCode[contains(@codeListValue,'lace')]/../../gmd:keyword/*/text() | //gmd:geographicIdentifier//gmd:code/*/text()");
+        G.evalProps(task, item, root, "place_keywords_s",
+            "//gmd:MD_KeywordTypeCode[contains(@codeListValue,'lace')]/../../gmd:keyword/*/text() | //gmd:geographicIdentifier//gmd:code/*/text() |" +
+            " //gmd:geographicElement/../gmd:description/*/text()");
 
         /* facet for all non-CINERGI controlled keywords, except place */
         this.clearProps(task,"tags_s");
@@ -114,7 +118,7 @@ G.evaluators.cinergi = {
         var item = task.item, root = task.root;
 
         // G.evalResourceLinks(task, item, root, "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL | gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
-        this.evalResourceLinks(task, item, root, "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL | gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
+     //   this.evalResourceLinks(task, item, root, "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL | gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
         this.evalWorkbenchLinks(task, item, root, "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine");
         this.evalDistributionLinks(task, item, root, "gmd:distributionInfo//gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource | gmd:identificationInfo//srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource");
     },
@@ -289,23 +293,7 @@ G.evaluators.cinergi = {
         //});
 
     },
-    evalResourceLinks: function(task,obj,contextNode,xpathExpression) {
-        if (!contextNode) return;
-        var self = this, urls = [], name = "resources_nst";
-        G.forEachNode(task,contextNode,xpathExpression,function(node){
-            var url = G.getNodeText(node);
-            var info = self.checkResourceLink(url);
-            if (info && info.linkUrl && info.linkType) {
-                if (urls.indexOf(info.linkUrl) === -1) {
-                    urls.push(info.linkUrl);
-                    G.writeMultiProp(obj,name,{
-                        "url_s": info.linkUrl,
-                        "url_type_s": info.linkType
-                    });
-                }
-            }
-        });
-    },
+
     checkResourceLink: function(url) {
         var endsWith = function(v,sfx) {return (v.indexOf(sfx,(v.length-sfx.length)) !== -1);};
 
