@@ -37,8 +37,8 @@ function(declare, lang, on, keys, domClass,query,
     templateString: template,
     
     useSimpleQueryString: null,
-
-
+   // script: 'custom/searchBoxTypeahead.js',
+      script: 'custom/searchBoxTypeahead.js',
     postCreate: function() {
       this.inherited(arguments);
       this.own(on(this.searchTextBox,"keyup",lang.hitch(this,function(evt) {
@@ -50,8 +50,12 @@ function(declare, lang, on, keys, domClass,query,
         //ready ( this.taDone(query));
     },
       startup:  function () {
-
-       require(["custom/searchBoxTypeahead.js",], function(){
+          var  ascript = this.script;
+          if (typeof ascript === "undefined" || ascript === null) {
+              ascript ="custom/searchBoxTypeahead.js";
+          }
+       //require(["custom/searchBoxTypeahead.js",], function(){
+               require([ascript,], function(){
 // separate out this to custom to allow for easier customization.
        });
       } ,

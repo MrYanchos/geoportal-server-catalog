@@ -2,7 +2,11 @@
 	<div class="input-group input-group-sm sb-typeahead-wrapper">
 		<input type="text" class="form-control sb-typeahead-text"
 			placeholder="${i18n.search.searchBox.search}..."
-			data-dojo-attach-point="searchTextBox"/> 
+			data-dojo-attach-point="searchTextBox"
+			   data-dojo-props="
+          script: 'custom/searchBoxTypeahead.js',
+          "
+		/>
 		<span class="input-group-btn">
 			<button class="btn btn-success btn-sm" type="button"
 				data-dojo-attach-point="searchButton"
