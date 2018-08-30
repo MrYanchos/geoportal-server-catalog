@@ -31,6 +31,8 @@ define([],function(){var obj={
   
   searchResults: {
     numPerPage: 10,
+    showPageCount: true,
+      maxShowPageCount: 9999,
     showDate: true,
     showOwner: true,
     showThumbnails: true,

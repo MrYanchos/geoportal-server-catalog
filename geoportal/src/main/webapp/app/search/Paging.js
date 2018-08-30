@@ -34,7 +34,9 @@ function(declare, lang, on, domClass, djNumber, topic, appTopics, template, i18n
     hasMore: false,
     nextStart: -1,
     numHits: 0,
-    numPerPage: null, 
+    numPerPage: null,
+    showPageCount: null,
+    maxShowPageCount: null,
     previousStart: -1,
     start: 1,
     
@@ -51,8 +53,21 @@ function(declare, lang, on, domClass, djNumber, topic, appTopics, template, i18n
       if (typeof this.numPerPage === "undefined" || this.numPerPage === null) {
         this.numPerPage = 10;
       }
-      
-      var self = this;
+        if (typeof this.showPageCount === "undefined" || this.showPageCount === null) {
+            this.showPageCount = AppContext.appConfig.searchResults.showPageCount;
+        }
+        if (typeof this.showPageCount === "undefined" || this.showPageCount === null) {
+            this.showPageCount = false;
+        }
+
+        if (typeof this.maxShowPageCount === "undefined" || this.maxShowPageCount === null) {
+            this.maxShowPageCount = AppContext.appConfig.searchResults.maxShowPageCount;
+        }
+        if (typeof this.maxShowPageCount === "undefined" || this.maxShowPageCount === null) {
+            this.maxShowPageCount = 9999;
+        }
+
+        var self = this;
       topic.subscribe(appTopics.ItemDeleted,function(params){
         if (params.searchPane && self.searchPane === params.searchPane) {
           self.numHits = self.numHits - 1;
@@ -123,6 +138,7 @@ function(declare, lang, on, domClass, djNumber, topic, appTopics, template, i18n
     
     _renderPaging: function(searchResponse) {
       var nStart = this._start, nHits = this.numHits, nPer = this.numPerPage;
+
       
       this.hasMore = false;
       this.nextStart = -1;
@@ -143,17 +159,30 @@ function(declare, lang, on, domClass, djNumber, topic, appTopics, template, i18n
       }
 
       var sPage = "";
+      if (this.showPageCount){
+          sPage = this.i18n.search.paging.pageCountPattern;
+      } else {
+          sPage = this.i18n.search.paging.pagePattern;
+      }
       if (nHits > nPer) {
         var nPage = 1;
         if (nStart > 1) {
           nPage = Math.floor(nStart / nPer) + 1;
         }
-        sPage = this.i18n.search.paging.pagePattern;
+       // sPage = this.i18n.search.paging.pagePattern;
         sPage = sPage.replace("{page}",""+nPage);
       } else {
-        sPage = this.i18n.search.paging.pagePattern;
+       // sPage = this.i18n.search.paging.pagePattern;
         sPage = sPage.replace("{page}",""+1);
       }
+        if (this.showPageCount) {
+            var nTotalPages = Math.round(nHits / nPer);
+            if (nTotalPages < this.maxShowPageCount) {
+                sPage = sPage.replace("{pages}", "" + nTotalPages);
+            } else {
+                sPage = sPage.replace("{pages}", "" + this.i18n.search.paging.pageCountMany);
+            }
+        }
       this.setNodeText(this.pagePatternNode,sPage);
       
       if (this.hasLess) {
