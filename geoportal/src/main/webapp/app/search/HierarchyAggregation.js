@@ -23,9 +23,10 @@ define(["dojo/_base/declare",
         "app/search/QClause",
       "dojo/store/Memory",
       "dijit/tree/ObjectStoreModel",
-      "dijit/Tree"],
+      "dijit/Tree",
+        "dojo/store/util/SimpleQueryEngine"],
 function(declare, lang, array, domConstruct, template, i18n, SearchComponent, 
-  DropPane, QClause, Memory, ObjectStoreModel, Tree) {
+  DropPane, QClause, Memory, ObjectStoreModel, Tree, SimpleQueryEngine) {
  // DropPane, QClause, TermsAggregationSettings) {
   var oThisClass = declare([SearchComponent], {
     
@@ -162,12 +163,14 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
       domConstruct.empty(this.categoryNode);
       var key = this.getAggregationKey();
       this.treeData = [];
-      var catStore = new Memory({
-        data: this.treeData,
-        getChildren: function (object) {
-          return this.query({parent: object.id})
-        }
-      });
+      //   var mySortOptions = {sort: [{attribute:"id",}]};
+      //   var catStore = new Memory({
+      //   data: this.treeData,
+      //   getChildren: function (object) {
+      //     return this.query({parent: object.id})
+      //   },
+      //   options: mySortOptions
+      // });
         if (searchResponse.aggregations) {
             var data = searchResponse.aggregations[key];
             if (data && data.buckets) {
@@ -208,17 +211,29 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
                                 count: entry.doc_count,
                                 count_children: entry.doc_count
                             };
-                            catStore.put(item);
+                            //catStore.put(item);
+                            this.treeData.push(item);
                         }
                     }
                     , this);
+                var mySortOptions = { sort: [{attribute:"key",}]};
+                this.treeData = SimpleQueryEngine({  },mySortOptions)(this.treeData);
+                var catStore = new Memory({
+                    data: this.treeData,
+                    getChildren: function (object) {
+                        return this.query({parent: object.id})
+                    },
 
+                });
                 array.forEach(
                     catStore.query(
-                        //null
+                        // null
                         // ,{
                         //     sort: function (a, b) {
-                        //         return a.id.length > b.id.length ? -1 : 1;
+                        //         console.info ( a.id > b.id );
+                        //         console.info (a.id);
+                        //         console.info (b.id);
+                        //         return a.id > b.id ? -1 : 1;
                         //     }
                         // }
                     ),
@@ -265,10 +280,14 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
     //});
 
 
+
+    //    catStore.fetch(mySortOptions);
       var catModel = new ObjectStoreModel({
-        store:  catStore,
-        query: {id: this.rootTerm}
+        store: catStore,
+        query: {id: this.rootTerm, }
       });
+       // catModel.fetch(mySortOptions);
+
       if (catStore.data.length >0 ) {
           var tree = new Tree({
               model: catModel,
