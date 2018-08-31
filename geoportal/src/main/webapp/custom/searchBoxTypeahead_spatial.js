@@ -60,24 +60,83 @@ var taCol = new Bloodhound({
     }
 });
 
+var placeUrl = "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest?text=%QUERY&category=Land+Features,Water+Features,Populated+Place,Coordinate+System,Parks+and+Outdoors,Professional+and+Other+Places,Postal+Locality&maxSuggestions=15&f=pjson";
+var placeParams = {"query": "%QUERY" };
+var taPlace = new Bloodhound({
+    datumTokenizer: function(datum) {
+        return Bloodhound.tokenizers.whitespace(datum.value);
+    },
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    remote: {
+        wildcard: placeParams.query,
+        url: placeUrl,
+        prepare: function(query, settings) {
+            var pq = query.split(' ');
+
+            gPre = pq[pq.length-1];
+            taPick = false;
+            var surl = settings.url.replace('%QUERY',gPre);
+
+            settings.url = surl;
+            return settings;
+        },
+        transform: function(response) {
+            // Map the remote source JSON array to a JavaScript object array
+            if ( response.suggestions ) {
+                var mr = response.suggestions;
+            } else  {
+                mr = response;
+            }
+
+            var zed = $.map(mr, function(taObj) {
+                console.log('map' + JSON.stringify(taObj) );
+                if ( taObj.text ){
+                    return {
+                        value: taObj.text,
+                        magicKey: taObj.magicKey
+                    };
+                } else {
+                    return {
+                        value: taObj.completion
+                    };
+                }
+            });
+
+            return zed;
+        }
+    }
+});
+
 var taTrim = false;
 var taDone = function () {
     // Instantiate the Typeahead UI
     $('.sb-typeahead-text').typeahead({ hint: true, highlight: true }, {
-        displayKey: 'value',
-        source: taCol,
-        limit: 10,
-        templates: { suggestion: function (data) {
-                var conCat = '';
+            displayKey: 'value',
+            source: taCol,
+            limit: 7,
+            templates: { suggestion: function (data) {
+                    var conCat = '';
 
-                if ( data.categories ) {
-                    conCat = '<p><strong>' + data.value + '</strong></br>' + data.categories + '</br><a href="' + data.uri + '" target="_blank" >' + data.uri + '</p>';
-                } else {
-                    conCat = '<p><strong>' + data.value + '</strong></p>';
-                }
-                return conCat;
-            }}
-    }).on('typeahead:autocomplete', function (obj) {
+                    if ( data.categories ) {
+                        conCat = '<p><strong>' + data.value + '</strong></br>' + data.categories + '</br><a href="' + data.uri + '" target="_blank" >' + data.uri + '</p>';
+                    } else {
+                        conCat = '<p><strong>' + data.value + '</strong></p>';
+                    }
+                    return conCat;
+                }}
+        }, {
+            displayKey: 'value',
+            source: taPlace,
+            limit: 7,
+            templates: { suggestion: function (data) {
+                    var conCat = '';
+                    if ( data.value ) {
+                        conCat = '<p style="background-color: #efefff; font-style: italic; "><strong><i>' + data.value + '</strong></p>';
+                    }
+                    return conCat;
+                }}
+        }
+    ).on('typeahead:autocomplete', function (obj) {
         var key = event.keyCode || event.charCode;
         if ( key == 9 ) {
             if ( keyCol.length > 0 ) {
@@ -128,8 +187,6 @@ var taDone = function () {
             getSearchCount(keyCol.trim());
         }
     });
-
-
 }
 
 function getSelectionText() {
@@ -164,11 +221,4 @@ function getSearchCount(qry) {
         }
     });
 }
-
 taDone();
-
-
-
-
-
-
