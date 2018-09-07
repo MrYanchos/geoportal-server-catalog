@@ -55,3 +55,41 @@
 
     top: 234px;
 }
+
+.g-spatial-filter-bbox {
+
+}
+.g-filter-bbox-input {
+    width: 70%;
+}
+.g-spatial-filter-n  {
+    width: 30%;
+
+      height: 12px;
+  }
+.g-spatial-filter-s{
+    width: 30%;
+
+    height: 12px;
+}
+.g-spatial-filter-e{
+    width: 30%;
+;
+     height: 12px;
+ }
+.g-spatial-filter-w{
+    width: 30%;
+
+    height: 12px;
+}
+
+.g-item-card .g-item-source-and-date {
+    padding: 2px;
+    font-size: 10px;
+    width: 15%;
+}
+/* .g-item-card .g-item-description, */
+.g-item-card .g-item-owner-and-date {
+
+    width: 75%;
+}

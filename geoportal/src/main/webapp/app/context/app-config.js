@@ -17,7 +17,7 @@ define([],function(){var obj={
   
   search: {
     allowSettings: false,
-    useSimpleQueryString: true,
+    useSimpleQueryString: false,
       highlightQuery: true
   },
   

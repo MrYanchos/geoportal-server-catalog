@@ -110,6 +110,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
         this._renderTitle(item, highlight);
         //this._renderOwnerAndDate(item);
         this._renderSourceAndDate(item);
+        this._renderCollectionAndDate(item);
         //util.setNodeText(this.descriptionNode,item.description);
         this._renderDescription(item,highlight);
       this._renderThumbnail(item);
@@ -757,21 +758,29 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
 
           if (Array.isArray(author)){
            author.forEach(function(element) {
-             if (typeof element === "string") {
-             if (text.length == 0  ) {
-                   text = "Authors: " + element;
-               } else {
-                   text = text + ", " + element;
-               };
-           }})
-           }
-           else {
-         	  if (typeof author === "string" && author.length > 0) {
-                   if (text.length > 0) text += " ";
-                   text = "Author: " + author;
-               }
-           }
+               if (typeof element === "string") {
 
+                   if (text.length == 0) {
+                       text = "Authors: " + element;
+                   } else {
+                       text = text + ", " + element;
+                   }
+                   ;
+               }
+
+
+               else {
+                   if (typeof author === "string" && author.length > 0) {
+                       if (text.length > 0) text += " ";
+                       text = "Author: " + author;
+                   }
+               }
+           } )
+
+           if (text.length == 0  ) {
+                  text = "<span>"+ text + "</span>"
+           }
+          }
 /*  SMR 2018-08-20
             * report either the publication(available, release) date or reported creation date
             *
@@ -782,7 +791,10 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                 if (idx > 0) date =date.substring(0,idx);
                 idx = date.indexOf("-01-01");
                 if (idx > 0) date =date.substring(0,idx);
-                date = ";    Publication: " + date;
+                if (date.length > 0) {
+                date = "; " + date;
+                }
+                date = "Publication: " + date;
             }
             else if (typeof item.apiso_CreatedDate_dt === "string" && item.apiso_CreatedDate_dt.length > 0 ){
              date = item.apiso_CreatedDate_dt;
@@ -790,15 +802,20 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                 if (idx > 0) date =date.substring(0,idx);
                 idx = date.indexOf("-01-01");
                 if (idx > 0) date =date.substring(0,idx);
-                date = ";    Created: " + date;
+                if (date.length > 0) {
+                    date = "; " + date;
+                }
+                date = "Created: " + date;
             }
-
+        if (date.length > 0  ) {
+            date = "<span>"+ date + "</span>";
+    }
              if (AppContext.appConfig.searchResults.showDate && typeof date === "string" && date.length > 0) {
                  text += date;
              }
 
              if (text.length > 0) {
-                 util.setNodeText(this.ownerAndDateNode,text);
+                 util.setNodeHtml(this.ownerAndDateNode,text);
              }
 
    /*  original code
@@ -814,6 +831,27 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
               util.setNodeText(this.ownerAndDateNode,text);
           }
    */
+      },
+      _renderCollectionAndDate: function(item) {
+          var owner = item.src_source_name_s;
+          var date = item.sys_modified_dt;
+           var text = "";
+
+
+
+                 if (typeof owner === "string" && owner.length > 0) {
+                     if (text.length > 0) text += " ";
+                     text = "<div> Source: " + owner + "</div>";
+                 }
+                 if (AppContext.appConfig.searchResults.showDate && typeof date === "string" && date.length > 0) {
+                     idx = date.indexOf("T");
+                     if (idx > 0) date =date.substring(0,idx);
+                     text += " <div>Last Modified: " + date+ "</div>";
+                 }
+                 if (text.length > 0) {
+              util.setNodeHtml(this.collectionAndDateNode, text);
+          }
+
       },
      _renderWorkbenchLinksDropdown: function(item,links) {
           if ( ! Array.isArray(item.services_nst)) return;
