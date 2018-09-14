@@ -81,7 +81,6 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
     postCreate: function() {
       this.intializeToolTip();
       this.inherited(arguments);
-
       var self = this;
       this.own(topic.subscribe(appTopics.ItemOwnerChanged,function(params){
         if (self.item && self.item === params.item) {
@@ -104,7 +103,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
       var item = this.item = hit._source;
       var highlight = hit.highlight;
 
-      item._id = hit._id; 
+      item._id = hit._id;
       var links = this._uniqueLinks(item);
      // util.setNodeText(this.titleNode,item.title);
         this._renderTitle(item, highlight);
@@ -188,7 +187,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
       topic.publish(appTopics.OnMouseLeaveResultItem,{item:this.item});
     },
     
-    _renderPreview: function(actionsNode, serviceType) {
+    _renderPreview: function(item, actionsNode, serviceType) {
       
       // declare preview pane
       var previewPane;
@@ -231,6 +230,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
       // create clickable link to launch preview dialog
       var previewNode = domConstruct.create("a",{
         href: "javascript:void(0)",
+        title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.preview, title: item.title}),
         innerHTML: i18n.item.actions.preview
       },actionsNode);
       
@@ -255,6 +255,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
           domConstruct.create("a",{
             href: "javascript:void(0)",
             innerHTML: i18n.item.actions.addToMap,
+            title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.addToMap, title: item.title}),
             onclick: function() {
               topic.publish(appTopics.AddToMapClicked,serviceType);
             }
@@ -262,7 +263,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
           
           // create clickable 'Preview' link if allowes
           if (PreviewUtil.canPreview(serviceType)) {
-            this._renderPreview(actionsNode, serviceType);
+            this._renderPreview(item, actionsNode, serviceType);
           }
           
           return true;
@@ -277,22 +278,25 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
         var htmlNode = domConstruct.create("a",{
           href: uri+"/html",
           target: "_blank",
-          innerHTML: "Full metadata record"
+          title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.html, title: item.title}),
+          innerHTML: i18n.item.actions.html
         },actionsNode);
         var xmlNode = domConstruct.create("a",{
           href: uri+"/xml",
           target: "_blank",
-          innerHTML: "ISO XML"
+          title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.xml, title: item.title}),
+          innerHTML: i18n.item.actions.xml
         },actionsNode);
         var jsonNode = domConstruct.create("a",{
           href: uri+"?pretty=true",
           target: "_blank",
+          title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.json, title: item.title}),
           innerHTML: i18n.item.actions.json
         },actionsNode);
-        if (AppContext.geoportal.supportsApprovalStatus ||
+        if (AppContext.geoportal.supportsApprovalStatus || 
             AppContext.geoportal.supportsGroupBasedAccess) {
           var client = new AppClient();
-          htmlNode.href = client.appendAccessToken(htmlNode.href);
+          htmlNode.href = client.appendAccessToken(htmlNode.href); 
           xmlNode.href = client.appendAccessToken(xmlNode.href);
           jsonNode.href = client.appendAccessToken(jsonNode.href);
         }
@@ -316,6 +320,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
         "data-toggle": "dropdown",
         "aria-haspopup": true,
         "aria-expanded": true,
+        title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.links, title: item.title}),
         innerHTML: i18n.item.actions.links
       },dd);
       domConstruct.create("span",{
@@ -375,12 +380,14 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
           "class": "small",
           href: url,
           target: "_blank",
+          title: string.substitute(i18n.item.actions.titleFormat, {action: u, title: item.title}),
+
           innerHTML: thelabel
         },ddli);
       });
       this._mitigateDropdownClip(dd,ddul);
     },
-
+    
     _renderOptionsDropdown: function(itemId,item) {
       var self = this;
       var isOwner = this._isOwner(item);
@@ -735,7 +742,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
 
       if (href && href.length > 0) {
         var link = domConstruct.create("a",{
-          href: href,
+          href: href, 
           target: "_blank",
           "class": "g-item-status",
           innerHTML: caption
