@@ -2,32 +2,36 @@
 	<div class="g-drop-pane" data-dojo-type="app/search/DropPane" 
 	  data-dojo-attach-point="dropPane"
 	  data-dojo-props="title:'${label}',open:${open}">
-	  <div class="g-spatial-filter-map" data-dojo-attach-point="mapNode">
+        <div  data-dojo-attach-point="searchWidgetNode"></div>
+        <div class="g-spatial-filter-map" data-dojo-attach-point="mapNode">
 	    <div class="g-spatial-filter-d3-tooltip" data-dojo-attach-point="tooltipNode"></div>
 	  </div>
-        <div class="g-spatial-filter-locator" data-dojo-attach-point="searchWidgetNode"></div>
-        <table class="g-spatial-filter-bbox ">
+
+  <!--      <table class="g-spatial-filter-bbox ">
             <tbody>
           <tr class="g-filter-bbox-input">
+              <td></td>
            <td>   <input type="text" class="g-spatial-filter-n"
                                                                    placeholder="${i18n.search.searchBox.search}..."
                                                                    data-dojo-attach-point="bboxN"/>
-              </td></tr>
+              </td>
+          <td></td></tr>
 <tr class="g-filter-bbox-input">
       <td style="column-span: all"> <input type="text" class="g-spatial-filter-w"
                    placeholder="${i18n.search.searchBox.search}..."
                    data-dojo-attach-point="bboxW"/>
     </td>
+    <td></td>
     <td><input type="text" class="g-spatial-filter-e"
                    placeholder="${i18n.search.searchBox.search}..."
                    data-dojo-attach-point="bboxE"/>
     </td>
 </tr>
             <tr class="g-filter-bbox-input">
-                <td style="column-span: all"><input type="text" class="g-spatial-filter-s"
+                <td></td> <td style="column-span: all"><input type="text" class="g-spatial-filter-s"
                    placeholder="${i18n.search.searchBox.search}..."
                    data-dojo-attach-point="bboxS"/>
-                </td></tr>
+                </td><td></td></tr>
             </tbody>
         </table>
         <div class="input-group-btn">
@@ -40,6 +44,7 @@
 				${i18n.search.searchBox.search}
 			</button>
 			</div>
+			-->
     </div>
 		</div>
 

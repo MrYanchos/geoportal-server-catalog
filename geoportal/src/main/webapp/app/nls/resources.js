@@ -89,7 +89,11 @@ define({
         settings: {
           caption: "Spatial Filter",
           aggregations: "Aggregations"
-        }
+        },
+          north: "North",
+          south: "South",
+          east: "East",
+          west: "West"
       },
       temporalFilter: {
         label: "Temporal",
@@ -221,8 +225,9 @@ define({
     
     item: {
       actions: {
-        html: "HTML",
-        xml: "XML",
+        html: "Full metadata record",
+       // xml: "XML",
+          xml: "ISO XML", // Cinergi transforms all to ISO
         json: "JSON",
         links: "Get Data",
         addToMap: "Add to Map",

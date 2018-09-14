@@ -2,33 +2,32 @@
 	<div class="g-drop-pane" data-dojo-type="app/search/DropPane" 
 	  data-dojo-attach-point="dropPane"
 	  data-dojo-props="title:'${label}',open:${open}">
-	  <div class="g-spatial-filter-map" data-dojo-attach-point="mapNode">
-	    <div class="g-spatial-filter-d3-tooltip" data-dojo-attach-point="tooltipNode"></div>
-	  </div>
-      <div  data-dojo-attach-point="searchWidgetNode"></div>
+        <div class="g-spatial-filter-d3-tooltip" data-dojo-attach-point="tooltipNode"></div>
+        <div  data-dojo-attach-point="relationsNode"></div>
+
         <table class="g-spatial-filter-bbox ">
             <tbody>
           <tr class="g-filter-bbox-input">
               <td></td>
            <td>   <input type="text" class="g-spatial-filter-n"
-                                                                   placeholder="${i18n.search.searchBox.search}..."
+            placeholder="${i18n.search.spatialFilter.north}..."
                                                                    data-dojo-attach-point="bboxN"/>
               </td>
           <td></td></tr>
 <tr class="g-filter-bbox-input">
       <td style="column-span: all"> <input type="text" class="g-spatial-filter-w"
-                   placeholder="${i18n.search.searchBox.search}..."
+                   placeholder="${i18n.search.spatialFilter.west}..."
                    data-dojo-attach-point="bboxW"/>
     </td>
     <td></td>
     <td><input type="text" class="g-spatial-filter-e"
-                   placeholder="${i18n.search.searchBox.search}..."
+                   placeholder="${i18n.search.spatialFilter.east}..."
                    data-dojo-attach-point="bboxE"/>
     </td>
 </tr>
             <tr class="g-filter-bbox-input">
                 <td></td> <td style="column-span: all"><input type="text" class="g-spatial-filter-s"
-                   placeholder="${i18n.search.searchBox.search}..."
+                   placeholder="${i18n.search.spatialFilter.south}..."
                    data-dojo-attach-point="bboxS"/>
                 </td><td></td></tr>
             </tbody>

@@ -63,24 +63,24 @@
     width: 70%;
 }
 .g-spatial-filter-n  {
-    width: 30%;
+    width: 6em;
 
-      height: 12px;
+      height:1.5em;
   }
 .g-spatial-filter-s{
-    width: 30%;
+    width: 6em;
 
-    height: 12px;
+    height: 1.5em;
 }
 .g-spatial-filter-e{
-    width: 30%;
+    width: 6em;
 ;
-     height: 12px;
+     height: 1.5em;
  }
 .g-spatial-filter-w{
-    width: 30%;
+    width: 6em;
 
-    height: 12px;
+    height: 1.5em;
 }
 
 .g-item-card .g-item-source-and-date {

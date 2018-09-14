@@ -14,8 +14,16 @@ https://stackoverflow.com/questions/13883902/dijit-why-am-i-getting-an-uncaught-
            script: 'custom/searchBoxTypeahead_spatial.js',
           "></div>
       <div id="infoSearchText">Information Search</div>
-      <div data-dojo-type="app/search/SpatialFilter"
+      <div data-dojo-type="app/search/SpatialFilter2"
         data-dojo-props="
+          field: 'envelope_geo',
+          pointField: 'envelope_cen_pt',
+          allowAggregation: true,
+          open: true,
+          label:'${i18n.search.criteria.map}'">
+      </div>
+      <div data-dojo-type="app/search/SpatialFilterText"
+           data-dojo-props="
           field: 'envelope_geo',
           pointField: 'envelope_cen_pt',
           allowAggregation: true,

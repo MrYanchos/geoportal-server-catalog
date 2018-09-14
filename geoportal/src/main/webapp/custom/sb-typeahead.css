@@ -92,7 +92,7 @@
     background-color: #ccc;
     background: #f8f8f8;
     height: auto;
-    width: 15em;
+    width: auto;
 }
 .form-control {
     padding: 6px;
@@ -100,3 +100,8 @@
     font-size: 12px;
 }
 .input-group div{ vertical-align: middle;}
+.input-group-btn {vertical-align: top;}
+.twitter-typeahead {
+    width:100%;
+    display: inline-block;
+}

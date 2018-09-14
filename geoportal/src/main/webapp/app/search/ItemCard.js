@@ -798,9 +798,8 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                 if (idx > 0) date =date.substring(0,idx);
                 idx = date.indexOf("-01-01");
                 if (idx > 0) date =date.substring(0,idx);
-                if (date.length > 0) {
-                date = "; " + date;
-                }
+
+
                 date = "Publication: " + date;
             }
             else if (typeof item.apiso_CreatedDate_dt === "string" && item.apiso_CreatedDate_dt.length > 0 ){
@@ -809,9 +808,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                 if (idx > 0) date =date.substring(0,idx);
                 idx = date.indexOf("-01-01");
                 if (idx > 0) date =date.substring(0,idx);
-                if (date.length > 0) {
-                    date = "; " + date;
-                }
+
                 date = "Created: " + date;
             }
         if (date.length > 0  ) {
@@ -848,15 +845,19 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
 
                  if (typeof owner === "string" && owner.length > 0) {
                      if (text.length > 0) text += " ";
-                     text = "<div> Source: " + owner + "</div>";
+                     text = "<span> Source: " + owner + "</span>";
                  }
                  if (AppContext.appConfig.searchResults.showDate && typeof date === "string" && date.length > 0) {
                      idx = date.indexOf("T");
                      if (idx > 0) date =date.substring(0,idx);
-                     text += " <div>Last Modified: " + date+ "</div>";
+                     text += " <span>Last Modified: " + date+ "</span>";
                  }
                  if (text.length > 0) {
-              util.setNodeHtml(this.collectionAndDateNode, text);
+                   var existing = this.ownerAndDateNode.innerHTML;
+                   if (existing) {
+                     text = existing + text;
+                   }
+              util.setNodeHtml(this.ownerAndDateNode, text);
           }
 
       },

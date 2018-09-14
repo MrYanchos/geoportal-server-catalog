@@ -103,7 +103,7 @@ function(declare, lang, array, aspect, djQuery, on, domConstruct, domClass, domG
           d.showDialog();
         });
       }
-      
+
       var _lodToGeoHashGridPrecision = {
         "default": 3,
         "min": 1,
@@ -369,7 +369,7 @@ function(declare, lang, array, aspect, djQuery, on, domConstruct, domClass, domG
       if (!this.showLocator) return;
       var params = {
         map: this.map,
-        enableButtonMode: true,
+        enableButtonMode: this.searchOnMap,
         enableHighlight: false,
         enableInfoWindow: false,
         showInfoWindowOnSelect: false
@@ -386,27 +386,33 @@ function(declare, lang, array, aspect, djQuery, on, domConstruct, domClass, domG
         }
       }
       //if (cfgParams) lang.mixin(params,cfgParams);
+
       var locator = new SearchWidget(params,this.searchWidgetNode);
       locator.startup();
-      domClass.add(locator.domNode,"g-spatial-filter-locator");
+
+        if (this.searchOnMap) {
+            domClass.add(locator.domNode, "g-spatial-filter-locator");
+        } else {
+            domClass.add(locator.domNode, "g-spatial-filter-locator-inline");
+        }
       this._locator = locator;
     },
 
-      updateBBox: function() {
-          var map = this.map;
-          var env = map.geographicExtent;
-          if (env) {
-              env1 = {xmin: env.xmin, ymin: env.ymin, xmax: env.xmax, ymax: env.ymax};
-              var n = this.bboxN;
-              var s = this.bboxS;
-              var e = this.bboxE;
-              var w = this.bboxW;
-              s.value = env.ymin;
-              n.value = env.ymax;
-              e.value = env.xmax;
-              w.value = env.xmin;
-          }
-      },
+      // updateBBox: function() {
+      //     var map = this.map;
+      //     var env = map.geographicExtent;
+      //     if (env) {
+      //         env1 = {xmin: env.xmin, ymin: env.ymin, xmax: env.xmax, ymax: env.ymax};
+      //         var n = this.bboxN;
+      //         var s = this.bboxS;
+      //         var e = this.bboxE;
+      //         var w = this.bboxW;
+      //         s.value = env.ymin;
+      //         n.value = env.ymax;
+      //         e.value = env.xmax;
+      //         w.value = env.xmin;
+      //     }
+      // },
 
     initializeMap: function() {
       var mapProps = this.map || AppContext.appConfig.searchMap || {};
@@ -429,7 +435,7 @@ function(declare, lang, array, aspect, djQuery, on, domConstruct, domClass, domG
         //window.AppContext.searchMap = this.map;
         this.own(on(map,"ExtentChange",lang.hitch(this,function(){
           if (this.getRelation() !== "any") this.search();
-          this.updateBBox();
+        //  this.updateBBox();
         })));
       })));
     },
