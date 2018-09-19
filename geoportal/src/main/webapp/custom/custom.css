@@ -93,3 +93,20 @@
 
     width: 75%;
 }
+
+.g-paging .pagination-page {
+   width: 4em;
+    padding: 0px 0px;
+}
+.g-paging .dijitTextBox .dijitInputField {
+    padding: 0px 0px;
+}
+.g-paging .dijitButtonContents {
+
+    padding: 0px 0px;
+}
+
+.g-paging  .dijitArrowButtonContainer{
+
+    padding: 0px 0px;
+}

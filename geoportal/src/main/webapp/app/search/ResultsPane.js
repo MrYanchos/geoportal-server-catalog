@@ -22,8 +22,10 @@ define(["dojo/_base/declare",
         "app/search/SearchComponent",
         "app/search/ItemCard",
         "app/search/DropPane",
-        "app/search/Paging"], 
-function(declare, lang, array, aspect, domConstruct, template, i18n, SearchComponent, ItemCard, DropPane, Paging) {
+        "app/search/Paging",
+        "app/search/Paging2",
+        "dojox/widget/Standby"],
+function(declare, lang, array, aspect, domConstruct, template, i18n, SearchComponent, ItemCard, DropPane, Paging, Paging2, Standby) {
   
   var oThisClass = declare([SearchComponent], {
     
@@ -39,7 +41,7 @@ function(declare, lang, array, aspect, domConstruct, template, i18n, SearchCompo
     postCreate: function() {
       this.inherited(arguments);
       this.addSort();
-      this.paging = new Paging({});
+      this.paging = new Paging2({});
       this.paging.placeAt(this.dropPane.toolsNode);
       /*
       // no longer needed
@@ -47,6 +49,9 @@ function(declare, lang, array, aspect, domConstruct, template, i18n, SearchCompo
         this.search();
       })));
       */
+
+        document.body.appendChild(this.statusNode.domNode);
+        this.statusNode.target = this.dropPane.domNode;
     },
     
     addSort: function() {
@@ -130,16 +135,19 @@ function(declare, lang, array, aspect, domConstruct, template, i18n, SearchCompo
       if (this.sortField !== null && this.sortDir !== null) {
         params.urlParams.sort = this.sortField+":"+this.sortDir;
       }
+        this.statusNode.show();
     },
     
     processError: function(searchError) {
       this.destroyItems();
       this.setNodeText(this.noMatchNode,i18n.search.results.error);
       this.noMatchNode.style.display = "block";
+        this.statusNode.hide();
     },
     
     processResults: function(searchResponse) {
-      this.paging.searchPane = this.searchPane;
+        this.statusNode.hide();
+        this.paging.searchPane = this.searchPane;
       this.paging.processResults(searchResponse);
       this.destroyItems();
       if (searchResponse.hits) {
