@@ -70,7 +70,8 @@ define({
         origin: "Source of Origin",
         approvalStatus: "Approval Status",
         access: "Access",
-        accessGroups: "Access Groups"
+        accessGroups: "Access Groups",
+          boundingBox: "Bounding Box"
       },
       componentSettings: {
         componentLabel: "Label",
@@ -82,6 +83,7 @@ define({
       },
       spatialFilter: {
         label: "Map",
+          labelForboundingBox: "Bounding Box",
         any: "Any",
         intersects: "Intersects",
         within: "Within",

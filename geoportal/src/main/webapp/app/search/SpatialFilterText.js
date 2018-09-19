@@ -70,13 +70,13 @@ function(declare, lang, array, aspect, djQuery, on, domConstruct, domClass, domG
     relationsNode: null,
     field: "envelope_geo",
     pointField: "envelope_cen_pt",
-    label: i18n.search.spatialFilter.label,
+    label: i18n.search.spatialFilter.labelForboundingBox,
     locatorParams: null,
     lodToGeoHashGridPrecision: null,
     open: false,
     highlightItemOnHover: true,
     showLocator: true,
-    map: null,
+    bBox: new Object() ,
     
     _highlighted: null,
     _locator: null,
@@ -100,117 +100,10 @@ function(declare, lang, array, aspect, djQuery, on, domConstruct, domClass, domG
         });
       }
       
-      var _lodToGeoHashGridPrecision = {
-        "default": 3,
-        "min": 1,
-        0: 1,
-        1: 1,
-        2: 2,
-        3: 2,
-        4: 3,
-        5: 4,
-        6: 4,
-        7: 5,
-        8: 5,
-        9: 6,
-        10: 6,
-        11: 6,
-        12: 7,
-        13: 7,
-        14: 7,
-        15: 7,
-        16: 7,
-        17: 8,
-        18: 8,
-        19: 8,
-        20: 8,
-        21: 9,
-        22: 9,
-        23: 9,
-        "max": 9
-      };
-      /*
-      var _lodToGeoHashGridPrecision = {
-        "default": 3,
-        "min": 1,
-        0: 2,
-        1: 2,
-        2: 3,
-        3: 3,
-        4: 3,
-        5: 4,
-        6: 4,
-        7: 5,
-        8: 5,
-        9: 6,
-        10: 6,
-        11: 6,
-        12: 7,
-        13: 7,
-        14: 7,
-        15: 7,
-        16: 7,
-        17: 8,
-        18: 8,
-        19: 8,
-        20: 8,
-        21: 9,
-        22: 9,
-        23: 9,
-        "max": 9
-      };
-       */
-      if (!this.lodToGeoHashGridPrecision) this.lodToGeoHashGridPrecision = _lodToGeoHashGridPrecision;
-      
+
       var self = this;
       
-      // this.own(topic.subscribe(appTopics.OnMouseEnterResultItem,function(params){
-      //   if (!self.highlightItemOnHover) return;
-      //   try {
-      //     var map = self.map, geometry, outSR;
-      //     if (map && params && params.item && params.item.envelope_geo) {
-      //       outSR = map.spatialReference;
-      //       var env = params.item.envelope_geo.coordinates;
-      //       if (env) {
-      //           geometry = new Extent(env[0][0], env[1][1], env[1][0], env[0][1], new SpatialReference(4326));
-      //       }
-      //     }
-      //     if (geometry && webMercatorUtils.canProject(geometry,outSR)) {
-      //       var projected = webMercatorUtils.project(geometry,outSR);
-      //       if (!self._highlighted) {
-      //         var symbol = new SimpleFillSymbol(
-      //           SimpleFillSymbol.STYLE_SOLID,
-      //           new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255,0,0]), 2),
-      //           new Color([255,255,0,0.3]));
-      //         self._highlighted = new Graphic(projected,symbol);
-      //         map.graphics.add(self._highlighted);
-      //       } else {
-      //         self._highlighted.setGeometry(projected);
-      //         self._highlighted.show();
-      //       }
-      //       self._highlighted.xtnItemId = params.item._id;
-      //     }
-      //   } catch(ex) {
-      //     console.warn("SpatialFilter.OnMouseEnterResultItem");
-      //     console.warn(ex);
-      //   }
-      // }));
-      
-      // this.own(topic.subscribe(appTopics.OnMouseLeaveResultItem,function(params){
-      //   if (self._highlighted) self._highlighted.hide();
-      // }));
-      
-      // var positionLocator = true;
-      // this.own(aspect.after(this.dropPane,"_setOpenAttr",function() {
-      //   if (positionLocator && self.map && self.map._slider && self._locator) {
-      //     var sliderPos = domGeometry.position(self.map._slider);
-      //     if (sliderPos.x > 0) {
-      //       var nd = self._locator.domNode;
-      //       domStyle.set(nd,"left",Math.round(sliderPos.x)+"px");
-      //       domStyle.set(nd,"top",Math.round(sliderPos.y+sliderPos.h)+"px");
-      //     }
-      //   }
-      // }));
+
     },
     
     destroy: function() {
@@ -259,55 +152,7 @@ function(declare, lang, array, aspect, djQuery, on, domConstruct, domClass, domG
       return sources;
     },
     
-    // equalInterval: function(min,max) {
-    //   var newsym = function(size) {
-    //     var olclr = Color.fromHex("#7A7A7A");
-    //     var sym = new SimpleMarkerSymbol().setSize(size);
-    //     sym.setOutline(new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,olclr,1));
-    //     return sym;
-    //   };
-    //   var defaultSym = new SimpleMarkerSymbol().setSize(0);
-    //   var renderer = new ClassBreaksRenderer(defaultSym,"Count");
-    //   // TODO isMaxInclusive ??
-    //   var iv = (max - min) / 4;
-    //   var v0 = 0;
-    //   var v1 = min;
-    //   var v2 = min+iv;
-    //   var v3 = min+(2*iv);
-    //   var v4 = max;
-    //   // 2,5,8,12 - 4,8,12,16
-    //   renderer.addBreak(v0,v1,newsym(4));
-    //   renderer.addBreak(v1,v2,newsym(8));
-    //   renderer.addBreak(v2,v3,newsym(12));
-    //   renderer.addBreak(v3,v4,newsym(16));
-    //   return renderer;
-    // },
-    //
-    // getGeoHashGridPrecision: function(hasSpatialFilter) {
-    //   // precision ranges from 0..12, 12 is than a square meter
-    //   var getInt = function(v) {
-    //     v = parseInt(""+v,10);
-    //     if (!isNaN(v) && v > 0 && v <= 12) return v;
-    //     return null;
-    //   };
-    //   var precision = null, level = null, lodToGeo = this.lodToGeoHashGridPrecision;
-    //   if (this.map && lodToGeo) {
-    //     level = this.map.getLevel();
-    //     if (lodToGeo.hasOwnProperty(level)) {
-    //       precision = getInt(lodToGeo[level]);
-    //     } else if (level > 10 && lodToGeo.hasOwnProperty("max")) {
-    //       precision = getInt(lodToGeo["max"]);
-    //     } else if (level < 2 && lodToGeo.hasOwnProperty("min")) {
-    //       precision = getInt(lodToGeo["max"]);
-    //     }
-    //   }
-    //   if (precision === null && lodToGeo && lodToGeo.hasOwnProperty("default")) {
-    //     precision = getInt(lodToGeo["default"]);
-    //   }
-    //   if (precision === null) precision = 3;
-    //   //console.warn("map-lod:",level," geohash-grid-precision:",precision);
-    //   return precision;
-    // },
+
     
     getRelation: function() {
       var r = djQuery("input[type=radio]:checked",this.relationsNode)[0].getAttribute("data-op");
@@ -361,81 +206,35 @@ function(declare, lang, array, aspect, djQuery, on, domConstruct, domClass, domG
       addChoice(i18n.search.spatialFilter.within,"within");
     },
     
-    // initializeLocator: function() {
-    //   if (!this.showLocator) return;
-    //   var params = {
-    //     map: this.map,
-    //     enableButtonMode: false,
-    //     enableHighlight: false,
-    //     enableInfoWindow: true,
-    //     showInfoWindowOnSelect: false
-    //   };
-    //   var cfgParams = this.locatorParams;
-    //   if (!cfgParams && AppContext.appConfig.searchMap) {
-    //     cfgParams = AppContext.appConfig.searchMap.locatorParams;
-    //   }
-    //   if (cfgParams) {
-    //     var sources = this._convertConfig(cfgParams);
-    //     if (sources && sources.length > 0) {
-    //       lang.mixin(params,cfgParams);
-    //       params.sources = sources;
-    //     }
-    //   }
-    //   //if (cfgParams) lang.mixin(params,cfgParams);
-    //   var locator = new SearchWidget(params,this.searchWidgetNode);
-    //   locator.startup();
-    //   domClass.add(locator.domNode,"g-spatial-filter-locator-inline");
-    //   this._locator = locator;
-    // },
-    //
-    //   updateBBox: function() {
-    //       var map = this.map;
-    //       var env = map.geographicExtent;
-    //       if (env) {
-    //           env1 = {xmin: env.xmin, ymin: env.ymin, xmax: env.xmax, ymax: env.ymax};
-    //           var n = this.bboxN;
-    //           var s = this.bboxS;
-    //           var e = this.bboxE;
-    //           var w = this.bboxW;
-    //           s.value = env.ymin;
-    //           n.value = env.ymax;
-    //           e.value = env.xmax;
-    //           w.value = env.xmin;
-    //       }
-    //   },
+ updateBBox: function(event){
 
-    // initializeMap: function() {
-    //   var mapProps = this.map || AppContext.appConfig.searchMap || {};
-    //   if (mapProps) mapProps = lang.clone(mapProps);
-    //   var v = mapProps.basemapUrl;
-    //   delete mapProps.basemapUrl;
-    //   if (typeof mapProps.basemap === "string" && mapProps.basemap.length > 0) {
-    //     v = null;
-    //   }
-    //   this.map = null;
-    //   var map = new Map(this.mapNode,mapProps);
-    //   if (typeof v === "string" && v.length > 0) {
-    //     v =  util.checkMixedContent(v);
-    //     var basemap = new ArcGISTiledMapServiceLayer(v);
-    //     map.addLayer(basemap);
-    //   }
-    //   this.own(on(map,"Load",lang.hitch(this,function(){
-    //     this.map = map;
-    //     this.initializeLocator();
-    //     //window.AppContext.searchMap = this.map;
-    //     this.own(on(map,"ExtentChange",lang.hitch(this,function(){
-    //       if (this.getRelation() !== "any") this.search();
-    //       this.updateBBox();
-    //     })));
-    //   })));
-    // },
-    
+ },
+      _getBbox: function (){
+
+          var ymax= parseInt(this.bboxN.value), ymin= parseInt(this.bboxS.value), xmax= parseInt(this.bboxE.value),xmin= parseInt(this.bboxW.value);
+          this.bBox.xmin= xmin;
+          this.bBox.xmax=xmax;
+          this.bBox.ymin=ymin;
+          this.bBox.ymax=ymax;
+return this.bBox;
+          },
+    _bBoxIsValid: function () {
+      var box = this._getBox();
+
+            if (!box) return;
+            if (box.xmin < -180) box.xmin = -180;
+            if (box.xmax > 180) box.xmax = 180;
+            if (box.ymin < -90) box.ymin = -90;
+            if (box.ymax > 90) box.ymax = 90;
+       return true;
+    },
+
     /* SearchComponent API ============================================= */
     
     appendQueryParams: function(params) {
       if (!this.hasField()) return;
       var field = this.field, relation = this.getRelation();
-      var map = this.map, qClause = null;
+      var  qClause = null;
       var env1, env2, query, tip;
       
       var chkBnd = function(env) {
@@ -471,12 +270,12 @@ function(declare, lang, array, aspect, djQuery, on, domConstruct, domClass, domG
         return qry;
       };
 
-      if (map && relation !== "any") {
+      if (relation !== "any") {
         //console.warn("map.geographicExtent",map.geographicExtent);
-        var env = map.geographicExtent;
+        var env = this._getBbox();
         if (env) {
           env1 = {xmin:env.xmin,ymin:env.ymin,xmax:env.xmax,ymax:env.ymax};
-          if (map.wrapAround180) {
+          if (env.xmax<env.xmin ) { // wraps
             //console.warn("xmin",env1.xmin,"xmax",env1.xmax);
             while (env1.xmin <= env1.xmax && env1.xmin < -180 && env1.xmax < -180) {
               env1.xmin = env1.xmin + 360;

@@ -11,24 +11,29 @@
               <td></td>
            <td>   <input type="text" class="g-spatial-filter-n"
             placeholder="${i18n.search.spatialFilter.north}..."
-                                                                   data-dojo-attach-point="bboxN"/>
+                                                                   data-dojo-attach-point="bboxN"
+                         data-dojo-attach-event="onBlur: updateBBox"/>
               </td>
           <td></td></tr>
 <tr class="g-filter-bbox-input">
       <td style="column-span: all"> <input type="text" class="g-spatial-filter-w"
                    placeholder="${i18n.search.spatialFilter.west}..."
-                   data-dojo-attach-point="bboxW"/>
+                   data-dojo-attach-point="bboxW"
+                                           data-dojo-attach-event="onBlur: updateBBox"
+      />
     </td>
     <td></td>
     <td><input type="text" class="g-spatial-filter-e"
                    placeholder="${i18n.search.spatialFilter.east}..."
-                   data-dojo-attach-point="bboxE"/>
+                   data-dojo-attach-point="bboxE"
+               data-dojo-attach-event="onBlur: updateBBox"/>
     </td>
 </tr>
             <tr class="g-filter-bbox-input">
                 <td></td> <td style="column-span: all"><input type="text" class="g-spatial-filter-s"
                    placeholder="${i18n.search.spatialFilter.south}..."
-                   data-dojo-attach-point="bboxS"/>
+                   data-dojo-attach-point="bboxS"
+                                                              data-dojo-attach-event="onBlur: updateBBox"/>
                 </td><td></td></tr>
             </tbody>
         </table>
