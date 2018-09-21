@@ -50,7 +50,7 @@
     margin: 0;
 }
 
-.typeahead-wrapper {
+.sb-typeahead-wrapper {
     color:#333333;
     display: block;
     background-color: #fff;
@@ -74,7 +74,7 @@
     background-color: #ccc;
     background: #f8f8f8;
     font-family: arial, sans-serif;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .triggered-events {
@@ -91,5 +91,17 @@
     color:#333333;
     background-color: #ccc;
     background: #f8f8f8;
-
+    height: auto;
+    width: auto;
+}
+.form-control {
+    padding: 6px;
+    vertical-align: middle;
+    font-size: 12px;
+}
+.input-group div{ vertical-align: middle;}
+.input-group-btn {vertical-align: top;}
+.twitter-typeahead {
+    width:100%;
+    display: inline-block;
 }

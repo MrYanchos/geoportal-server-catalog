@@ -81,7 +81,6 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
     postCreate: function() {
       this.intializeToolTip();
       this.inherited(arguments);
-
       var self = this;
       this.own(topic.subscribe(appTopics.ItemOwnerChanged,function(params){
         if (self.item && self.item === params.item) {
@@ -104,12 +103,13 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
       var item = this.item = hit._source;
       var highlight = hit.highlight;
 
-      item._id = hit._id; 
+      item._id = hit._id;
       var links = this._uniqueLinks(item);
      // util.setNodeText(this.titleNode,item.title);
         this._renderTitle(item, highlight);
         //this._renderOwnerAndDate(item);
         this._renderSourceAndDate(item);
+        this._renderCollectionAndDate(item);
         //util.setNodeText(this.descriptionNode,item.description);
         this._renderDescription(item,highlight);
       this._renderThumbnail(item);
@@ -187,7 +187,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
       topic.publish(appTopics.OnMouseLeaveResultItem,{item:this.item});
     },
     
-    _renderPreview: function(actionsNode, serviceType) {
+    _renderPreview: function(item, actionsNode, serviceType) {
       
       // declare preview pane
       var previewPane;
@@ -230,6 +230,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
       // create clickable link to launch preview dialog
       var previewNode = domConstruct.create("a",{
         href: "javascript:void(0)",
+        title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.preview, title: item.title}),
         innerHTML: i18n.item.actions.preview
       },actionsNode);
       
@@ -254,6 +255,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
           domConstruct.create("a",{
             href: "javascript:void(0)",
             innerHTML: i18n.item.actions.addToMap,
+            title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.addToMap, title: item.title}),
             onclick: function() {
               topic.publish(appTopics.AddToMapClicked,serviceType);
             }
@@ -261,7 +263,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
           
           // create clickable 'Preview' link if allowes
           if (PreviewUtil.canPreview(serviceType)) {
-            this._renderPreview(actionsNode, serviceType);
+            this._renderPreview(item, actionsNode, serviceType);
           }
           
           return true;
@@ -276,22 +278,25 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
         var htmlNode = domConstruct.create("a",{
           href: uri+"/html",
           target: "_blank",
-          innerHTML: "Full metadata record"
+          title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.html, title: item.title}),
+          innerHTML: i18n.item.actions.html
         },actionsNode);
         var xmlNode = domConstruct.create("a",{
           href: uri+"/xml",
           target: "_blank",
-          innerHTML: "ISO XML"
+          title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.xml, title: item.title}),
+          innerHTML: i18n.item.actions.xml
         },actionsNode);
         var jsonNode = domConstruct.create("a",{
           href: uri+"?pretty=true",
           target: "_blank",
+          title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.json, title: item.title}),
           innerHTML: i18n.item.actions.json
         },actionsNode);
-        if (AppContext.geoportal.supportsApprovalStatus ||
+        if (AppContext.geoportal.supportsApprovalStatus || 
             AppContext.geoportal.supportsGroupBasedAccess) {
           var client = new AppClient();
-          htmlNode.href = client.appendAccessToken(htmlNode.href);
+          htmlNode.href = client.appendAccessToken(htmlNode.href); 
           xmlNode.href = client.appendAccessToken(xmlNode.href);
           jsonNode.href = client.appendAccessToken(jsonNode.href);
         }
@@ -315,6 +320,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
         "data-toggle": "dropdown",
         "aria-haspopup": true,
         "aria-expanded": true,
+        title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.links, title: item.title}),
         innerHTML: i18n.item.actions.links
       },dd);
       domConstruct.create("span",{
@@ -374,12 +380,14 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
           "class": "small",
           href: url,
           target: "_blank",
+          title: string.substitute(i18n.item.actions.titleFormat, {action: u, title: item.title}),
+
           innerHTML: thelabel
         },ddli);
       });
       this._mitigateDropdownClip(dd,ddul);
     },
-
+    
     _renderOptionsDropdown: function(itemId,item) {
       var self = this;
       var isOwner = this._isOwner(item);
@@ -734,7 +742,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
 
       if (href && href.length > 0) {
         var link = domConstruct.create("a",{
-          href: href,
+          href: href, 
           target: "_blank",
           "class": "g-item-status",
           innerHTML: caption
@@ -757,21 +765,29 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
 
           if (Array.isArray(author)){
            author.forEach(function(element) {
-             if (typeof element === "string") {
-             if (text.length == 0  ) {
-                   text = "Authors: " + element;
-               } else {
-                   text = text + ", " + element;
-               };
-           }})
-           }
-           else {
-         	  if (typeof author === "string" && author.length > 0) {
-                   if (text.length > 0) text += " ";
-                   text = "Author: " + author;
-               }
-           }
+               if (typeof element === "string") {
 
+                   if (text.length == 0) {
+                       text = "Authors: " + element;
+                   } else {
+                       text = text + ", " + element;
+                   }
+                   ;
+               }
+
+
+               else {
+                   if (typeof author === "string" && author.length > 0) {
+                       if (text.length > 0) text += " ";
+                       text = "Author: " + author;
+                   }
+               }
+           } )
+
+           if (text.length == 0  ) {
+                  text = "<span>"+ text + "</span>"
+           }
+          }
 /*  SMR 2018-08-20
             * report either the publication(available, release) date or reported creation date
             *
@@ -782,7 +798,9 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                 if (idx > 0) date =date.substring(0,idx);
                 idx = date.indexOf("-01-01");
                 if (idx > 0) date =date.substring(0,idx);
-                date = ";    Publication: " + date;
+
+
+                date = "Publication: " + date;
             }
             else if (typeof item.apiso_CreatedDate_dt === "string" && item.apiso_CreatedDate_dt.length > 0 ){
              date = item.apiso_CreatedDate_dt;
@@ -790,15 +808,18 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                 if (idx > 0) date =date.substring(0,idx);
                 idx = date.indexOf("-01-01");
                 if (idx > 0) date =date.substring(0,idx);
-                date = ";    Created: " + date;
-            }
 
+                date = "Created: " + date;
+            }
+        if (date.length > 0  ) {
+            date = "<span>"+ date + "</span>";
+    }
              if (AppContext.appConfig.searchResults.showDate && typeof date === "string" && date.length > 0) {
                  text += date;
              }
 
              if (text.length > 0) {
-                 util.setNodeText(this.ownerAndDateNode,text);
+                 util.setNodeHtml(this.ownerAndDateNode,text);
              }
 
    /*  original code
@@ -814,6 +835,31 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
               util.setNodeText(this.ownerAndDateNode,text);
           }
    */
+      },
+      _renderCollectionAndDate: function(item) {
+          var owner = item.src_source_name_s;
+          var date = item.sys_modified_dt;
+           var text = "";
+
+
+
+                 if (typeof owner === "string" && owner.length > 0) {
+                     if (text.length > 0) text += " ";
+                     text = "<span> Source: " + owner + "</span>";
+                 }
+                 if (AppContext.appConfig.searchResults.showDate && typeof date === "string" && date.length > 0) {
+                     idx = date.indexOf("T");
+                     if (idx > 0) date =date.substring(0,idx);
+                     text += " <span>Last Modified: " + date+ "</span>";
+                 }
+                 if (text.length > 0) {
+                   var existing = this.ownerAndDateNode.innerHTML;
+                   if (existing) {
+                     text = existing + text;
+                   }
+              util.setNodeHtml(this.ownerAndDateNode, text);
+          }
+
       },
      _renderWorkbenchLinksDropdown: function(item,links) {
           if ( ! Array.isArray(item.services_nst)) return;

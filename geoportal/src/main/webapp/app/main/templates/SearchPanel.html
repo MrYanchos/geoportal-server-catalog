@@ -9,15 +9,26 @@ https://stackoverflow.com/questions/13883902/dijit-why-am-i-getting-an-uncaught-
     <div class="g-search-pane" data-dojo-type="app/search/SearchPane">
     <div class="g-search-pane-left">
       <div data-dojo-type="app/search/PageUrlFilter"></div>
-      <div data-dojo-type="app/search/SearchBox2"></div>
+      <div data-dojo-type="app/search/SearchBox2"
+           data-dojo-props="
+           script: 'custom/searchBoxTypeahead_spatial.js',
+          "></div>
       <div id="infoSearchText">Information Search</div>
-      <div data-dojo-type="app/search/SpatialFilter"
+      <div data-dojo-type="app/search/SpatialFilter2"
         data-dojo-props="
           field: 'envelope_geo',
           pointField: 'envelope_cen_pt',
           allowAggregation: true,
           open: true,
           label:'${i18n.search.criteria.map}'">
+      </div>
+      <div data-dojo-type="app/search/SpatialFilterText"
+           data-dojo-props="
+          field: 'envelope_geo',
+          pointField: 'envelope_cen_pt',
+          allowAggregation: true,
+          open: true,
+          label:'${i18n.search.criteria.boundingBox}'">
       </div>
       <div data-dojo-type="app/search/DateFilter"
            data-dojo-props="
@@ -40,7 +51,16 @@ https://stackoverflow.com/questions/13883902/dijit-why-am-i-getting-an-uncaught-
           label:'Temporal Extent (slider)',
           fieldsOperator: 'should'">
       </div>
-
+        <div data-dojo-type="app/search/HierarchyAggregation"
+                   data-dojo-props="field:'hierarchies_cat',
+             rootTerm:'Category',
+             label:'CINERGI facet keywords',
+             props:{size:1000,
+             <!-- order:{_term:'asc'} -->
+             },
+             showRoot: true,
+             tooltip: 'Keywords added by CINERGI keyword enhancer'">
+    </div>
     <!-- e.g. field:'keywords_s',label:'Keywords',props:{size:20,min_doc_count:500} -->
       <div data-dojo-type="app/search/TermsAggregation"
              data-dojo-props="
@@ -73,27 +93,18 @@ https://stackoverflow.com/questions/13883902/dijit-why-am-i-getting-an-uncaught-
              label:'Place keywords' ">
         </div>
 
-      <div data-dojo-type="app/search/HierarchyAggregation"
-             data-dojo-props="
-             field:'hierarchies_cat',
-             rootTerm:'Category',
-             label:'CINERGI facet keywords',
-             props:{size:1000,order:{_term:'asc'}},
-             showRoot: false,
-             tooltip: 'Keywords added by CINERGI keyword enhancer'">
-        </div>
 
-      <div>Metadata Properties</div>
-    
-      <div data-dojo-type="app/search/TemporalFilter"
+        <div data-dojo-type="app/search/TemporalFilter"
              data-dojo-props="
           field:'apiso_PublicationDate_dt',
           interval:'year',
           open:false,
           label:'Publication Date',
           fieldsOperator: 'must'">
-     </div>
-        
+        </div>
+
+      <div>Metadata Properties</div>
+
       <div data-dojo-type="app/search/TemporalFilter"
          data-dojo-props="
           field:'sys_modified_dt',

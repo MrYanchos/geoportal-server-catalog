@@ -51,3 +51,62 @@
     font-size:8px;
     font-style:normal;font-weight:normal;font-variant:normal;text-transform:none;text-indent:0;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-size:12px;line-height:2.66667}
 
+.g-spatial-filter-locator {
+
+    top: 234px;
+}
+
+.g-spatial-filter-bbox {
+
+}
+.g-filter-bbox-input {
+    width: 70%;
+}
+.g-spatial-filter-n  {
+    width: 6em;
+
+      height:1.5em;
+  }
+.g-spatial-filter-s{
+    width: 6em;
+
+    height: 1.5em;
+}
+.g-spatial-filter-e{
+    width: 6em;
+;
+     height: 1.5em;
+ }
+.g-spatial-filter-w{
+    width: 6em;
+
+    height: 1.5em;
+}
+
+.g-item-card .g-item-source-and-date {
+    padding: 2px;
+    font-size: 10px;
+    width: 15%;
+}
+/* .g-item-card .g-item-description, */
+.g-item-card .g-item-owner-and-date {
+
+    width: 75%;
+}
+
+.g-paging .pagination-page {
+   width: 4em;
+    padding: 0px 0px;
+}
+.g-paging .dijitTextBox .dijitInputField {
+    padding: 0px 0px;
+}
+.g-paging .dijitButtonContents {
+
+    padding: 0px 0px;
+}
+
+.g-paging  .dijitArrowButtonContainer{
+
+    padding: 0px 0px;
+}

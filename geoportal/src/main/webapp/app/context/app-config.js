@@ -1,4 +1,5 @@
-define([],function(){var obj={
+define(["dojo/i18n!app/nls/resources",]
+    ,function(i18n){var obj={
 // .......................................................................................
   
   edit: {
@@ -17,8 +18,8 @@ define([],function(){var obj={
   
   search: {
     allowSettings: false,
-    useSimpleQueryString: true,
-      highlightQuery: true
+    useSimpleQueryString: false,
+    highlightQuery: true
   },
   
   searchMap: {
@@ -26,9 +27,41 @@ define([],function(){var obj={
     autoResize: true, 
     wrapAround180: true,
     center: [-98, 40], 
-    zoom: 3
+    zoom: 3,
+      searchOnMap: false,
+      locatorParams: {
+      sources:[
+          {
+              type:"locator",
+              url: "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer",
+              singleLineFieldName: "SingleLine",
+              outFields: ["Addr_type"],
+              // name: i18n.widgets.Search.main.esriLocatorName,
+              localSearchOptions: {
+                  minScale: 300000,
+                  distance: 90
+              },
+              placeholder: "find  a place",
+              categories: [
+                  "Populated Place",
+                  "Education",
+                  "Land Features",
+                  "Wildlife Reserve",
+                  "Nature Reserve",
+                  "Harbor",
+                  "Mine",
+
+                  "Water Features",
+              ],
+              maxResults:10,
+              maxSuggestions: 20,
+              searchInCurrentMapExtent: false,
+
+          }
+      ],
+      }
   },
-  
+
   searchResults: {
     numPerPage: 10,
     showPageCount: true,

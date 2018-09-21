@@ -89,110 +89,119 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
     },
     
     search: function() {
-      var components = this.getSearchComponents();
-      var self = this, params = {urlParams:{}};
-        var uri = window.location.search;
-        var query = uri.substring(uri.indexOf("?") + 1, uri.length);
-        if (query != null && query.length >0) {
-            // ioQuery.queryToObject(query); // tried no reference error
-            //        params.urlParams = dojo.queryToObject(query);
-        }
-        array.forEach(components,function(component){
-        component.appendQueryParams(params);
-      });
-      var url = "./elastic/"+AppContext.geoportal.metadataIndexName+"/item/_search";
-      var v, postData = null;
-        if (typeof this.highlightQuery === "undefined" || this.highlightQuery === null) {
-            this.highlightQuery = AppContext.appConfig.search.highlightQuery;
-        }
-      if (AppContext.geoportal.supportsApprovalStatus || 
-          AppContext.geoportal.supportsGroupBasedAccess) {
-        var client = new AppClient();
-        url = client.appendAccessToken(url); 
-      }
-      
-      var sProp = null, oProp = null, props = params.urlParams;
-      for (sProp in props) {
-        if (props.hasOwnProperty(sProp)) {
-          oProp = props[sProp];
-          if (typeof oProp !== "undefined" && oProp !== null) {
-            if (url.indexOf("?") === -1) url += "?";
-            else url += "&";
-            url += sProp+"="+encodeURIComponent(oProp);
-          }
-        }
-      }
-      if (!params.hasScorable && typeof params.urlParams.sort === "undefined") {
-        v = AppContext.appConfig.searchResults.defaultSort;
-        if (typeof this.defaultSort === "string" && this.defaultSort.length > 0) {
-          if (url.indexOf("?") === -1) url += "?";
-          else url += "&";
-          url += "sort="+encodeURIComponent(this.defaultSort);
-        }
-      }
 
-      //console.warn("params.queries",params.queries);
-      if (params.queries && params.queries.length > 0) {
-        if (postData === null) postData = {};
-        postData.query = {"bool":{"must":params.queries}};
-        if (this.highlightQuery){
-            postData.highlight = {
-            "require_field_match": false,
-                "pre_tags" : ["<em>"],
-                "post_tags" : ["</em>"],
-                "fields" :  {
-                "*": {"require_field_match" : false} }
-
-          };
-        }
-      } 
-      if (params.aggregations) {
-        if (postData === null) postData = {};
-        postData.aggregations = params.aggregations;
-      }
-      if (this._dfd !== null && !this._dfd.isCanceled()) {
-        this._dfd.cancel("Search aborted.",false);
-      }
-      
-      var dfd = null;
-      if (postData === null) {
-        dfd = this._dfd = dojoRequest.get(url,{handleAs:"json"});
-      } else {
-        dfd = this._dfd = dojoRequest.post(url,{
-          handleAs: "json",
-          headers: {"Content-Type": "application/json"},
-          data: JSON.stringify(postData)
-        });
-      }
-      
-      dfd.then(function(response) {
-        if (!dfd.isCanceled()) {
-          //console.warn("search-response",response);
-          self.lastQueryCount = 0;
-          self.lastQueryWasMyContent = !!params.wasMyContent;
-          if (postData && postData.query) {
-            self.lastQuery = JSON.stringify({"query": postData.query});
-          } else {
-            self.lastQuery = null;
+          var components = this.getSearchComponents();
+          var self = this, params = {urlParams: {}};
+          var uri = window.location.search;
+          var query = uri.substring(uri.indexOf("?") + 1, uri.length);
+          if (query != null && query.length > 0) {
+              // ioQuery.queryToObject(query); // tried no reference error
+              //        params.urlParams = dojo.queryToObject(query);
           }
-          response.urlParams = params.urlParams;
-          array.forEach(components,function(component){
-            component.processResults(response);
+          array.forEach(components, function (component) {
+              component.appendQueryParams(params);
           });
-        }
-      }).otherwise(function(error){
-        if (!dfd.isCanceled()) {
-          if (error && error.dojoType && error.dojoType === "cancel") {
-          } else {
-            console.warn("search-error");
-            console.warn(error);
-            array.forEach(components,function(component){
-              component.processError(error);
-            });            
+          var url = "./elastic/" + AppContext.geoportal.metadataIndexName + "/item/_search";
+          var v, postData = null;
+          if (typeof this.highlightQuery === "undefined" || this.highlightQuery === null) {
+              this.highlightQuery = AppContext.appConfig.search.highlightQuery;
           }
-        }
-      });
-      return dfd;
+          if (AppContext.geoportal.supportsApprovalStatus ||
+              AppContext.geoportal.supportsGroupBasedAccess) {
+              var client = new AppClient();
+              url = client.appendAccessToken(url);
+          }
+
+          var sProp = null, oProp = null, props = params.urlParams;
+          for (sProp in props) {
+              if (props.hasOwnProperty(sProp)) {
+                  oProp = props[sProp];
+                  if (typeof oProp !== "undefined" && oProp !== null) {
+                      if (url.indexOf("?") === -1) url += "?";
+                      else url += "&";
+                      url += sProp + "=" + encodeURIComponent(oProp);
+                  }
+              }
+          }
+          if (!params.hasScorable && typeof params.urlParams.sort === "undefined") {
+              v = AppContext.appConfig.searchResults.defaultSort;
+              if (typeof this.defaultSort === "string" && this.defaultSort.length > 0) {
+                  if (url.indexOf("?") === -1) url += "?";
+                  else url += "&";
+                  url += "sort=" + encodeURIComponent(this.defaultSort);
+              }
+          }
+
+
+          //console.warn("params.queries",params.queries);
+          if (params.queries && params.queries.length > 0) {
+              if (postData === null) postData = {};
+              postData.query = {"bool": {"must": params.queries}};
+              if (this.highlightQuery) {
+                  postData.highlight = {
+                      "require_field_match": false,
+                      "pre_tags": ["<em>"],
+                      "post_tags": ["</em>"],
+                      "fields": {
+                          "*": {"require_field_match": false}
+                      }
+
+                  };
+              }
+          }
+          if (params.aggregations) {
+              if (postData === null) postData = {};
+              postData.aggregations = params.aggregations;
+          }
+          if (this._dfd !== null && !this._dfd.isCanceled()) {
+              this._dfd.cancel("Search aborted.", false);
+          }
+
+        var dfd = null;
+
+          try {
+
+            if (postData === null) {
+                dfd = this._dfd = dojoRequest.get(url, {handleAs: "json"});
+            } else {
+                dfd = this._dfd = dojoRequest.post(url, {
+                    handleAs: "json",
+                    headers: {"Content-Type": "application/json"},
+                    data: JSON.stringify(postData)
+                });
+            }
+
+            dfd.then(function (response) {
+                if (!dfd.isCanceled()) {
+                    //console.warn("search-response",response);
+                    self.lastQueryCount = 0;
+                    self.lastQueryWasMyContent = !!params.wasMyContent;
+                    if (postData && postData.query) {
+                        self.lastQuery = JSON.stringify({"query": postData.query});
+                    } else {
+                        self.lastQuery = null;
+                    }
+                    response.urlParams = params.urlParams;
+                    array.forEach(components, function (component) {
+                        component.processResults(response);
+                    });
+                }
+            }).otherwise(function (error) {
+                if (!dfd.isCanceled()) {
+                    if (error && error.dojoType && error.dojoType === "cancel") {
+                    } else {
+                        console.warn("search-error");
+                        console.warn(error);
+                        array.forEach(components, function (component) {
+                            component.processError(error);
+                        });
+                    }
+                }
+            });
+            return dfd;
+      } catch {
+
+      }
     }
 
   });

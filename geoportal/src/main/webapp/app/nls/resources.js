@@ -70,7 +70,8 @@ define({
         origin: "Source of Origin",
         approvalStatus: "Approval Status",
         access: "Access",
-        accessGroups: "Access Groups"
+        accessGroups: "Access Groups",
+          boundingBox: "Bounding Box"
       },
       componentSettings: {
         componentLabel: "Label",
@@ -82,6 +83,7 @@ define({
       },
       spatialFilter: {
         label: "Map",
+          labelForboundingBox: "Bounding Box",
         any: "Any",
         intersects: "Intersects",
         within: "Within",
@@ -89,7 +91,11 @@ define({
         settings: {
           caption: "Spatial Filter",
           aggregations: "Aggregations"
-        }
+        },
+          north: "North",
+          south: "South",
+          east: "East",
+          west: "West"
       },
       temporalFilter: {
         label: "Temporal",
@@ -221,12 +227,14 @@ define({
     
     item: {
       actions: {
-        html: "HTML",
-        xml: "XML",
+        html: "Full metadata record",
+       // xml: "XML",
+          xml: "ISO XML", // Cinergi transforms all to ISO
         json: "JSON",
         links: "Get Data",
         addToMap: "Add to Map",
         preview: "Preview",
+        titleFormat: "${action} link for ${title}",
         options: {
           caption: "Options",
           editMetadata: "Edit Metadata",

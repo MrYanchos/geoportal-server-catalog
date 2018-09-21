@@ -1,0 +1,57 @@
+<div class="g-paging">
+ <div class="g-paging-count" data-dojo-attach-point="countNode">
+
+ </div>
+	<select data-dojo-attach-point="numPerPageNode" data-dojo-type="dijit.form.Select"
+			data-dojo-attach-event="onChange: numPerPageNodeChanged">
+		<option value="10" selected="selected">10</option>
+		<option value="20" >20</option>
+		<option value="50">50</option>
+		<option value="100">100</option>
+		<option value="500">500</option>
+	</select>
+
+	<ul class="pagination pagination-sm" data-dojo-attach-point="pagingNode">
+		<li>
+			<a href="#" aria-label="First"
+				data-dojo-attach-point="firstButton"
+				data-dojo-attach-event="onClick: firstButtonClicked"
+				title="${i18n.search.paging.firstTip}"
+				><span aria-hidden="true">&laquo;</span>
+		  </a>
+		</li>
+		<li>
+			<a href="#" aria-label="Previous"
+				data-dojo-attach-point="previousButton"
+				data-dojo-attach-event="onClick: previousButtonClicked"
+				title="${i18n.search.paging.previousTip}"
+				><span aria-hidden="true">&lt;</span>
+		  </a>
+		</li>
+		<li>
+		  <a><span data-dojo-attach-point="pagePatternNode">
+
+		  </span></a>
+			<input class="pagination-page" data-dojo-attach-point="goToPageNode"  type="text"
+				   data-dojo-type="dijit.form.NumberTextBox"
+				   data-dojo-props="intermediateChanges: true"
+				   name= "goToPage"
+				   value="1"
+				   constraints="{min:1,max:10,places:0}"
+				   required="true"
+				   invalidMessage= "Invalid page."
+				   data-dojo-attach-event="onBlur: goToPageNodeUpdated"
+			/>
+
+		</li>
+		<li>
+			<a href="#" aria-label="Next"
+				data-dojo-attach-point="nextButton"
+				data-dojo-attach-event="onClick: nextButtonClicked"
+				title="${i18n.search.paging.nextTip}"
+				><span aria-hidden="true">&gt;</span>
+		  </a>
+		</li>
+	</ul>
+
+</div>
