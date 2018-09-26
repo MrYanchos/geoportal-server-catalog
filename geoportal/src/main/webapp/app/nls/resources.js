@@ -79,13 +79,15 @@ define({
         reset: "Reset"
       },
       searchBox: {
-        search: "Search"
+        search: "Search",
       },
       spatialFilter: {
         label: "Map",
           labelForboundingBox: "Bounding Box",
-        any: "Any",
-        intersects: "Intersects",
+          any: "Any",
+          searchBboxLabel: "Search Using Bounding Box",
+          searchMapLabel: "Search Using MapExtent",
+          intersects: "Intersects",
         within: "Within",
         countPattern: "{count} centered here",
         settings: {
@@ -191,7 +193,7 @@ define({
         next: ">",
         nextTip: "Next",
         pagePattern: "Page {page}",
-        pageCountPattern: "{page} of {pages} Pages",
+        pageCountPattern: " of {pages} Pages",
           pageCountMany: "Many",
         countPattern: "{count} items"
       },

@@ -23,7 +23,8 @@ define(["dojo/i18n!app/nls/resources",]
   },
   
   searchMap: {
-    basemap: "streets",
+    open: true,
+      basemap: "streets",
     autoResize: true, 
     wrapAround180: true,
     center: [-98, 40], 

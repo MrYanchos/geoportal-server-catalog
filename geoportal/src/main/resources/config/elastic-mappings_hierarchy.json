@@ -109,6 +109,9 @@
         },
         "description": {
           "type": "text"
+        },
+        "suggest" : {
+          "type" : "completion"
         }
       },
       "dynamic_templates": [

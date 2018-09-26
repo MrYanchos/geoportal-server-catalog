@@ -29,10 +29,7 @@
 		  </a>
 		</li>
 		<li>
-		  <a><span data-dojo-attach-point="pagePatternNode">
-
-		  </span></a>
-			<input class="pagination-page" data-dojo-attach-point="goToPageNode"  type="text"
+		<span><input class="pagination-page" data-dojo-attach-point="goToPageNode"  type="text"
 				   data-dojo-type="dijit.form.NumberTextBox"
 				   data-dojo-props="intermediateChanges: true"
 				   name= "goToPage"
@@ -42,8 +39,10 @@
 				   invalidMessage= "Invalid page."
 				   data-dojo-attach-event="onBlur: goToPageNodeUpdated"
 			/>
-
-		</li>
+		  <span data-dojo-attach-point="pagePatternNode">
+          </span>
+        </span>
+        </li>
 		<li>
 			<a href="#" aria-label="Next"
 				data-dojo-attach-point="nextButton"

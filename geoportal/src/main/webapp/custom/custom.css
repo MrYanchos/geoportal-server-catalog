@@ -98,8 +98,10 @@
    width: 4em;
     padding: 0px 0px;
 }
-.g-paging .dijitTextBox .dijitInputField {
+.g-paging .dijitTextBox .dijitInputField,
+.g-paging .dijitTextBox .dijitInputInner {
     padding: 0px 0px;
+    line-height: 1.5;
 }
 .g-paging .dijitButtonContents {
 
@@ -109,4 +111,7 @@
 .g-paging  .dijitArrowButtonContainer{
 
     padding: 0px 0px;
+}
+.g-paging .pagination-sm > li > span {
+    padding: 0em 0.5em;
 }
