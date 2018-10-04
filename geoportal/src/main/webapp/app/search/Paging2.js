@@ -40,6 +40,7 @@ function(declare, lang, on, domClass, djNumber, topic, InlineEditBox, Select, Nu
     numPerPage: null,
     showPageCount: null,
     maxShowPageCount: null,
+      maxShowPageCountText: null,
     previousStart: -1,
     start: 1,
     
@@ -71,6 +72,12 @@ function(declare, lang, on, domClass, djNumber, topic, InlineEditBox, Select, Nu
         }
         if (typeof this.maxShowPageCount === "undefined" || this.maxShowPageCount === null) {
             this.maxShowPageCount = 9999;
+        }
+        if (typeof this.maxShowPageCountText === "undefined" || this.maxShowPageCountText === null) {
+            this.maxShowPageCountText = AppContext.appConfig.searchResults.maxShowPageCountText;
+        }
+        if (typeof this.maxShowPageCountText === "undefined" || this.maxShowPageCountText === null) {
+            this.maxShowPageCountText = ">10k";
         }
 
         var self = this;
@@ -224,7 +231,7 @@ function(declare, lang, on, domClass, djNumber, topic, InlineEditBox, Select, Nu
             if (nTotalPages < this.maxShowPageCount) {
                 sPage = sPage.replace("{pages}", "" + nTotalPages);
             } else {
-                sPage = sPage.replace("{pages}", "" + this.i18n.search.paging.pageCountMany);
+                sPage = sPage.replace("{pages}", "" + this.maxShowPageCountText);
             }
         }
       this.setNodeText(this.pagePatternNode,sPage);

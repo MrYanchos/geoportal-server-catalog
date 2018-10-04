@@ -66,7 +66,8 @@ define(["dojo/i18n!app/nls/resources",]
   searchResults: {
     numPerPage: 10,
     showPageCount: true,
-      maxShowPageCount: 9999,
+    maxShowPageCount: 9999,
+      maxShowPageCountText: ">10k",
     showDate: true,
     showOwner: true,
     showThumbnails: true,

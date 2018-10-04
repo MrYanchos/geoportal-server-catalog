@@ -949,7 +949,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                 "data-toggle": "dropdown",
                 "aria-haspopup": true,
                 "aria-expanded": true,
-                innerHTML: "Data Discovery Studio"
+                innerHTML: "Studio"
             }, dd);
             domConstruct.create("span", {
                 "class": "caret"
@@ -958,7 +958,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                 "class": "dropdown-menu",
             }, dd);
 
-            uri = "http://suave-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb?documentId=" + encodeURIComponent(item);
+            uri = "http://suave-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb?documentId=" + encodeURIComponent(item._id);
             uriTitle = "suave-jupyterhub.com (local authentication required)"
             var ddli2 = domConstruct.create("li", {}, ddul);
             domConstruct.create("a", {
@@ -967,7 +967,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                 target: "_blank",
                 innerHTML: uriTitle
             }, ddli2);
-            var uri = "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/stable?urlpath=%2Fnotebooks%2FCinergiDispatch.ipynb?documentId=" + encodeURIComponent(item);
+            var uri = "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/stable?urlpath=%2Fnotebooks%2FCinergiDispatch.ipynb?documentId=" + encodeURIComponent(item._id);
             var uriTitle = "MyBinder-Stable";
             var ddli = domConstruct.create("li", {}, ddul);
             domConstruct.create("a", {
@@ -976,7 +976,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                 target: "_blank",
                 innerHTML: uriTitle
             }, ddli);
-            var uri = "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/master?urlpath=%2Fnotebooks%2FDispatchTesting%2FCinergiDispatch-UseMetadata.ipynb?documentId=" + encodeURIComponent(item);
+            var uri = "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/master?urlpath=%2Fnotebooks%2FDispatchTesting%2FCinergiDispatch-UseMetadata.ipynb?documentId=" + encodeURIComponent(item._id);
             var uriTitle = "MyBinder-Development";
             var ddli0 = domConstruct.create("li", {}, ddul);
             domConstruct.create("a", {
@@ -986,7 +986,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                 innerHTML: uriTitle
             }, ddli0);
 
-            uri = "https://suave-jupyter.nautilus.optiputer.net/?documentId=" + encodeURIComponent(item);
+            uri = "https://suave-jupyter.nautilus.optiputer.net/?documentId=" + encodeURIComponent(item._id);
             uriTitle = "Optiputer (google authentication required)"
 
             var ddli3 = domConstruct.create("li", {}, ddul);

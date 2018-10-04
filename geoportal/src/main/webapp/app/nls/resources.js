@@ -194,7 +194,7 @@ define({
         nextTip: "Next",
         pagePattern: "Page {page}",
         pageCountPattern: " of {pages} Pages",
-          pageCountMany: "Many",
+          pageCountMany: ">10k",
         countPattern: "{count} items"
       },
       termsAggregation: {

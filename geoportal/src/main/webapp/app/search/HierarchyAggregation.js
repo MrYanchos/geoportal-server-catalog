@@ -248,7 +248,10 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
 
                             if (parent.length >0) {
                                 parent[0].count_children = parent[0].count_children + entry.count;
-                                var v = parent[0].term + " (" + parent[0].count + "/" + parent[0].count_children + ")";
+                                var count =  parent[0].count_children > parent[0].count ? parent[0].count_children : parent[0].count;
+                                 var v = parent[0].term + " (" + count + ")";
+
+                                // var v = parent[0].term + " (" + parent[0].count + "/" + parent[0].count_children + ")";
                                 parent[0].name = v;
                             }
                         }
