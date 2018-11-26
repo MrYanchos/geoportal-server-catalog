@@ -50,7 +50,7 @@ G.evaluators.cinergi = {
         var iden = G.getNode(task, root, "gmd:identificationInfo/gmd:MD_DataIdentification | gmd:identificationInfo/srv:SV_ServiceIdentification");
 
         /* get title and alternateTitle */
-        G.evalProp(task, item, iden, "title", "gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString | gmd:citation/gmd:CI_Citation/gmd:alternateTitle/gco:CharacterString");
+        G.evalProp(task, item, iden, "title", "gmd:citation/gmd:CI_Citation/gmd:title/*/text() | gmd:citation/gmd:CI_Citation/gmd:alternateTitle/*/text()");
 
         /*    G.evalProp(task,item,iden,"description","gmd:abstract/gco:CharacterString");
                 get abstract and other citation details */
@@ -66,7 +66,7 @@ G.evaluators.cinergi = {
 
         /* include position name for individual, leave out 'missing', get only pointOf contact */
         this.clearProps(task,"contact_people_s");
-        G.evalProps(task, item, root, "contact_people_s", "//gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='pointOfContact']/gmd:individualName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString | //gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='pointOfContact']/gmd:positionName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+        G.evalProps(task, item, root, "contact_people_s", "//gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='pointOfContact']/gmd:individualName[not(contains(gco:CharacterString,'issing'))]/*/text() | //gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='pointOfContact']/gmd:positionName[not(contains(gco:CharacterString,'issing'))]/*/text()");
 
         /* these are the points of contacts, for metadata, the resource, or distribution; no distinction made */
         this.clearProps(task,"contact_organizations_s");
@@ -76,9 +76,9 @@ G.evaluators.cinergi = {
         filter for responsible party in identification; sometimes the author is put in identificationInformation
             point of contact */
         this.clearProps(task,"cited_individual_s");
-        G.evalProps(task, item, iden, "cited_individual_s", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:individualName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+        G.evalProps(task, item, iden, "cited_individual_s", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:individualName[not(contains(gco:CharacterString,'issing'))]/*/text()");
         this.clearProps(task,"cited_organization_s");
-        G.evalProps(task, item, iden, "cited_organization_s", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+        G.evalProps(task, item, iden, "cited_organization_s", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/*/text()");
 
         /* to generate facet for place names
          * dwv 2018-08-28 add named places */

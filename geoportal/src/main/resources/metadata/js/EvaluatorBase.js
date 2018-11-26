@@ -18,6 +18,7 @@ var G = {
   DateUtil: Java.type("com.esri.geoportal.base.util.DateUtil"),
   Val: Java.type("com.esri.geoportal.base.util.Val"),
 
+
   XPATH_NODE: javax.xml.xpath.XPathConstants.NODE,
   XPATH_NODESET: javax.xml.xpath.XPathConstants.NODESET,
   XPATH_STRING: javax.xml.xpath.XPathConstants.STRING,
@@ -192,7 +193,11 @@ var G = {
         value = this.DateUtil.checkIsoDateTime(value,isEnd);
       }
     }
-    return value;
+      if ( typeof value === "string") {
+        value= value.trim();
+         value = this.Val.unescapeHtml4( value);
+      }
+      return value
   },
 
   evalCode: function(task,obj,contextNode,name,xpathExpression) {

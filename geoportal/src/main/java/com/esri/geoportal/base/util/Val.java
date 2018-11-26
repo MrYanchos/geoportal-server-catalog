@@ -13,13 +13,12 @@
  * limitations under the License.
  */
 package com.esri.geoportal.base.util;
+
+import org.apache.commons.text.StringEscapeUtils;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Locale;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * Value utilities.
@@ -211,5 +210,17 @@ public class Val {
     }
     return v;
   }
+  /**
+   * URL encodes a value.
+   * @param v the value
+   * @return the encoded value
+   */
+  public static String unescapeHtml4(String v) {
+    if (v != null) {
 
+        return StringEscapeUtils.unescapeHtml4​(v);
+
+    }
+    return v;
+  }
 }
