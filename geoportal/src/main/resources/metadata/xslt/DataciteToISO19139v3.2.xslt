@@ -3,7 +3,8 @@
     xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco"
     xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink"
     xmlns:datetime="http://exslt.org/dates-and-times"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="datetime">
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                exclude-result-prefixes="datetime">
 
     <xsl:output method="xml" encoding="utf-8" omit-xml-declaration="no" indent="yes"/>
     <!-- 
@@ -38,8 +39,8 @@
 	SMR 2018-06-19  add input parameter for gmd:dateStamp named 'updateDate'. This should be the most recent update
 	   date for the source record being transformed. Since DataCiteXML doesn't have an element for the 
 	   metadata update date, this should be populated from the file-system update date
+	dwv 2018-11-28 Initial clean up to brand as data discovery studio. Will need work to make generic.
 	-->
-    
     
     <!--  * @copyright    2007-2017 Interdisciplinary Earth Data Alliance, Columbia University. 
 	        All Rights Reserved.
@@ -76,7 +77,7 @@
             <xsl:value-of select="normalize-space(//*[local-name() = 'publisher'][1])"/>
         </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="string('Interdisciplinary Earth Data Alliance')"/>
+                <xsl:value-of select="string('Data Discovery Studio')"/>
             </xsl:otherwise>
  
         </xsl:choose>
@@ -88,7 +89,7 @@
         <gmd:contact>
             <gmd:CI_ResponsibleParty>
                 <gmd:organisationName>
-                    <gco:CharacterString>Interdisciplinary Earth Data Alliance</gco:CharacterString>
+                    <gco:CharacterString>Data Discovery Studio </gco:CharacterString>
                 </gmd:organisationName>
                 <gmd:contactInfo>
                     <gmd:CI_Contact>
@@ -108,7 +109,7 @@
                                                 <xsl:value-of select="string('info@marine-geo.org')"/>
                                             </xsl:when>
                                         <xsl:otherwise>
-                                            <xsl:value-of select="string('info@iedadata.org')"/>
+                                            <xsl:value-of select="string('datadiscoverystudio@gmail.com')"/>
                                         </xsl:otherwise>
                                         </xsl:choose>
                                     </gco:CharacterString>
@@ -141,7 +142,7 @@
                                             <xsl:value-of select="string('http://www.earthchem.org/sites/earthchem.org/files/arthemia_logo.jpg')"/>
                                         </xsl:when>
                                         <xsl:otherwise>
-                                            <xsl:value-of select="string('https://www.iedadata.org/wp-content/themes/IEDA/assets/img/logo.png')"/>
+                                            <xsl:value-of select="string('https://www.earthcube.org/sites/default/files/doc-repository/logo_earthcube_cube-only_SMALL.png')"/>
                                         </xsl:otherwise>
                                     </xsl:choose>
                                     </gmd:URL>
@@ -202,14 +203,19 @@
 				metadata record, not the described resource which is identified by a DOI.
 			-->
 
-            <xsl:variable name="fileIdentifierPrefix" select="string('urn:ieda:')"/>
+            <xsl:variable name="fileIdentifierPrefix" select="string('urn:datacite:')"/>
             <gmd:fileIdentifier>
                 <gco:CharacterString>
                     <xsl:choose>
                         <xsl:when
-                            test="string-length($datacite-identifier) &gt; 0 and count($datacite-identifier[@identifierType = 'DOI']) &gt; 0">
+                            test="starts-with($datacite-identifier, 'DOI')">
+                           <!-- <xsl:value-of
+                                select="concat($fileIdentifierPrefix, string('metadataabout:'), normalize-space(translate($datacite-identifier, '/:', '[DASH][DASH]')))"
+                            />
+                            -->
+                            <!-- do not change the idenfifier. change DASH DASH back to dashes if used -->
                             <xsl:value-of
-                                select="concat($fileIdentifierPrefix, string('metadataabout:'), normalize-space(translate($datacite-identifier, '/:', '--')))"
+                                    select="$datacite-identifier"
                             />
                         </xsl:when>
                         <xsl:when
@@ -319,10 +325,10 @@
                     <xsl:otherwise>
                         <!-- put something in, but flag as bogus -->
                         <gco:DateTime>
-                            <xsl:value-of select="$currentDateTime"/>
                             <xsl:attribute name="gco:nilReason">
                                 <xsl:value-of select="string('missing')"/>
                             </xsl:attribute>
+                            <xsl:value-of select="$currentDateTime"/>
                         </gco:DateTime>
                     </xsl:otherwise>
                 </xsl:choose>
@@ -619,9 +625,7 @@
                                         </gmd:name>
                                         <gmd:description>
                                             <gco:CharacterString>
-                                                <xsl:value-of select="normalize-space(string('Link to DOI landing page or 
-                                                    data facility landing page if no DOI is
-                                                assigned.'))" />
+                                                <xsl:value-of select="normalize-space(string('Link to DOI landing page or  data facility landing page if no DOI is assigned.'))" />
                                             </gco:CharacterString>
                                         </gmd:description>
                                         <gmd:function>

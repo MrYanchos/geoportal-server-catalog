@@ -90,19 +90,32 @@
             <gmd:fileIdentifier>
                 <gco:CharacterString>
                     <xsl:choose>
-                        <xsl:when test="string-length($dc-identifier[1]) &gt; 0">
-                            <xsl:value-of
-                                select="concat($fileIdentifierPrefix, string('metadataabout:'), normalize-space(translate($dc-identifier[1], '/:', '--')))"
+                        <xsl:when
+                                test="starts-with($dc-identifier, 'doi') or starts-with($dc-identifier, 'DOI')">
+                        <!--         test="string-length($dc-identifier) &gt; 0 and count($dc-identifier[@identifierType = 'DOI']) &gt; 0"> -->
+                        <xsl:value-of
+                            select="concat($fileIdentifierPrefix, string('metadataabout:'), normalize-space(translate($dc-identifier, '/:', '--')))"
+                        />
+
+                        <!-- do not change the idenfifier. change DASH DASH back to dashes if used -->
+                        <!--     <xsl:value-of
+                                    select="$dc-identifier"
                             />
-                        </xsl:when>
-                        <!-- <xsl:when
-                            test="count($dc-alternateIDs/*[local-name() = 'alternateIdentifier'][@alternateIdentifierType = 'IEDA submission_ID']) &gt; 0">
-                            <xsl:value-of
-                                select="
-                                    concat($fileIdentifierPrefix, string('metadataabout:'),
-                                    normalize-space(substring-after($dc-alternateIDs/*[local-name() = 'alternateIdentifier'][@alternateIdentifierType = 'IEDA submission_ID']/text(), 'urn:')))"
-                            />
-                        </xsl:when>-->
+                            -->
+                    </xsl:when>
+                    <xsl:when test="string-length($dc-identifier[1]) &gt; 0">
+                        <xsl:value-of
+                            select="concat($fileIdentifierPrefix, string('metadataabout:'), normalize-space(translate($dc-identifier[1], '/:', '--')))"
+                        />
+                    </xsl:when>
+                    <!-- <xsl:when
+                        test="count($dc-alternateIDs/*[local-name() = 'alternateIdentifier'][@alternateIdentifierType = 'IEDA submission_ID']) &gt; 0">
+                        <xsl:value-of
+                            select="
+                                concat($fileIdentifierPrefix, string('metadataabout:'),
+                                normalize-space(substring-after($dc-alternateIDs/*[local-name() = 'alternateIdentifier'][@alternateIdentifierType = 'IEDA submission_ID']/text(), 'urn:')))"
+                        />
+                    </xsl:when>-->
                         <xsl:otherwise>
                             <xsl:value-of
                                 select="concat($fileIdentifierPrefix, string('metadata:'), normalize-space(translate($dc-titles[1], '/: ,', '----')))"
