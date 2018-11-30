@@ -10,7 +10,7 @@
     <!-- 
 	Damian Ulbricht original xslt 
 	Revised by Stephen Richard to generalize handling of more options and update for 
-	DataCite v4 xml.  For use by IEDA
+	DataCite v4 xml, originally for use by IEDA integrated catalog.
 	This transform takes a datacite v2,3, or 4 xml document and transforms to ISO19139 xml.
 	uses local-names for elements, so for those elements that are the same in DataCite v3 and v4
 	will work. 
@@ -40,6 +40,8 @@
 	   date for the source record being transformed. Since DataCiteXML doesn't have an element for the 
 	   metadata update date, this should be populated from the file-system update date
 	dwv 2018-11-28 Initial clean up to brand as data discovery studio. Will need work to make generic.
+	SMR 2018-11-30 Remove dataCentre keyword used by IEDA geoportal, update other constants for data discovery studio
+                    change logic so DOI is not used as the metadata record fileIdentifier	
 	-->
     
     <!--  * @copyright    2007-2017 Interdisciplinary Earth Data Alliance, Columbia University. 
@@ -55,34 +57,7 @@
 <!-- parameter to pass in the gmd:dateStamp for metadata update date -->
     <xsl:param name="updateDate"></xsl:param>
 
-<!-- this is used for the Data Centre keyword type for faceting in the search interface (Geoportal) -->
-    <xsl:variable name="datacentre">
-        <xsl:choose>
-            <!-- USAP -->
-            <xsl:when test="//*[local-name()='alternateIdentifier' and contains(text(),'www.usap-dc.org')]">
-                <xsl:value-of select="string('US Antarctic Program Data Center (USAP-DC)')"/>
-            </xsl:when>
-            
-            <!-- ECL -->
-            <xsl:when test="//*[local-name()='alternateIdentifier' and contains(text(),'www.earthchem.org')]">
-                <xsl:value-of select="string('EarthChem Library (ECL)')"/>
-            </xsl:when>
-			<!-- Academic Seismic Portal at Lamont -->
-            <xsl:when test="//*[local-name()='alternateIdentifier' and contains(@alternateIdentifierType,'UTIG')]">
-                <xsl:value-of select="string('ASP@LDEO')"/>
-            </xsl:when>
-            
-            <xsl:when test="string-length(normalize-space(//*[local-name() = 'publisher'][1]))>0 and
-                normalize-space(//*[local-name() = 'publisher'][1]) != 'missing'">
-            <xsl:value-of select="normalize-space(//*[local-name() = 'publisher'][1])"/>
-        </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="string('Data Discovery Studio')"/>
-            </xsl:otherwise>
- 
-        </xsl:choose>
-    </xsl:variable>
-    
+
     <!-- The contact for the metadata - static value; customize for your
 		application.  -->   
     <xsl:template name="metadatacontact">
@@ -98,49 +73,22 @@
                                 <gmd:electronicMailAddress>
                                     <!--<gco:CharacterString>info@EarthChem.org</gco:CharacterString>-->
                                     <gco:CharacterString>
-                                        <xsl:choose>
-                                            <xsl:when test="$datacentre='US Antarctic Program Data Center (USAP-DC)'"> 
-                                                <xsl:value-of select="string('web@usap-dc.org')"/>
-                                            </xsl:when>
-                                            <xsl:when test="$datacentre='EarthChem Library (ECL)'"> 
-                                                <xsl:value-of select="string('info@EarthChem.org')"/>
-                                            </xsl:when>
-                                            <xsl:when test="$datacentre='ASP@LDEO'">
-                                                <xsl:value-of select="string('info@marine-geo.org')"/>
-                                            </xsl:when>
-                                        <xsl:otherwise>
-                                            <xsl:value-of select="string('datadiscoverystudio@gmail.com')"/>
-                                        </xsl:otherwise>
-                                        </xsl:choose>
+                                       <xsl:value-of select="string('datadiscoverystudio@gmail.com')"/>
                                     </gco:CharacterString>
                                 </gmd:electronicMailAddress>
                             </gmd:CI_Address>
                         </gmd:address>
-                        <!--  only allow one online resource; choose the logo...
-						<gmd:onlineResource>
-							<gmd:CI_OnlineResource>
-								<gmd:linkage>
-									<gmd:URL>http://www.earthchem.org/library</gmd:URL>
-								</gmd:linkage>
-								<gmd:function>
-									<gmd:CI_OnLineFunctionCode
-										codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
-										codeListValue="information"
-										>information</gmd:CI_OnLineFunctionCode>
-								</gmd:function>
-							</gmd:CI_OnlineResource>
-						</gmd:onlineResource>-->
+                        <!--  only allow one online resource; choose the logo...-->
                         <gmd:onlineResource>
                             <gmd:CI_OnlineResource>
                                 <gmd:linkage>
                                     <gmd:URL>
                                     <xsl:choose>
-                                        <xsl:when test="$datacentre='US Antarctic Program Data Center (USAP-DC)'"> 
+									<!-- add logic here to identify various harvest source logos -->
+                                        <xsl:when test="'variable'='US Antarctic Program Data Center (USAP-DC)'"> 
                                             <xsl:value-of select="string('http://www.usap-dc.org/static/imgs/header/usaplogo.png')"/>
                                         </xsl:when>
-                                        <xsl:when test="$datacentre='EarthChem Library (ECL)'"> 
-                                            <xsl:value-of select="string('http://www.earthchem.org/sites/earthchem.org/files/arthemia_logo.jpg')"/>
-                                        </xsl:when>
+                                        
                                         <xsl:otherwise>
                                             <xsl:value-of select="string('https://www.earthcube.org/sites/default/files/doc-repository/logo_earthcube_cube-only_SMALL.png')"/>
                                         </xsl:otherwise>
@@ -181,11 +129,11 @@
 		recommend using these to report on how this record was created and by who. -->
     <xsl:variable name="metaMaintenanceNote"
         select="
-            string('This metadata record was generated by an xslt transformation from a DataCite metadata record; The transform was created by Damian Ulbricht and Stephen M. Richard. 2017-11-15 these records include new IEDA keywords for geoportal facets')"/>
-    <xsl:variable name="maintenanceContactID"
-        select="string('http://orcid.org/0000-0001-6041-5302')"/>
-    <xsl:variable name="maintenanceContactName" select="string('metadata curator')"/>
-    <xsl:variable name="maintenanceContactEmail" select="string('info@iedadata.org')"/>
+            string('This metadata record was generated by an xslt transformation from a DataCite metadata record; The transform was created by Damian Ulbricht and Stephen M. Richard.')"/>
+	<!-- ORCID or other URI to identify the maintenance contact -->
+    <xsl:variable name="maintenanceContactID"  select="string('')"/>
+    <xsl:variable name="maintenanceContactName" select="string('datadiscoverystudio metadata curator')"/>
+    <xsl:variable name="maintenanceContactEmail" select="string('datadiscoverystudio@gmail.com')"/>
 
     <xsl:variable name="currentDateTime">
         <xsl:value-of select="datetime:date-time()"/>
@@ -200,32 +148,21 @@
             xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/gmd/gmd.xsd">
 
             <!--  The fileIdentifier identifies the 
-				metadata record, not the described resource which is identified by a DOI.
-			-->
-
+				metadata record, not the described resource, which is identified by a DOI. -->
             <xsl:variable name="fileIdentifierPrefix" select="string('urn:datacite:')"/>
             <gmd:fileIdentifier>
                 <gco:CharacterString>
                     <xsl:choose>
                         <xsl:when
                             test="starts-with($datacite-identifier, 'DOI')">
-                           <!-- <xsl:value-of
-                                select="concat($fileIdentifierPrefix, string('metadataabout:'), normalize-space(translate($datacite-identifier, '/:', '[DASH][DASH]')))"
-                            />
-                            -->
-                            <!-- do not change the idenfifier. change DASH DASH back to dashes if used -->
-                            <xsl:value-of
-                                    select="$datacite-identifier"
-                            />
+                           <xsl:value-of
+                                select="concat($fileIdentifierPrefix, string('metadataabout:'), normalize-space(translate($datacite-identifier, '/:', '--')))" />
+                            
+                            <!-- do not use the DOI as the metadata record identifier; it identifies the resource
+									the fileidentifier identifies the metadata record
+                            <xsl:value-ofselect="$datacite-identifier" /  -->
                         </xsl:when>
-                        <xsl:when
-                            test="count($datacite-alternateIDs/*[local-name() = 'alternateIdentifier'][@alternateIdentifierType = 'IEDA submission_ID']) &gt; 0">
-                            <xsl:value-of
-                                select="
-                                    concat($fileIdentifierPrefix, string('metadataabout:'),
-                                    normalize-space(substring-after($datacite-alternateIDs/*[local-name() = 'alternateIdentifier'][@alternateIdentifierType = 'IEDA submission_ID']/text(), 'urn:')))"
-                            />
-                        </xsl:when>
+
                         <xsl:otherwise>
                             <xsl:value-of
                                 select="concat($fileIdentifierPrefix, string('metadata:'), normalize-space(translate($datacite-titles/*[local-name() = 'title'][1], '/: ,', '----')))"
@@ -341,7 +278,7 @@
                 <gco:CharacterString>2007</gco:CharacterString>
             </gmd:metadataStandardVersion>
 
-            <!-- DataCite is WGS84; need to verify for IEDA usage-->
+            <!-- DataCite is WGS84; need to verify instead of assuming-->
             <!--			<gmd:referenceSystemInfo>
 				<gmd:MD_ReferenceSystem>
 					<gmd:referenceSystemIdentifier>
@@ -426,8 +363,8 @@
                                     <xsl:with-param name="role">publisher</xsl:with-param>
                                 </xsl:call-template>
                             </gmd:citedResponsibleParty>
-<!-- some ECL records have long lists of related publications; ideally these would be links thru related resources, but ...
-                            Don't want these to be indexed with abstract, so put them here and check that they show up in the full record display-->
+<!-- some records have long lists of related publications; ideally these would be links thru related resources, but ...
+                            Don't want these to be indexed with abstract, so put them here and check that they show up in the full record display. This is based on IEDA practice of labeling these with 'Related publications:' -->
                             <xsl:if
                                 test="//*[local-name() = 'description'][@descriptionType = 'Other'][contains(., 'Related publications:')]">
                                 <gmd:otherCitationDetails>
@@ -534,22 +471,6 @@
                     <xsl:call-template name="freekeywords"/>
                     <xsl:call-template name="thesauruskeywords"/>
                     <xsl:call-template name="geolocationplace"/>
- <!-- insert data center keyword; this is configured at the beginning of this xslt -->                   
-                    <gmd:descriptiveKeywords>
-                        <gmd:MD_Keywords>
-                            <gmd:keyword>
-                                <gco:CharacterString>
-                                    <xsl:value-of select="$datacentre"/>
-                                </gco:CharacterString>
-                            </gmd:keyword>
-                            <gmd:type>
-                                <gmd:MD_KeywordTypeCode
-                                    codeList="http://www.ngdc.noaa.gov/metadata/published/xsd/schema/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode"
-                                    codeListValue="dataCentre">Data Center</gmd:MD_KeywordTypeCode>
-                            </gmd:type>
-                        </gmd:MD_Keywords>
-                    </gmd:descriptiveKeywords>
-                    
                     
                     <xsl:call-template name="license"/>
 
@@ -1933,7 +1854,6 @@ The ID of persons should also be put as "xlink:href" attribute into the parent e
 
     <!-- retrieves keywords that have a subject scheme - group by subjectScheme -->
     <xsl:template name="thesauruskeywords">
-        <xsl:variable name="IEDAthesaurus" select="string('IEDA integrated catalog keyword vocabulary')"/>
         <xsl:for-each select="//*[local-name()='subject']">       
             <xsl:if test="generate-id(.) = generate-id(key('topic',string(@subjectScheme))[1])">
                 <xsl:variable name="theScheme" select="string(@subjectScheme)"/>
@@ -1958,87 +1878,7 @@ The ID of persons should also be put as "xlink:href" attribute into the parent e
                                         codeListValue="place">place</gmd:MD_KeywordTypeCode>
                                 </gmd:type>
                             </xsl:when>
-                            <xsl:when
-                                test="translate($theScheme, $uppercase, $smallcase) = 'ieda topic' ">
-                                <gmd:type>
-                                    <gmd:MD_KeywordTypeCode
-                                        codeList="http://www.ngdc.noaa.gov/metadata/published/xsd/schema/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode"
-                                        codeListValue="theme">IEDA topic</gmd:MD_KeywordTypeCode>
-                                </gmd:type>
-                                <gmd:thesaurusName>
-                                    <gmd:CI_Citation>
-                                        <gmd:title>
-                                            <gco:CharacterString>
-                                                <xsl:value-of select="$IEDAthesaurus"/>
-                                            </gco:CharacterString>
-                                        </gmd:title>
-                                        <gmd:date>
-                                            <gmd:CI_Date>
-                                                <gmd:date>
-                                                    <gco:Date>2017-10-11</gco:Date>
-                                                </gmd:date>
-                                                <gmd:dateType>
-                                                    <gmd:CI_DateTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_DateTypeCode" codeListValue="creation">creation</gmd:CI_DateTypeCode>
-                                                </gmd:dateType>
-                                            </gmd:CI_Date>
-                                        </gmd:date>
-                                    </gmd:CI_Citation>
-                                </gmd:thesaurusName>
-                            </xsl:when>
-                            <xsl:when
-                                test="translate($theScheme, $uppercase, $smallcase) = 'ieda feature of interest' ">
-                                <gmd:type>
-                                    <gmd:MD_KeywordTypeCode
-                                        codeList="http://www.ngdc.noaa.gov/metadata/published/xsd/schema/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode"
-                                        codeListValue="theme">IEDA feature of interest</gmd:MD_KeywordTypeCode>
-                                </gmd:type>
-                                <gmd:thesaurusName>
-                                    <gmd:CI_Citation>
-                                        <gmd:title>
-                                            <gco:CharacterString>
-                                                <xsl:value-of select="$IEDAthesaurus"/>
-                                            </gco:CharacterString>
-                                        </gmd:title>
-                                        <gmd:date>
-                                            <gmd:CI_Date>
-                                                <gmd:date>
-                                                    <gco:Date>2017-10-11</gco:Date>
-                                                </gmd:date>
-                                                <gmd:dateType>
-                                                    <gmd:CI_DateTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_DateTypeCode" codeListValue="creation">creation</gmd:CI_DateTypeCode>
-                                                </gmd:dateType>
-                                            </gmd:CI_Date>
-                                        </gmd:date>
-                                    </gmd:CI_Citation>
-                                </gmd:thesaurusName>
-                            </xsl:when>
-                            <xsl:when
-                                test="contains(translate($theScheme, $uppercase, $smallcase),'ieda data type')">
-                                <gmd:type>
-                                    <gmd:MD_KeywordTypeCode
-                                        codeList="http://www.ngdc.noaa.gov/metadata/published/xsd/schema/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode"
-                                        codeListValue="theme">IEDA data type categories</gmd:MD_KeywordTypeCode>
-                                </gmd:type>
-                                <gmd:thesaurusName>
-                                    <gmd:CI_Citation>
-                                        <gmd:title>
-                                            <gco:CharacterString>
-                                                <xsl:value-of select="$IEDAthesaurus"/>
-                                            </gco:CharacterString>
-                                        </gmd:title>
-                                        <gmd:date>
-                                            <gmd:CI_Date>
-                                                <gmd:date>
-                                                    <gco:Date>2017-10-11</gco:Date>
-                                                </gmd:date>
-                                                <gmd:dateType>
-                                                    <gmd:CI_DateTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_DateTypeCode" codeListValue="creation">creation</gmd:CI_DateTypeCode>
-                                                </gmd:dateType>
-                                            </gmd:CI_Date>
-                                        </gmd:date>
-                                    </gmd:CI_Citation>
-                                </gmd:thesaurusName>
-                            </xsl:when>
+ <!-- remove keyword categories specific to IEDA catalog -->
                             <xsl:when
                                 test="translate($theScheme, $uppercase, $smallcase) = 'instrument' 
                                 or translate($theScheme, $uppercase, $smallcase)= 'sensor'">
@@ -2122,7 +1962,7 @@ The ID of persons should also be put as "xlink:href" attribute into the parent e
                 <xsl:otherwise>
                     <xsl:attribute name="xlink:href">
                         <xsl:value-of
-                            select="string('https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode')"
+                            select="string('https://creativecommons.org/licenses/unknown')"
                         />
                     </xsl:attribute>
                 </xsl:otherwise>
@@ -2136,7 +1976,7 @@ The ID of persons should also be put as "xlink:href" attribute into the parent e
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
-                                    select="string('Creative Commons Attribution-NonCommercial-Share Alike 3.0 United States [CC BY-NC-SA 3.0]')"
+                                    select="string('license not specified')"
                                 />
                             </xsl:otherwise>
                         </xsl:choose>
