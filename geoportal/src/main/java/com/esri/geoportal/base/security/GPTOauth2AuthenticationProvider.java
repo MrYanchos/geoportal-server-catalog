@@ -69,20 +69,20 @@ public class GPTOauth2AuthenticationProvider implements AuthenticationProvider {
     this.allUsersCanPublish = allUsersCanPublish;
   }
 
-  /** The ArcGIS application item id that will be used for OAuthe authentication. */
+  /** The  application item id that will be used for OAuthe authentication. */
   public String getAppId() {
     return appId;
   }
-  /** The ArcGIS application item id that will be used for OAuth authentication. */
+  /** The  application item id that will be used for OAuth authentication. */
   public void setAppId(String appId) {
     this.appId = appId;
   }
 
-  /** The ArcGIS OAuth authorize URL. */
+  /** The  OAuth authorize URL. */
   public String getAuthorizeUrl() {
     return authorizeUrl;
   }
-  /** The ArcGIS OAuth authorize URL. */
+  /** The  OAuth authorize URL. */
   public void setAuthorizeUrl(String authorizeUrl) {
     this.authorizeUrl = authorizeUrl;
   }
@@ -114,7 +114,7 @@ public class GPTOauth2AuthenticationProvider implements AuthenticationProvider {
     this.geoportalAdministratorsGroupId = geoportalAdministratorsGroupId;
   }
 
-  /** The id of the ArcGIS group containing Geoportal publishers (optional). */
+  /** The id of the  group containing Geoportal publishers (optional). */
   public String getGeoportalPublishersGroupId() {
     return geoportalPublishersGroupId;
   }

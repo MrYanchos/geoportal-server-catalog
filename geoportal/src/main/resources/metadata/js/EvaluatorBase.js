@@ -195,7 +195,7 @@ var G = {
     }
       if ( typeof value === "string") {
         value= value.trim();
-         value = this.Val.unescapeHtml4( value);
+         value = this.Val.unescape( value);
       }
       return value
   },
