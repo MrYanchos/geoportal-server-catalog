@@ -30,7 +30,7 @@ define(["dojo/_base/declare",
         "app/search/ResultsPane"], 
 function(declare, lang, array, query, domClass, topic, appTopics, registry,
          _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, template, i18n, 
-         dojoRequest, AppClient) {
+         dojoRequest, AppClient,ResultsPane ) {
 
   var oThisClass = declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
 
@@ -199,8 +199,8 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
                 }
             });
             return dfd;
-      } catch {
-
+      } catch(error) {
+              console.warn("search-error");
       }
     }
 

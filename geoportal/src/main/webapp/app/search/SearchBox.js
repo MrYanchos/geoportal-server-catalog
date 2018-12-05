@@ -20,9 +20,10 @@ define(["dojo/_base/declare",
         "dojo/text!./templates/SearchBox.html",
         "dojo/i18n!app/nls/resources",
         "app/search/SearchComponent",
-        "app/search/QClause"], 
+        "app/search/QClause",
+    "app/etc/util"],
 function(declare, lang, on, keys, domClass,
-         template, i18n, SearchComponent, QClause) {
+         template, i18n, SearchComponent, QClause,Util) {
   
   var oThisClass = declare([SearchComponent], {
 
@@ -46,19 +47,20 @@ function(declare, lang, on, keys, domClass,
         var tipPattern = i18n.search.appliedFilters.tipPattern;
         var tip = tipPattern.replace("{type}",i18n.search.searchBox.search).replace("{value}",v);
         var query = null, useSimpleQueryString = this.useSimpleQueryString;
+        var q = Util.escapeForLucene(lang.trim(v));
         if (typeof useSimpleQueryString === "undefined" || useSimpleQueryString === null) {
           useSimpleQueryString = AppContext.appConfig.search.useSimpleQueryString;
         }
         if (useSimpleQueryString) {
           query = {"simple_query_string": {
             "analyze_wildcard": true,
-            "query": v
+            "query": q
           }};
         } else {
           query = {"query_string": {
             "analyze_wildcard": true,
-            "query": v,
-                  "analyzer": "snowball",
+            "query": q,
+
                   "fields": ["_source.title^5","_source.*_cat^10","_all"],
                   "default_operator": "and"
           }};
