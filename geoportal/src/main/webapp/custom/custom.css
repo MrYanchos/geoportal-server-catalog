@@ -115,3 +115,15 @@
 .g-paging .pagination-sm > li > span {
     padding: 0em 0.5em;
 }
+
+.navbar-brand {
+    height:auto;
+    padding-bottom: 12px;
+    padding-top: 12px;
+}
+.navbar-logo {
+    height:48px;
+    width: auto;
+   float:left ;
+
+}

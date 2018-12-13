@@ -15,16 +15,27 @@
 package com.esri.geoportal.base.util;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.apache.commons.text.translate.NumericEntityUnescaper;
+import org.apache.commons.text.translate.OctalUnescaper;
+import org.apache.commons.text.translate.UnicodeUnescaper;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Value utilities.
  */
 public class Val {
-
+  static OctalUnescaper OCTAL = new OctalUnescaper();
+  static NumericEntityUnescaper NUMERIC = new NumericEntityUnescaper(NumericEntityUnescaper.OPTION.semiColonOptional);
+  static UnicodeUnescaper UNICODE = new UnicodeUnescaper();
+  static Pattern p = Pattern.compile("\\\\[0-8]{2,3}");
   /**
    * Converts a string to a boolean.
    * @param v the string
@@ -211,14 +222,129 @@ public class Val {
     return v;
   }
   /**
-   * URL encodes a value.
+   * decodes a html value.
    * @param v the value
-   * @return the encoded value
+   * @return the decoded value
    */
   public static String unescapeHtml4(String v) {
     if (v != null) {
 
-        return StringEscapeUtils.unescapeHtml4​(v);
+        return StringEscapeUtils.unescapeHtml4(v);
+
+    }
+    return v;
+  }
+  /**
+   * decodes an eNunmericEntity value.
+   * @param v the value
+   * @return the decoded value
+   */
+  public static String unescapeNunmericEntity(String v) {
+    if (v != null) {
+
+      try {
+        StringWriter writer = new StringWriter(v.length() * 2);
+        NUMERIC.translate(v, writer);
+        return writer.toString();
+      } catch (IOException var3) {
+        throw new RuntimeException(var3);
+      }
+
+    }
+    return v;
+  }
+  /**
+   * decodes an octal value.
+   * @param v the value
+   * @return the decoded value
+   */
+  public static String unescapeOctal(String v) {
+    if (v != null) {
+
+      try {
+        StringWriter writer = new StringWriter(v.length() * 2);
+        OCTAL.translate(v, writer);
+        String out = writer.toString();
+        return writer.toString();
+      } catch (IOException var3) {
+        throw new RuntimeException(var3);
+      }
+
+    }
+    return v;
+  }
+  /**
+   * decodes an octal value.
+   * @param v the value
+   * @return the decoded value
+   */
+  public static String unescapeUnicode(String v) {
+    if (v != null) {
+
+      try {
+        StringWriter writer = new StringWriter(v.length() * 2);
+        UNICODE.translate(v, writer);
+        return writer.toString();
+      } catch (IOException var3) {
+        throw new RuntimeException(var3);
+      }
+
+    }
+    return v;
+  }
+
+  /**
+   * dencodes an octal value.
+   * @param v the value
+   * @return the deencoded value
+   */
+    /*
+  Octal to Unicode is a special case for when an file gets read as ISO_8859_1
+
+   */
+  public static String unescapeOctalToUnicode(String v) {
+    if (v != null) {
+      try {
+        StringWriter writer = new StringWriter(v.length() * 2);
+        OCTAL.translate(v, writer);
+        byte[] c = writer.toString().getBytes(StandardCharsets.ISO_8859_1);
+        v = new String (c,StandardCharsets.UTF_8);
+
+        return v;
+      } catch (IOException var3) {
+        throw new RuntimeException(var3);
+      }
+
+    }
+    return v;
+  }
+  /**
+   * dencodes html and  octal values.
+   * @param v the value
+   * @return the decoded value
+   */
+  /*
+  This assumes that only one character set will be in a string.
+  Either HTMl, or the Octal.
+   */
+  public static String unescape(String v) {
+    if (v != null) {
+      String rv = unescapeHtml4(v);
+      if (!rv.equals(v)){
+        return rv;
+      }
+
+      Matcher m = p.matcher(v); //p = Pattern.compile("\\\\[0-8]{2,3}");
+      boolean b =m.find();
+      if (b) {
+        //rv = unescapeOctalToUnicode(v);
+        v = unescapeOctal(v);
+        if (!rv.equals(v)) {
+          return rv;
+        }
+      }
+      //v = unescapeUnicode(v);
+      //v = unescapeNunmericEntity(v);
 
     }
     return v;

@@ -23,11 +23,11 @@ define(["dojo/_base/declare",
         "app/search/SearchComponent",
         "app/search/QClause",
 
-    ],
+   "app/etc/util" ],
 
 function(declare, lang, on, keys, domClass,query,
          template, i18n, SearchComponent, QClause,
-
+         Util
 
 ) {
   
@@ -70,16 +70,17 @@ function(declare, lang, on, keys, domClass,query,
         if (typeof useSimpleQueryString === "undefined" || useSimpleQueryString === null) {
           useSimpleQueryString = AppContext.appConfig.search.useSimpleQueryString;
         }
+         var q = Util.escapeForLucene(lang.trim(v));
         if (useSimpleQueryString) {
           query = {"simple_query_string": {
             "analyze_wildcard": true,
-            "query": v
+            "query": q
           }};
         } else {
           query = {"query_string": {
             "analyze_wildcard": true,
-            "query": v,
-                  "analyzer": "snowball",
+            "query": q,
+
                   "fields": ["_source.title^5","_source.*_cat^10","_all"],
                   "default_operator": "and"
           }};

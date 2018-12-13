@@ -5,8 +5,10 @@
     xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gco="http://www.isotc211.org/2005/gco"
     xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx"
     xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+
     xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink"
     exclude-result-prefixes="xs xsi gmi gmd srv gml gco gmx csw" version="1.2">
+
 
     <!-- 
   Template to build xsl transform to map content from standard ISO19139 xml metadata format to 
@@ -48,6 +50,7 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
  <!--   <xsl:template match="//gmd:MD_Metadata | gmi:MI_Metadata">-->
         <xsl:template name="iso2sdo">
         <xsl:param name="isopath"/>
+
         <!-- Define variables for content elements -->
         <xsl:variable name="additionalContexts">
             <xsl:text>"datacite": "http://purl.org/spar/datacite/",&#10;
@@ -754,12 +757,19 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
                 <xsl:with-param name="pfor" select="$format"/>
                 <xsl:with-param name="prp" select="$distributorContact"/>
             </xsl:call-template>
+            <!-- this test below is causing an issue with the standard java XSLT -->
+         <!--   <xsl:if
+                test="following::gmd:distributorTransferOptions//gmd:onLine or parent::node()/following-sibling::gmd:onLine">          
+                <xsl:text>,&#10;</xsl:text>              
+            </xsl:if>
+           --> 
             <xsl:if
-                test="following::gmd:distributorTransferOptions//gmd:onLine or parent::node()/following-sibling::gmd:onLine">
-                <xsl:text>,&#10;</xsl:text>
+                test="not(position() = last())">          
+                <xsl:text>,&#10;</xsl:text>              
             </xsl:if>
         </xsl:for-each>
-        <xsl:text>  ],&#10;</xsl:text>
+
+        <xsl:text> ],&#10;</xsl:text>
 
         <xsl:if test="string-length(string($datasetIdentifiers)) > 0">
             <xsl:text>  "identifier": &#10;</xsl:text>
@@ -1189,15 +1199,25 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
                         select="concat(' amendment:', normalize-space(following-sibling::gmd:amendmentNumber/child::node()/text()))"
                     />
                 </xsl:if>
+                
                 <xsl:text>"</xsl:text>
 
                 <!-- comma if there are more formats -->
-                <xsl:if
+                <!-- in default java transformer, child::gmd:MD_Format/gmd:name produces a comma when it should not... but not always -->
+               <xsl:if
                     test="parent::node()/parent::node()/following-sibling::node()/child::gmd:MD_Format/gmd:name"
-                    >, </xsl:if>
+                    ><xsl:text>, </xsl:text></xsl:if>
+                 
+      <!--           <xsl:if
+                    test="parent::node()/parent::node()/following-sibling::node()/child::*[local-name()='MD_Format']/gmd:name"
+                    >
+
+                   <xsl:text>,</xsl:text>
+                </xsl:if>
+      -->  
             </xsl:for-each>
 
-            <xsl:if test="count($pfor/gmd:name) > 1">
+            <xsl:if test="count($pfor/gmd:name) > 1">  
                 <xsl:text>]</xsl:text>
             </xsl:if>
         </xsl:variable>
@@ -1306,7 +1326,7 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
             <xsl:text>,&#10;      "provider": </xsl:text>
             <xsl:value-of select="$distProvider"/>
         </xsl:if>
-        <xsl:if test="string-length($distFormat) > 0">
+        <xsl:if test="string-length(normalize-space($distFormat)) > 0">
             <xsl:text>,&#10;      "fileFormat": </xsl:text>
             <xsl:value-of select="$distFormat"/>
         </xsl:if>
@@ -1316,7 +1336,7 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
             <xsl:text>"</xsl:text>
         </xsl:if>
 
-        <xsl:if test="string-length($distPublishDate) > 0">
+        <xsl:if test="string-length(normalize-space($distPublishDate)) > 0">
             <xsl:text>,&#10;      "datePublished": "</xsl:text>
             <xsl:value-of select="$distPublishDate"/>
             <xsl:text>"</xsl:text>

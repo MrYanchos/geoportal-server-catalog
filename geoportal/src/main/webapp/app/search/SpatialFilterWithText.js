@@ -681,7 +681,7 @@ function(declare, lang, array, aspect, djQuery, on, domConstruct, domClass, domG
       if (this === qClause.parentQComponent) {
         djQuery("input[data-op=intersects]",this.relationsNode)[0].checked = true;
       }
-        this.searchUsingBBox = false;
+        this.searchUsingBbox = false;
         this.searchUsingMap = false;
 
     }

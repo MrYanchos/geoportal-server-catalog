@@ -83,7 +83,9 @@ function(declare, lang, Deferred, topic, appTopics, i18n, AppClient, SignIn,
       }
       return false;
     },
-        
+
+
+
     _showAgsOAuthSignIn: function(oauth) {
       var self = this, portalUrl = oauth.portalUrl;
       arcgisUtils.arcgisUrl = portalUrl;  // PortalImplementation
@@ -105,12 +107,42 @@ function(declare, lang, Deferred, topic, appTopics, i18n, AppClient, SignIn,
         });
       });
     },
-    
+      _showOAuthSignIn: function(oauth) {
+      var self = this, portalUrl = oauth.portalUrl;
+          // subsitute your own client id to identify who spawned the login and check for a matching redirect URI
+          var info = new OAuthInfo({
+              appId: oauth.appId, //*** Your Client ID value goes here ***//
+              popup: true // inline redirects don't require any additional app configuration
+          });
+           esriId.registerOAuthInfos([info]);
+          esriId.getCredential(portalUrl);
+          // arcgisUtils.arcgisUrl = portalUrl;  // PortalImplementation
+          // esriId.getCredential(portalUrl,{oAuthPopupConfirmation:true}).then(function (){
+          //     var portal = new arcgisPortal.Portal(portalUrl);
+          //     portal.signIn().then(function(portalUser){
+          //         //console.warn("portalUser",portalUser);
+          //         self.arcgisPortalUser = portalUser;
+          //         var u = portalUser.username;
+          //         var p = "__rtkn__:"+portalUser.credential.token;
+          //         self.signIn(u,p).then(function(){
+          //         }).otherwise(function(error){
+          //             // TODO handle
+          //             console.warn("Error occurred while signing in:",error);
+          //         });
+          //     }).otherwise(function(error){
+          //         // TODO handle
+          //         console.warn("Error occurred while signing in:",error);
+          //     });
+          // });
+      },
     showSignIn: function() {
       var ctx = window.AppContext;
       if (ctx.geoportal && ctx.geoportal.arcgisOAuth && ctx.geoportal.arcgisOAuth.appId) {
         this._showAgsOAuthSignIn(ctx.geoportal.arcgisOAuth);
-      } else {
+      } if (ctx.geoportal && ctx.geoportal.OAuth && ctx.geoportal.OAuth.appId) {
+            this._showOAuthSignIn(ctx.geoportal.OAuth);
+      }
+            else {
         (new SignIn()).show();
       }
     },
@@ -153,9 +185,10 @@ function(declare, lang, Deferred, topic, appTopics, i18n, AppClient, SignIn,
     
     whenAppStarted: function() {
       var self = this, dfd = new Deferred(), ctx = window.AppContext, oauth;
-      if (ctx.geoportal) oauth = ctx.geoportal.arcgisOAuth; 
-      
-      if (oauth && oauth.appId) {
+      if (ctx.geoportal) oauth = ctx.geoportal.arcgisOAuth  ;
+      if (oauth==null) oauth = ctx.geoportal.oAuth;
+
+        if (oauth && oauth.appId) {
         var portalUrl = oauth.portalUrl;
         arcgisUtils.arcgisUrl = portalUrl;  // PortalImplementation
         var info = new OAuthInfo({

@@ -14,13 +14,12 @@
  */
 package com.esri.geoportal.service.rest;
 import com.esri.geoportal.base.security.ArcGISAuthenticationProvider;
+import com.esri.geoportal.base.security.GPTOauth2AuthenticationProvider;
 import com.esri.geoportal.base.security.Group;
 import com.esri.geoportal.context.AppRequest;
 import com.esri.geoportal.context.AppResponse;
 import com.esri.geoportal.context.AppUser;
 import com.esri.geoportal.context.GeoportalContext;
-
-import java.util.List;
 
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
@@ -32,6 +31,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.util.List;
 
 /**
  * Handles /rest/geoportal requests.
@@ -108,7 +108,25 @@ public class GeoportalService {
           jso.add("createAccountUrl",ap.getCreateAccountUrl());
         }
       }
-      
+/* ArcGISAuthenticationProvider returns null,
+while
+Oauth2AuthenticationProvider returns an object
+commenting out until this is figured out
+  */
+      GPTOauth2AuthenticationProvider oa2p = gc.getBeanIfDeclared("oauth2AuthenticationProvider",
+              GPTOauth2AuthenticationProvider.class,null);
+      if (oa2p != null) {
+        jso.add("OAuth",Json.createObjectBuilder()
+                .add("appId",oa2p.getAppId())
+                .add("portalUrl",oa2p.getPortalUrl())
+               // .add("restUrl",oa2p.getRestUrl())
+                .add("expirationMinutes",oa2p.getExpirationMinutes())
+                .add("showMyProfileLink",oa2p.getShowMyProfileLink())
+        );
+        if (oa2p.getCreateAccountUrl() != null && oa2p.getCreateAccountUrl().length() > 0) {
+          jso.add("createAccountUrl",oa2p.getCreateAccountUrl());
+        }
+      }
       response.writeOkJson(request,jso);
       return response.build();      
     } catch (Throwable t) {
