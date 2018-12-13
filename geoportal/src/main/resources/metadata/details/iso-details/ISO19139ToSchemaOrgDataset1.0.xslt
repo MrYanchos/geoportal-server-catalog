@@ -6,7 +6,7 @@
     xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx"
     xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
     xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink"
-    exclude-result-prefixes="xs xsi gmi gmd srv gml gco gmx csw" version="1.1">
+    exclude-result-prefixes="xs xsi gmi gmd srv gml gco gmx csw" version="1.2">
 
     <!-- 
   Template to build xsl transform to map content from standard ISO19139 xml metadata format to 
@@ -25,8 +25,13 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
     gml:polygon/gml:Point, and gmd:geographicBounding box; other gml geometries are ignored. 
     2018-07-17  version 1.1.1  Fix problem with comma insertion in SpatialExtent
     2018-08-30  Fix problem with identifier strings that include reserve characters; if its not an
-          http URI, then replace all the special characters with '.'   Also fix problem with quotes in 
-          legal restriction statements.
+          http URI, then replace all the special characters with '.'   Also fix problem with quotes in legal restriction statements. Add variables for numbers, otherchar and allowedsymbols	
+	2018-05-20 name template iso2sdo and add input parameter isopath, use these to inject a link
+    to the full iso record that is being trasformed as and additional distribution; following
+    recommendation from DataOne for harvest to DataOne coordinating node. To use as stand alone 
+    transform, comment out template definition with name and uncomment template definition with 
+    match (lines 50,51).	
+2018-12-13 updates to identify current version
  -->
 
     <xsl:output method="text" indent="yes" encoding="UTF-8"/>
