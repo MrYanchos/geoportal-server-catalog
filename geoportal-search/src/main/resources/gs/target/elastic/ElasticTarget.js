@@ -155,7 +155,7 @@
       
       // allow Elasticsearch DSL searches
       if (task.config.allowDslSearches) {
-        var body, sBody = task.request.body;
+        var body, sBody = task.request.getEsDsl()? task.request.getEsDsl(): task.request.body;
         if (typeof sBody === "string" && sBody.indexOf("{") === 0) {
           sBody = sBody.trim();
           if (sBody.indexOf("{") === 0) {
@@ -214,6 +214,12 @@
       var bbox = task.request.getBBox();
       if (typeof bbox === "string" && bbox.length > 0) {
         coords = bbox.split(",");
+        if (coords.length > 3) {
+          if ((coords[0] < -180.0) && (coords[2] >= -180.0)) coords[0] = -180.0;
+          if ((coords[1] < -90.0) && (coords[3] >= -90.0)) coords[1] = -90.0;
+          if ((coords[2] > 180.0) && (coords[0] <= 180.0)) coords[2] = 180.0;
+          if ((coords[3] > 90.0) && (coords[1] <= 90.0)) coords[3] = 90.0;
+        }
       }
 
       if (hasField && Array.isArray(coords) && coords.length > 3) {

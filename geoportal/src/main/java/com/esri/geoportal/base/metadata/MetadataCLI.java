@@ -56,6 +56,8 @@ public class MetadataCLI{
      *
      */
     public static void main( String[] args ) {
+        System.err.println("ignore errors. This needs to be reworked as a spring shell application");
+
         AbstractApplicationContext context = null;
         Option help = Option.builder("h")
                 .required(false)
@@ -85,7 +87,7 @@ public class MetadataCLI{
                         .hasArg()
                         .longOpt("metdatafile")
                         .desc("Metadata File")
-                       // .type(File.class)
+                        // .type(File.class)
                         .build();
         ;
 
@@ -100,7 +102,7 @@ public class MetadataCLI{
         options.addOption(help);
         //options.addOption(metadataJsDir);
         options.addOption(metadataFile);
-;
+
         options.addOption(verbose);
         ;
         // create the parser
@@ -109,7 +111,7 @@ public class MetadataCLI{
             context = new ClassPathXmlApplicationContext("config/cli-context.xml"
 
                     ,"**/cli-app-factory.xml"
-                );
+            );
             // parse the command line arguments
             CommandLine line = parser.parse(options, args);
             Boolean v = line.hasOption("v");
@@ -130,6 +132,8 @@ public class MetadataCLI{
 
     }
     public static void testScriptEvaluator( File metadata, Boolean verbose) throws Exception {
+        System.err.println("IGNORE errors above this line. This needs to be reworked as a spring shell application");
+
         ObjectMapper mapper = new ObjectMapper();
         AppUser user = null;
         boolean pretty = true;

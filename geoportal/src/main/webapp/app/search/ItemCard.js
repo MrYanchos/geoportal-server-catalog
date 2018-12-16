@@ -16,7 +16,6 @@
   SMR2018-08-18
   uniqueLinks looks at distribution_links_s
  */
-
 define(["dojo/_base/declare",
   "dojo/_base/lang",
   "dojo/_base/array",
@@ -231,6 +230,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
       var previewNode = domConstruct.create("a",{
         href: "javascript:void(0)",
         title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.preview, title: item.title}),
+        "aria-label": string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.preview, title: item.title}),
         innerHTML: i18n.item.actions.preview
       },actionsNode);
       
@@ -256,6 +256,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
             href: "javascript:void(0)",
             innerHTML: i18n.item.actions.addToMap,
             title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.addToMap, title: item.title}),
+            "aria-label": string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.addToMap, title: item.title}),
             onclick: function() {
               topic.publish(appTopics.AddToMapClicked,serviceType);
             }
@@ -279,18 +280,21 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
           href: uri+"/html",
           target: "_blank",
           title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.html, title: item.title}),
+          "aria-label": string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.html, title: item.title}),
           innerHTML: i18n.item.actions.html
         },actionsNode);
         var xmlNode = domConstruct.create("a",{
           href: uri+"/xml",
           target: "_blank",
           title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.xml, title: item.title}),
+          "aria-label": string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.xml, title: item.title}),
           innerHTML: i18n.item.actions.xml
         },actionsNode);
         var jsonNode = domConstruct.create("a",{
           href: uri+"?pretty=true",
           target: "_blank",
           title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.json, title: item.title}),
+          "aria-label": string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.json, title: item.title}),
           innerHTML: i18n.item.actions.json
         },actionsNode);
         if (AppContext.geoportal.supportsApprovalStatus || 
@@ -307,7 +311,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
         }
       }
     },
-
+    
     _renderLinksDropdown: function(item,links) {
       if (links.length === 0) return;
       var dd = domConstruct.create("div",{
@@ -321,6 +325,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
         "aria-haspopup": true,
         "aria-expanded": true,
         title: string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.links, title: item.title}),
+        "aria-label": string.substitute(i18n.item.actions.titleFormat, {action: i18n.item.actions.links, title: item.title}),
         innerHTML: i18n.item.actions.links
       },dd);
       domConstruct.create("span",{
@@ -381,7 +386,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
           href: url,
           target: "_blank",
           title: string.substitute(i18n.item.actions.titleFormat, {action: u, title: item.title}),
-
+          "aria-label": string.substitute(i18n.item.actions.titleFormat, {action: u, title: item.title}),
           innerHTML: thelabel
         },ddli);
       });
@@ -725,7 +730,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
       }
       return null;
     },
-
+    
     _renderUrlLinks: function(item) {
       if (AppContext.appConfig.searchResults.showCustomLinks) {
         this._renderUrlLink(item.url_thumbnail_s, i18n.item.actions.urlLinks.thumbnail);
@@ -736,10 +741,10 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
         this._renderUrlLink(item.url_ftp_download_s, i18n.item.actions.urlLinks.downloadFTP);
       }
     },
-
+    
     _renderUrlLink: function(href, caption) {
       var actionsNode = this.actionsNode;
-
+      
       if (href && href.length > 0) {
         var link = domConstruct.create("a",{
           href: href, 

@@ -25,8 +25,8 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 
-/** 
- * A metadata document. 
+/**
+ * A metadata document.
  */
 public class MetadataDocument {
   
@@ -161,6 +161,7 @@ public class MetadataDocument {
     this.setDom(DomUtil.makeDom(this.getXml(),true));
     return this.getDom();
   }
+  
   /**
    * Ensures the the minimal components.
    */
@@ -178,7 +179,7 @@ public class MetadataDocument {
         "metadata.Evaluator",Evaluator.class,new Evaluator());
     evaluator.evaluate(this);
   }
-  
+
   /**
    * Evaluate the supplied JSON document.
    * @throws Exception if an exception occurs
@@ -188,7 +189,7 @@ public class MetadataDocument {
         "metadata.Evaluator",Evaluator.class,new Evaluator());
     evaluator.evaluateSuppliedJson(this);
   }
-  
+
   /** True if the document has evaluated json. */
   public boolean hasEvaluatedJson() {
     return (evaluatedJson != null && evaluatedJson.length() > 0);

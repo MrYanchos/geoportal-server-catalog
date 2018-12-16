@@ -75,7 +75,8 @@ define(["dojo/i18n!app/nls/resources",]
     showApprovalStatus: true,
     defaultSort: "sys_modified_dt:desc",
     showLinks: true,
-    showCustomLinks: true
+    showCustomLinks: true,
+    showOpenSearchLinks: true
   },
   
   statusChecker: {

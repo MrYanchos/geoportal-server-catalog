@@ -4,15 +4,20 @@ body {
 }
 
 /* chrome */
+
+
+/* outline: none commented out for accessibility*/
+/*
 :focus {
   outline: none;
-}
+}*/
 
 .calcite .dijitTitlePaneTitle, .calcite .dijitTitlePaneTextNode {
   font-size: 12px;
 }
 .calcite .dijitTitlePaneTitle {
   padding: 4px 6px;
+  overflow-y: hidden;
 }
 .calcite .dijitTitlePaneContentInner {
   padding: 8px;
@@ -81,7 +86,7 @@ body {
 }
 
 .navbar-inverse {
-  background-color: #196fa6;
+  background-color: #005e95;
 }
 .navbar-inverse .navbar-nav > .active > a, 
 .navbar-inverse .navbar-nav > .active > a:hover, 
@@ -109,13 +114,11 @@ body {
   background-image: none;
   transition: none;
   background-color: transparent;
-  outline: none;
 }
 .g-app > .navbar-inverse .navbar-nav > li.active > a {
   background-image: linear-gradient(to bottom, transparent 90%, #cfe1ec 91%, #cfe1ec 100%);
   transition: color 150ms linear 0s, text-decoration 150ms linear 0s;
   background-color: transparent;
-  outline: none;
 }
 .g-app > .navbar-inverse .navbar-nav > li > a:hover {
   outline: thin dotted;
@@ -195,9 +198,7 @@ body {
 }
 .g-spatial-filter-locator-inline {
   display: block;
-
   z-index: 31;
-
 }
 .g-applied-filters .g-drop-pane-tools label {
 	margin-right: 20px;
@@ -347,7 +348,7 @@ body {
 }
 .g-labels-right .control-label {
 	text-align: right;
-	color: #a6a6a6;
+	color: #6e6e6e;
 }
 
 .calcite .gxePrimaryToolbar > .gxeTabs > .gxeTabButton {
@@ -459,3 +460,56 @@ body {
 	margin-bottom: 8px;
 }
 
+/* Accessibility Changes */
+.btn-success {
+    color: #ffffff;
+    background-color: #338033;
+    border-color: #50834f;
+}
+
+a {
+    color: #005e95;
+    text-decoration: none;
+}
+
+a.dropdown-toggle:focus {
+    outline: 5px auto -webkit-focus-ring-color;
+}
+
+.pagination > .disabled > span, .pagination > .disabled > span:hover, .pagination > .disabled > span:focus, .pagination > .disabled > a, .pagination > .disabled > a:hover, .pagination > .disabled > a:focus {
+    color: #595959;
+    background-color: #ffffff;
+    border-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.offscreen {
+	position: absolute;
+	height: 1px;
+	width: 1px;
+	overflow: hidden;
+	clip-path: inset(1px 1px 1px 1px);
+	clip-path: inset(1px, 1px, 1px, 1px);
+}
+
+.skip-to-content.offscreen:focus {
+	position: relative;
+	display: inline-block;
+	height: auto;
+	width: auto;
+	padding: 0.625em 1.25em;
+	background-color: #005e95;
+	color: #fff;
+	overflow: visible;
+	clip-path: none;
+	text-decoration: none;
+}
+
+.g-open-search-result-links {
+  float: right;
+  padding: 1em;
+}
+
+.g-open-search-result-link {
+  margin-left: 1em;
+}
