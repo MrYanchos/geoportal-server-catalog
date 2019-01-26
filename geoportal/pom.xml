@@ -10,10 +10,11 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <log4j.version>2.10.0</log4j.version>
+    <log4j.version>2.11.1</log4j.version>
     <springframework.version>4.3.10.RELEASE</springframework.version>
     <springsecurity.version>4.2.3.RELEASE</springsecurity.version>
     <jackson.version>2.9.0</jackson.version>
+    <tomcat.http.port>8081</tomcat.http.port>
   </properties>
 
 	<repositories>
@@ -264,6 +265,20 @@
           -->
         </configuration>
       </plugin>
+          <plugin>
+            <!-- https://mvnrepository.com/artifact/org.apache.tomcat.maven/tomcat7-maven-plugin -->
+            <groupId>org.apache.tomcat.maven</groupId>
+            <artifactId>tomcat7-maven-plugin</artifactId>
+            <version>2.2</version>
+            <configuration>
+              <port>${tomcat.http.port}</port>
+              <useTestClasspath>true</useTestClasspath>
+              <systemProperties>
+                <MAVEN_OPTS>-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000</MAVEN_OPTS>
+              </systemProperties>
+            </configuration>
+        </plugin>
+
     </plugins>
   </build>
   
