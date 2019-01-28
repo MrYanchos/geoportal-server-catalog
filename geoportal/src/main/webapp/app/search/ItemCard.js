@@ -122,6 +122,7 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
         this._renderWorkbenchLinksDropdown(item,links);
         this._renderCinergiLinks(hit._id,item),
         this._renderSchemaOrg(item)
+      this._renderId(item);
     },
     
     _canEditMetadata: function(item,isOwner,isAdmin,isPublisher) {
@@ -1072,6 +1073,23 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
             }
         }
     }
+    },
+      _renderId: function (item) {
+      /* This node will allow jquery to
+      grab identifiers, without having to resort to parsing URLS
+       */
+          var idNode = this.idNode;
+          var esId = item._id;
+          var fid = item.fileid;
+
+          dojo.attr(idNode,{ 'esId': esId } );
+
+          if (fid) {
+              dojo.attr(idNode,{ 'fileid': fid } );
+          }
+
+      }
+
   });
   
   return oThisClass;
