@@ -175,22 +175,24 @@ function openReplacement(method, url, async, user, password) {
 
 function sendReplacement(data) {
 
-    var dt = typeof data;
-    var io = data.indexOf("query");
+    if ( data !== null & typeof(data) !== "undefined") {
+        var dt = typeof data;
+        var io = data.indexOf("query");
 
-    if (typeof data === "string" && data.indexOf("query") > 0) {
-
-        localStorage.setItem("saveSearch", data);
-
-
+        if ( typeof data === "string" && data.indexOf("query") > 0 ) {
+            localStorage.setItem("saveSearch", data);
+        }
+        if(this.onreadystatechange) {
+            this._onreadystatechange = this.onreadystatechange;
+        }
+        this.onreadystatechange = onReadyStateChangeReplacement;
+        return send.apply(this, arguments);
+    } else {
+        return send.apply(this, arguments);
     }
-    if (this.onreadystatechange) {
-        this._onreadystatechange = this.onreadystatechange;
-    }
-    this.onreadystatechange = onReadyStateChangeReplacement;
 
-    return send.apply(this, arguments);
 }
+
 
 function onReadyStateChangeReplacement() {
 
