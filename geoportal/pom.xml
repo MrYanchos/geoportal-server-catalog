@@ -152,7 +152,11 @@
       <version>2.4.0</version>
     </dependency>
       -->
-
+  <dependency>
+    <groupId>org.keycloak</groupId>
+    <artifactId>keycloak-spring-security-adapter</artifactId>
+    <version>2.5.5.Final</version>
+  </dependency>
   </dependencies> 
 
   <build>
