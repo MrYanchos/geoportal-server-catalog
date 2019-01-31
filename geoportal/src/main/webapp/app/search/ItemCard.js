@@ -49,12 +49,13 @@ define(["dojo/_base/declare",
   "app/content/UploadMetadata",
   "app/preview/PreviewUtil",
   "app/preview/PreviewPane",
+    "app/collection/CollectionScripts",
     "app/prov/Prov"],
 function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domConstruct,
   _WidgetBase,_AttachMixin, _TemplatedMixin, _WidgetsInTemplateMixin, Tooltip, TooltipDialog, popup,
   template, i18n, AppClient, ServiceType, util, ConfirmationDialog, ChangeOwner, DeleteItems,
   MetadataEditor, gxeConfig, SetAccess, SetApprovalStatus, SetField, UploadMetadata, 
-  PreviewUtil, PreviewPane) {
+  PreviewUtil, PreviewPane, Collection) {
   
   var oThisClass = declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
  
@@ -65,8 +66,8 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
     item: null,
     itemsNode: null,
     searchPane: null,
-      script: 'custom/localCollectionSaveEvents.js',
-      script2: 'custom/localCollectionSaveUI.js',
+  //    script: 'custom/localCollectionSaveEvents.js',
+  //    script2: 'custom/localCollectionSaveUI.js',
 
     allowedServices: {
       "featureserver":"agsfeatureserver",
@@ -102,24 +103,25 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
         //collection
        //  on(this,"click", setSavedCard);
       on(this,"click", assignEvent);
-       setSavedCard();
+        setSavedCard();
         // assignEvent();
 
     },
-      startup:  function () {
-          var  ascript = this.script;
-          if (typeof ascript === "undefined" || ascript === null) {
-              ascript ="custom/localCollectionSaveEvents.js";
-          }
-          var  ascript2 = this.script2;
-          if (typeof ascript === "undefined" || ascript === null) {
-              ascript ="custom/localCollectionSaveUI.js";
-          }
-
-          require([ascript,ascript2], function(){
-// separate out this to custom to allow for easier customization.
-          });
-      },
+//  Now in app/collection/CollectionScripts
+//     startup:  function () {
+//           var  ascript = this.script;
+//           if (typeof ascript === "undefined" || ascript === null) {
+//               ascript ="custom/localCollectionSaveEvents.js";
+//           }
+//           var  ascript2 = this.script2;
+//           if (typeof ascript === "undefined" || ascript === null) {
+//               ascript ="custom/localCollectionSaveUI.js";
+//           }
+//
+//           require([ascript,ascript2], function(){
+// // separate out this to custom to allow for easier customization.
+//           });
+//       },
 
     render: function(hit) {
       var item = this.item = hit._source;

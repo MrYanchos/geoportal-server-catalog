@@ -18,33 +18,52 @@
             "app/common/Templated",
             "dojo/text!./templates/CollectionPanel.html",
             "dojo/i18n!../nls/resources",
+        "app/collection/CollectionScripts"
         ],
-        function(declare, lang, Templated, template, i18n) {
+        function(declare, lang, Templated, template, i18n, collectionScripts) {
 
             var oThisClass = declare([Templated], {
 
                 i18n: i18n,
                 templateString: template,
-                script: 'custom/localCollectionSaveEvents.js',
-                script2: 'custom/localCollectionSaveUI.js',
+
                 postCreate: function() {
                     this.inherited(arguments);
                 },
-                startup:  function () {
-                    var  ascript = this.script;
-                    if (typeof ascript === "undefined" || ascript === null) {
-                        ascript ="custom/localCollectionSaveEvents.js";
-                    }
-                    var  ascript2 = this.script2;
-                    if (typeof ascript === "undefined" || ascript === null) {
-                        ascript ="custom/localCollectionSaveUI.js";
-                    }
-
-                    require([ascript,ascript2], function(){
-// separate out this to custom to allow for easier customization.
-                    });
+                startup: function() {
+                    this.inherited(arguments);
                 }
+
             });
 
             return oThisClass;
         });
+//         function(declare, lang, Templated, template, i18n) {
+//
+//             var oThisClass = declare([Templated], {
+//
+//                 i18n: i18n,
+//                 templateString: template,
+//                 script: 'custom/localCollectionSaveEvents.js',
+//                 script2: 'custom/localCollectionSaveUI.js',
+//                 postCreate: function() {
+//                     this.inherited(arguments);
+//                 },
+//                 startup:  function () {
+//                     var  ascript = this.script;
+//                     if (typeof ascript === "undefined" || ascript === null) {
+//                         ascript ="custom/localCollectionSaveEvents.js";
+//                     }
+//                     var  ascript2 = this.script2;
+//                     if (typeof ascript === "undefined" || ascript === null) {
+//                         ascript ="custom/localCollectionSaveUI.js";
+//                     }
+//
+//                     require([ascript,ascript2], function(){
+// // separate out this to custom to allow for easier customization.
+//                     });
+//                 }
+//             });
+//
+//             return oThisClass;
+//         });
