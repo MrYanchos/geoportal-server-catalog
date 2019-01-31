@@ -127,3 +127,46 @@
    float:left ;
 
 }
+
+.g-item-save {
+
+    font-family: "Avenir Next W01","Avenir Next","Avenir","Helvetica Neue","Helvetica","Arial","sans-serif";
+
+}
+
+.g-item-save-xx {
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-bottom: 2px;
+    padding-top: 2px;
+    margin-top: 2px;
+    color: #440000;
+    display: inline-block;
+    margin-left: 400px;
+    font-family: "Avenir Next W01","Avenir Next","Avenir","Helvetica Neue","Helvetica","Arial",sans-serif;
+    border:2px solid #dcdcdc;
+    background-color: #29fa6;
+
+}
+.g-item-card .g-item-card-saved {
+    margin-top: 5px;
+    margin-left: 40px;
+    padding: 4px;
+    border-bottom: 1px solid #cccccc;
+    font-family: "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+}
+
+.g-item-card-saved {
+    background-color: #aaaaaa;
+    font-family: "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+}
+
+.g-item-card .g-item-title {
+    font-weight: bold;
+    font-family: "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+}
+
+.g-item-card .g-item-status {
+    margin-right: 0.5em;
+    font-family: "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+}

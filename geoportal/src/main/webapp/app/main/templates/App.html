@@ -16,21 +16,25 @@
 		  <li class="nav-item">
 			  <a class="nav-link" href="#contributePanel" data-toggle="tab">Contribute</a>
 		  </li>
-	    <li class="nav-item">
-	      <a class="nav-link" href="#aboutPanel" data-toggle="tab">${i18n.nav.about}</a>
-	    </li>
-	  </ul>
-	  
-	  <div class="g-tools pull-right">
-		  <a class="g-help" href="help/" target="_blank"
-rel="help"
-		  >Help</a>
-		  <span class="g-username" data-dojo-attach-point="usernameNode"></span>
-<!--	    <a class="g-signin" href="#"
-	      data-dojo-attach-point="signInNode" 
-	      data-dojo-attach-event="onclick: signInClicked"
-	      >${i18n.nav.signIn}</a>
--->
+		  		  <li class="nav-item">
+          		  <a class="nav-link" href="#collectionPanel" data-toggle="tab">Collection</a>
+                    </li>
+
+                  <li class="nav-item">
+                    <a class="nav-link" href="#aboutPanel" data-toggle="tab">${i18n.nav.about}</a>
+                  </li>
+                </ul>
+
+                <div class="g-tools pull-right">
+                    <a class="g-help" href="help/" target="_blank"
+          rel="help"
+                    >Help</a>
+                    <span class="g-username" data-dojo-attach-point="usernameNode"></span>
+          <!--	    <a class="g-signin" href="#"
+                    data-dojo-attach-point="signInNode"
+                    data-dojo-attach-event="onclick: signInClicked"
+                    >${i18n.nav.signIn}</a>
+          -->
 		  <div id="idAppDropdown" class="dropdown pull-right g-options">
 		    <a href="#" class="dropdown-toggle" aria-label="Dropdown Menu" data-toggle="dropdown"
 		      ><span class="glyphicon glyphicon-menu-hamburger"></span></a>
@@ -84,6 +88,9 @@ rel="help"
     </div>
 	  <div id="contributePanel" role="tabpanel" class="tab-pane fade" >
 		  <div data-dojo-type="app/main/ContributePanel" data-dojo-attach-point="contributePanel"></div>
+	  </div>
+	  <div id="collectionPanel" role="tabpanel" class="tab-pane fade" >
+		  <div data-dojo-type="app/main/CollectionPanel" data-dojo-attach-point="collectionPanel"></div>
 	  </div>
     <div id="aboutPanel" role="tabpanel" class="tab-pane fade" >
       <div data-dojo-type="app/main/AboutPanel" data-dojo-attach-point="aboutPanel"></div>

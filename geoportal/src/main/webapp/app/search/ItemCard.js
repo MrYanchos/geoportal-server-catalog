@@ -27,6 +27,7 @@ define(["dojo/_base/declare",
   "dojo/dom-class",
   "dojo/dom-construct",
   "dijit/_WidgetBase",
+  "dijit/_AttachMixin",
   "dijit/_TemplatedMixin",
   "dijit/_WidgetsInTemplateMixin",
   "dijit/Tooltip",
@@ -50,7 +51,7 @@ define(["dojo/_base/declare",
   "app/preview/PreviewPane",
     "app/prov/Prov"],
 function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domConstruct,
-  _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, Tooltip, TooltipDialog, popup, 
+  _WidgetBase,_AttachMixin, _TemplatedMixin, _WidgetsInTemplateMixin, Tooltip, TooltipDialog, popup,
   template, i18n, AppClient, ServiceType, util, ConfirmationDialog, ChangeOwner, DeleteItems,
   MetadataEditor, gxeConfig, SetAccess, SetApprovalStatus, SetField, UploadMetadata, 
   PreviewUtil, PreviewPane) {
@@ -59,12 +60,14 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
  
     i18n: i18n,
     templateString: template,
-    
+
     isItemCard: true,
     item: null,
     itemsNode: null,
     searchPane: null,
-    
+      script: 'custom/localCollectionSaveEvents.js',
+      script2: 'custom/localCollectionSaveUI.js',
+
     allowedServices: {
       "featureserver":"agsfeatureserver",
       "imageserver":"agsimageserver",
@@ -96,8 +99,28 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
           self._renderOwnerAndDate(self.item);
         }
       }));
+        //collection
+       //  on(this,"click", setSavedCard);
+      on(this,"click", assignEvent);
+       setSavedCard();
+        // assignEvent();
+
     },
-    
+      startup:  function () {
+          var  ascript = this.script;
+          if (typeof ascript === "undefined" || ascript === null) {
+              ascript ="custom/localCollectionSaveEvents.js";
+          }
+          var  ascript2 = this.script2;
+          if (typeof ascript === "undefined" || ascript === null) {
+              ascript ="custom/localCollectionSaveUI.js";
+          }
+
+          require([ascript,ascript2], function(){
+// separate out this to custom to allow for easier customization.
+          });
+      },
+
     render: function(hit) {
       var item = this.item = hit._source;
       var highlight = hit.highlight;
@@ -120,9 +143,10 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
       this._renderUrlLinks(item);
 
         this._renderWorkbenchLinksDropdown(item,links);
-        this._renderCinergiLinks(hit._id,item),
-        this._renderSchemaOrg(item)
+        this._renderCinergiLinks(hit._id,item);
+        this._renderSchemaOrg(item);
       this._renderId(item);
+
     },
     
     _canEditMetadata: function(item,isOwner,isAdmin,isPublisher) {
@@ -1072,9 +1096,9 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                 this.ToolTip.label = this.extendedToolTip + this.ToolTip.label;
             }
         }
-    }
     },
-      _renderId: function (item) {
+
+      _renderId: function(item) {
       /* This node will allow jquery to
       grab identifiers, without having to resort to parsing URLS
        */
@@ -1088,7 +1112,8 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
               dojo.attr(idNode,{ 'fileid': fid } );
           }
 
-      }
+      },
+
 
   });
   
