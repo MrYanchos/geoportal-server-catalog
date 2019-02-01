@@ -16,6 +16,8 @@
 
 
 var container= $('#collectionPanel');
+var mdRecordsId = "uniqName_9_24";
+var collectionPanelId = "uniqName_9_22";
 //var container= $('#collectionContent');
 
 
@@ -178,7 +180,7 @@ function makeCollectionPanel(){
 
     var col = getCollections();
 
-    var uniq = $('<div id="uniqName_9_20" widgetid="uniqName_9_20" >');
+    var uniq = $('<div id="'+ collectionPanelId + '" widgetid="'+ collectionPanelId + '" >');
     var cp =   $('<div class="g-drop-pane dijitTitlePane" id="dijit_TitlePane_0" widgetid="dijit_TitlePane_0">');
     var tb =  $('<div data-dojo-attach-event="ondijitclick:_onTitleClick, onkeydown:_onTitleKey" class="dijitTitlePaneTitle dijitTitlePaneTitleOpen dijitOpen" data-dojo-attach-point="titleBarNode" id="dijit_TitlePane_0_titleBarNode">').html('Saved Collections');
     var tb2 = $('<div class="dijitTitlePaneTitleFocus" data-dojo-attach-point="focusNode" role="button" aria-controls="dijit_TitlePane_0_pane" tabindex="0" aria-pressed="true">');
@@ -261,7 +263,7 @@ function _selCollection(colVal) {
         $(this).remove();
     });
 
-    var uniq = $('#uniqName_9_22');
+    var uniq = $('#'+collectionPanelId);
     var cp =  $('<div class="g-drop-pane dijitTitlePane" id="dijit_TitlePane_0" widgetid="dijit_TitlePane_0">');
     var mda = getMdRecords("collections",ColID);
 
@@ -357,11 +359,20 @@ function rightPanel(container) {
     container.append(rPanel);
 
 }
+function refeshMdPanel(container) {
+
+   // var mdPanel = $('#'+mdRecordsId);
+
+    var mr = makeRecordPanel();
+    $('#'+mdRecordsId).replaceWith(mr);
+
+
+}
 
 function makeRecordPanel(rp, qf, q) {
 //UI for the mdRecords Panel
 
-    var uniq = $('<div id="uniqName_9_22" widgetid="uniqName_9_22" >');
+    var uniq = $('<div id="'+mdRecordsId+'" widgetid="'+mdRecordsId+'" >');
     var cp =   $('<div class="g-drop-pane dijitTitlePane" id="dijit_TitlePane_0" widgetid="dijit_TitlePane_0">');
     var tb =  $('<div data-dojo-attach-event="ondijitclick:_onTitleClick, onkeydown:_onTitleKey" class="dijitTitlePaneTitle dijitTitlePaneTitleOpen dijitOpen" data-dojo-attach-point="titleBarNode" id="dijit_TitlePane_0_titleBarNode">')
         .html('Saved Results');
@@ -565,7 +576,7 @@ function show_cinergi(sp, savedSearch ) {
 
     mdArray = [];
 
-    var uniq = $('#uniqName_9_22');
+    var uniq = $('#'+collectionPanelId);
     var cp =  $('<div class="g-drop-pane dijitTitlePane" id="dijit_TitlePane_0" widgetid="dijit_TitlePane_0">');
 
     $.ajax({
@@ -661,6 +672,7 @@ function saveMdRecord(md) {
 
     var key = "mdRec-" + md.id;
     localStorage.setItem(key, JSON.stringify(md) );
+    refeshMdPanel(container);
     return key;
 }
 

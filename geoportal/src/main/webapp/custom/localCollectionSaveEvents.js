@@ -62,13 +62,13 @@ function createUUID() {
     return uuid;
 }
 
-
-function saveMdRecord(md) {
-
-    var key = "mdRec-" + md.id;
-    localStorage.setItem(key, JSON.stringify(md));
-    return key;
-}
+// duplicate version. Also in UI
+// function saveMdRecord(md) {
+//
+//     var key = "mdRec-" + md.id;
+//     localStorage.setItem(key, JSON.stringify(md));
+//     return key;
+// }
 
 function setSavedCard(gC) {
     console.log('click Card:setSavedEvent');
