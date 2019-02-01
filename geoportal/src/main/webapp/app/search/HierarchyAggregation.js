@@ -182,10 +182,13 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
                 }
                 array.forEach(data.buckets, function (entry) {
                         // this.addEntry(entry.key,entry.doc_count,missingVal);
-                        if (this.stopFullMatch.includes(entry.key.trim())) {
+                        var stop = array.filter(this.stopTreeMatch, function(item){
+                            return entry.key.trim() == item;
+                        });
+                        if (stop.length>0) {
                             return;
                         }
-                        var stop = array.filter(this.stopTreeMatch, function(item){
+                        stop = array.filter(this.stopTreeMatch, function(item){
                             return entry.key.trim().startsWith(item);
                         });
                         if (stop.length>0){
