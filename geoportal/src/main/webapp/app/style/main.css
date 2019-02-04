@@ -99,6 +99,13 @@ body {
 .navbar-inverse .glyphicon, .navbar-inverse .navbar-brand {
   color: #ffffff;
 }
+.tab-content > .active {
+    display: block;
+    margin-top: -70px;
+    padding-top: 70px;
+
+}
+
 .g-app > .navbar {
 	min-height: 5px;
 }
