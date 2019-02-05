@@ -22,6 +22,7 @@ define(["dojo/_base/declare",
   "dojo/string",
   "dojo/topic",
   "dojo/request/xhr",
+   "dojo/request",
   "dojo/on",
   "app/context/app-topics",
   "dojo/dom-class",
@@ -50,12 +51,14 @@ define(["dojo/_base/declare",
   "app/preview/PreviewUtil",
   "app/preview/PreviewPane",
     "app/collection/CollectionScripts",
-    "app/prov/Prov"],
-function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domConstruct,
+    "app/prov/Prov",
+    "dojo/text!./templates/jupyter_hubs.json"
+    ],
+function(declare, lang, array, string, topic, xhr, request, on, appTopics, domClass, domConstruct,
   _WidgetBase,_AttachMixin, _TemplatedMixin, _WidgetsInTemplateMixin, Tooltip, TooltipDialog, popup,
   template, i18n, AppClient, ServiceType, util, ConfirmationDialog, ChangeOwner, DeleteItems,
   MetadataEditor, gxeConfig, SetAccess, SetApprovalStatus, SetField, UploadMetadata, 
-  PreviewUtil, PreviewPane, Collection) {
+  PreviewUtil, PreviewPane, Collection, prov, hubs) {
   
   var oThisClass = declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
  
@@ -80,7 +83,10 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
       "wfs": "wfs",
       "wms": "wms"
     },
-    
+     // "jupyter_hubs_file":require.toUrl("custom/jupyter_hubs.json"),
+      jupyter_hubs_json: hubs,
+      jupyter_hubs: dojo.fromJson(hubs),
+
     postCreate: function() {
       this.intializeToolTip();
       this.inherited(arguments);
@@ -107,24 +113,14 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
         // assignEvent();
 
     },
-//  Now in app/collection/CollectionScripts
-//     startup:  function () {
-//           var  ascript = this.script;
-//           if (typeof ascript === "undefined" || ascript === null) {
-//               ascript ="custom/localCollectionSaveEvents.js";
-//           }
-//           var  ascript2 = this.script2;
-//           if (typeof ascript === "undefined" || ascript === null) {
-//               ascript ="custom/localCollectionSaveUI.js";
-//           }
-//
-//           require([ascript,ascript2], function(){
-// // separate out this to custom to allow for easier customization.
-//           });
-//       },
+
+    // startup:  function () {
+
+    //   },
 
     render: function(hit) {
-      var item = this.item = hit._source;
+
+        var item = this.item = hit._source;
       var highlight = hit.highlight;
 
       item._id = hit._id;
@@ -990,44 +986,76 @@ function(declare, lang, array, string, topic, xhr, on, appTopics, domClass, domC
                 "class": "dropdown-menu",
             }, dd);
 
-            uri = "http://suave-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb?documentId=" + encodeURIComponent(item._id);
-            uriTitle = "suave-jupyterhub.com (local authentication required)"
-            var ddli2 = domConstruct.create("li", {}, ddul);
-            domConstruct.create("a", {
-                "class": "small",
-                href: uri,
-                target: "_blank",
-                innerHTML: uriTitle
-            }, ddli2);
-            var uri = "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/stable?urlpath=%2Fnotebooks%2FCinergiDispatch.ipynb?documentId=" + encodeURIComponent(item._id);
-            var uriTitle = "MyBinder-Stable";
-            var ddli = domConstruct.create("li", {}, ddul);
-            domConstruct.create("a", {
-                "class": "small",
-                href: uri,
-                target: "_blank",
-                innerHTML: uriTitle
-            }, ddli);
-            var uri = "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/master?urlpath=%2Fnotebooks%2FDispatchTesting%2FCinergiDispatch-UseMetadata.ipynb?documentId=" + encodeURIComponent(item._id);
-            var uriTitle = "MyBinder-Development";
-            var ddli0 = domConstruct.create("li", {}, ddul);
-            domConstruct.create("a", {
-                "class": "small",
-                href: uri,
-                target: "_blank",
-                innerHTML: uriTitle
-            }, ddli0);
+            if (lang.isArray(this.jupyter_hubs.hubs)) {
+                array.forEach(this.jupyter_hubs.hubs, function (hub) {
+                    var ddli = domConstruct.create("li", {}, ddul);
+                    var uri = hub.uri_template.replace("{docId}", encodeURIComponent(item._id));
+                    var divClass = "small";
+                    if (hub.disabled){
+                        divClass = "small disabled";
+                    }
+                    if (lang.isArray(hub.branches)) {
+                        array.forEach(hub.branches, function (branch) {
 
-            uri = "https://suave-jupyter.nautilus.optiputer.net/?documentId=" + encodeURIComponent(item._id);
-            uriTitle = "Optiputer (google authentication required)"
+                            var branchuri = uri.replace("{branch}",branch.branch );
+                            var title  = hub.title.replace("{branch}",branch.title);
+                        domConstruct.create("a", {
+                            "class": "small",
+                            href: branchuri,
+                            target: "_blank",
+                            innerHTML: title
+                        }, ddli);
+                        });
+                    } else {
+                        domConstruct.create("a", {
+                            "class": "small",
+                            href: uri,
+                            target: "_blank",
+                            innerHTML: hub.title
+                        }, ddli);
+                    }
+                });
+            }
 
-            var ddli3 = domConstruct.create("li", {}, ddul);
-            domConstruct.create("a", {
-                "class": "small",
-                href: uri,
-                target: "_blank",
-                innerHTML: uriTitle
-            }, ddli3);
+
+            // uri = "http://suave-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb?documentId=" + encodeURIComponent(item._id);
+            // uriTitle = "suave-jupyterhub.com (local authentication required)"
+            // var ddli2 = domConstruct.create("li", {}, ddul);
+            // domConstruct.create("a", {
+            //     "class": "small",
+            //     href: uri,
+            //     target: "_blank",
+            //     innerHTML: uriTitle
+            // }, ddli2);
+            // var uri = "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/stable?urlpath=%2Fnotebooks%2FCinergiDispatch.ipynb?documentId=" + encodeURIComponent(item._id);
+            // var uriTitle = "MyBinder-Stable";
+            // var ddli = domConstruct.create("li", {}, ddul);
+            // domConstruct.create("a", {
+            //     "class": "small",
+            //     href: uri,
+            //     target: "_blank",
+            //     innerHTML: uriTitle
+            // }, ddli);
+            // var uri = "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/master?urlpath=%2Fnotebooks%2FDispatchTesting%2FCinergiDispatch-UseMetadata.ipynb?documentId=" + encodeURIComponent(item._id);
+            // var uriTitle = "MyBinder-Development";
+            // var ddli0 = domConstruct.create("li", {}, ddul);
+            // domConstruct.create("a", {
+            //     "class": "small",
+            //     href: uri,
+            //     target: "_blank",
+            //     innerHTML: uriTitle
+            // }, ddli0);
+            //
+            // uri = "https://suave-jupyter.nautilus.optiputer.net/?documentId=" + encodeURIComponent(item._id);
+            // uriTitle = "Optiputer (google authentication required)"
+            //
+            // var ddli3 = domConstruct.create("li", {}, ddul);
+            // domConstruct.create("a", {
+            //     "class": "small",
+            //     href: uri,
+            //     target: "_blank",
+            //     innerHTML: uriTitle
+            // }, ddli3);
             this._mitigateDropdownClip(dd, ddul);
         }
       },

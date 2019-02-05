@@ -1,0 +1,27 @@
+{ "documentation":"docId will be filled in by geoportal.  ",
+
+  "hubs":[
+  {
+    "title": "suave-jupyterhub.com (local authentication required)",
+    "uri_template": "http://suave-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb?documentId={docId}"
+  },
+  {
+    "title": "MyBinder-{branch}",
+    "uri_template": "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/{branch}?urlpath=%2Fnotebooks%2FCinergiDispatch.ipynb?documentId={docId}",
+    "branches": [
+    {"branch":"stable",
+      "title":"Production"},
+    {"branch":"master",
+      "title":"Development"}
+
+  ]
+  },
+  {
+    "disabled": true,
+    "title": "Optiputer (google authentication required)",
+    "uri_template": "https://suave-jupyter.nautilus.optiputer.net/?documentId={docId}"
+  }
+]
+}
+
+
