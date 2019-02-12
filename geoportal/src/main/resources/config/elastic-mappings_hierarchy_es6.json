@@ -56,7 +56,6 @@
             "reverse"
           ]
         }
-
       },
       "filter": {
         "english_stemmer": {
@@ -64,9 +63,12 @@
           "name": "english"
         },
         "hierarchy_stop": {
-          "type":       "stop",
+          "type": "stop",
           "ignore_case": true,
-          "stopwords":  ["category > unassigned", "unassigned"]
+          "stopwords": [
+            "category > unassigned",
+            "unassigned"
+          ]
         },
         "shingle": {
           "type": "shingle",
@@ -77,43 +79,6 @@
     }
   },
   "mappings": {
-    "blob": {
-      "properties": {
-        "sys_blob": {
-          "type": "binary",
-          "store": true,
-          "doc_values": false
-        },
-        "sys_itemid": {
-          "type": "keyword"
-        },
-        "sys_meta": {
-          "type": "keyword",
-          "index": false,
-          "store": true,
-          "doc_values": false
-        }
-      }
-    },
-    "clob": {
-      "properties": {
-        "sys_clob": {
-          "type": "keyword",
-          "index": false,
-          "store": true,
-          "doc_values": false
-        },
-        "sys_itemid": {
-          "type": "keyword"
-        },
-        "sys_meta": {
-          "type": "keyword",
-          "index": false,
-          "store": true,
-          "doc_values": false
-        }
-      }
-    },
     "item": {
       "properties": {
         "title": {
@@ -134,8 +99,8 @@
         "description": {
           "type": "text"
         },
-        "keyword" : {
-          "type" : "keyword",
+        "keywords": {
+          "type": "keyword",
           "fields": {
             "trigram": {
               "type": "text",
@@ -146,20 +111,8 @@
             }
           }
         },
-        "tags" : {
-        "type" : "keyword",
-        "fields": {
-          "trigram": {
-            "type": "text",
-            "analyzer": "trigram"
-          },
-          "completion": {
-            "type": "completion"
-          }
-        }
-      },
-      "contact_people" : {
-          "type" : "keyword",
+        "tags": {
+          "type": "keyword",
           "fields": {
             "trigram": {
               "type": "text",
@@ -170,8 +123,8 @@
             }
           }
         },
-        "contact_organizations" : {
-          "type" : "keyword",
+        "contact_people": {
+          "type": "keyword",
           "fields": {
             "trigram": {
               "type": "text",
@@ -182,8 +135,8 @@
             }
           }
         },
-        "place_keywords" : {
-          "type" : "keyword",
+        "contact_organizations": {
+          "type": "keyword",
           "fields": {
             "trigram": {
               "type": "text",
@@ -194,7 +147,19 @@
             }
           }
         },
-        "categories_cat": {
+        "place_keywords": {
+          "type": "keyword",
+          "fields": {
+            "trigram": {
+              "type": "text",
+              "analyzer": "trigram"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "categories": {
           "type": "text",
           "analyzer": "category_analyzer",
           "fielddata": true,
@@ -211,7 +176,6 @@
             }
           }
         }
-
       },
       "dynamic_templates": [
         {
@@ -274,8 +238,7 @@
           "_dt": {
             "match": "*_dt",
             "mapping": {
-              "type": "date",
-              "format": "date_optional_time"
+              "type": "date"
             }
           }
         },

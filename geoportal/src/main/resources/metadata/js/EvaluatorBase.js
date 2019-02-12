@@ -18,6 +18,8 @@ var G = {
   DateUtil: Java.type("com.esri.geoportal.base.util.DateUtil"),
   Val: Java.type("com.esri.geoportal.base.util.Val"),
 
+  DateRegEx00:  new RegExp('\-00$'), // YearMonth match YYYY-MM-00
+  DateRegEx0000:  new RegExp('\-00\-00$'), // Year Only match YYYY-00-00
 
   XPATH_NODE: javax.xml.xpath.XPathConstants.NODE,
   XPATH_NODESET: javax.xml.xpath.XPathConstants.NODESET,
@@ -188,15 +190,44 @@ var G = {
     if (typeof value === "undefined" || value === null ) return;
     if (options && options.dataType && typeof value !== "undefined" && value !== null) {
       if (options.dataType === "IsoDateTime" && typeof value === "string") {
-        if (value.startsWith('9999')) return; // Data.Gov uses 9999-01-01 as default
+        print("checkval(isodatetime):" + value);
+
+        /* issues from 1.6 million records:
+        Bad Defaults:9999, 0000-00-00Z
+        Year Year-Month: YYYY-00-00, YYYY-MM-00, 2011-??-??Z, 1990-NaN-01
+        Bad Terms: Unknown, Present, now, updated daily
+        Bad Times: YYYY-MM-DDT01010000, 2019-02-02 11:03:50, 2015-10-30T00:16:46ZT00:00:00
+                     2002-02-27TVaries by scene, 2003-01-01TVaries by LIDAR Mission Task
+        Isodates bad format: 2012-9-30
+        Non-IsoDate formats: 7/7/2010Z, May 27, 2016
+        wonky: 1975-98Z,03/0-1/-05T12:00:00
+               1004-23-01Z, 0819-20-02T12:00:00
+        Moving Time Periods: R/P1D, P0Y0M1DT0H0M0S, R/P3M
+         */
+        value= value.trim();
+        // Just strip off the time.
+        if (value.charAt(10) === 'T') {
+         value = value.slice(0,10);
+            print(value);
+        }
+        if (value.startsWith('9999') || value.startsWith('0000') ) return; // Data.Gov uses 9999-01-01 as default
+          if(this.DateRegEx0000.exec(value)){
+            value = value.replace("-00-00", "");
+          }
+          if(this.DateRegEx00.exec(value)){
+              value = value.replace("-00", "");
+          }
         var isEnd = (options.isEnd || false);
+          // this adds time
         value = this.DateUtil.checkIsoDateTime(value,isEnd);
+
       }
     }
       if ( typeof value === "string") {
         value= value.trim();
          value = this.Val.unescape( value);
       }
+
       return value
   },
 

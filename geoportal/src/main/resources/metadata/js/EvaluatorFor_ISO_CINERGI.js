@@ -24,10 +24,13 @@ SMR 2018-08-18 update xpaths as noted in comments,
 /*
 dwv 2018-08-27 extend, from EvaluatorForISO.js
    update version to v1.3.cinergi
+dwv 2019-02-11 Added non-dynamic fields to the index to enable autocompletion
+    keywords, place_keywords, tags, contact_people,contact_{people,organizations}
+    cited_{people,organizations}*
 */
 G.evaluators.cinergi = {
 
-    version: "iso.v1.3.cinergi",
+    version: "iso.v1.4.cinergi",
 
     evaluate: function (task) {
         var metadataType = G._metadataTypes["iso19115base"];
@@ -59,6 +62,7 @@ G.evaluators.cinergi = {
         /* get any child text under gmd:keyword--CharacterString, Anchor etc. Same as apiso_Subject_txt*/
         this.clearProps(task,"keywords_s");
         G.evalProps(task, item, root, "keywords_s", "//gmd:MD_TopicCategoryCode | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/*/text()");
+        G.evalProps(task, item, root, "keywords", "//gmd:MD_TopicCategoryCode | //gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/*/text()");
 
 
         G.evalProp(task, item, iden, "thumbnail_s", "gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString");
@@ -67,18 +71,22 @@ G.evaluators.cinergi = {
         /* include position name for individual, leave out 'missing', get only pointOf contact */
         this.clearProps(task,"contact_people_s");
         G.evalProps(task, item, root, "contact_people_s", "//gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='pointOfContact']/gmd:individualName[not(contains(gco:CharacterString,'issing'))]/*/text() | //gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='pointOfContact']/gmd:positionName[not(contains(gco:CharacterString,'issing'))]/*/text()");
+        G.evalProps(task, item, root, "contact_people", "//gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='pointOfContact']/gmd:individualName[not(contains(gco:CharacterString,'issing'))]/*/text() | //gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='pointOfContact']/gmd:positionName[not(contains(gco:CharacterString,'issing'))]/*/text()");
 
         /* these are the points of contacts, for metadata, the resource, or distribution; no distinction made */
         this.clearProps(task,"contact_organizations_s");
         G.evalProps(task, item, root, "contact_organizations_s", "//gmd:CI_RoleCode[contains(text(),'ontact') or contains(@codeListValue, 'ontact')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+        G.evalProps(task, item, root, "contact_organizations", "//gmd:CI_RoleCode[contains(text(),'ontact') or contains(@codeListValue, 'ontact')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
 
         /* ResponsibleParty who have role author, creator, principal (or principle) Investigator, originator
         filter for responsible party in identification; sometimes the author is put in identificationInformation
             point of contact */
         this.clearProps(task,"cited_individual_s");
         G.evalProps(task, item, iden, "cited_individual_s", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:individualName[not(contains(gco:CharacterString,'issing'))]/*/text()");
+        G.evalProps(task, item, iden, "cited_individual", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:individualName[not(contains(gco:CharacterString,'issing'))]/*/text()");
         this.clearProps(task,"cited_organization_s");
         G.evalProps(task, item, iden, "cited_organization_s", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/*/text()");
+        G.evalProps(task, item, iden, "cited_organization", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/*/text()");
 
         /* to generate facet for place names
          * dwv 2018-08-28 add named places */
@@ -86,10 +94,13 @@ G.evaluators.cinergi = {
         G.evalProps(task, item, root, "place_keywords_s",
             "//gmd:MD_KeywordTypeCode[contains(@codeListValue,'lace')]/../../gmd:keyword/*/text() | //gmd:geographicIdentifier//gmd:code/*/text() |" +
             " //gmd:geographicElement/../gmd:description/*/text()");
-
+        G.evalProps(task, item, root, "place_keywords",
+            "//gmd:MD_KeywordTypeCode[contains(@codeListValue,'lace')]/../../gmd:keyword/*/text() | //gmd:geographicIdentifier//gmd:code/*/text() |" +
+            " //gmd:geographicElement/../gmd:description/*/text()");
         /* facet for all non-CINERGI controlled keywords, except place */
         this.clearProps(task,"tags_s");
         G.evalProps(task, item, root, "tags_s", "//gmd:MD_Keywords[not(descendant::*[contains(text(),'Cinergi')]) and //gmd:MD_KeywordTypeCode[not(contains(@codeListValue,'lace') )]]/gmd:keyword/*/text()");
+        G.evalProps(task, item, root, "tags", "//gmd:MD_Keywords[not(descendant::*[contains(text(),'Cinergi')]) and //gmd:MD_KeywordTypeCode[not(contains(@codeListValue,'lace') )]]/gmd:keyword/*/text()");
 
         this.clearProps(task,"distribution_links_s");
         G.evalProps(task, item, root, "distribution_links_s", "/gmd:distributionInfo//gmd:MD_DigitalTransferOptions//gmd:linkage/gmd:URL | gmd:identificationInfo//srv:SV_OperationMetadata//gmd:linkage/gmd:URL | //gmd:aggregationInfo//gmd:code[starts-with(gco:CharacterString/text(),'http')]/gco:CharacterString");
