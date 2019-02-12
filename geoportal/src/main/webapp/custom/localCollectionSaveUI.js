@@ -3,13 +3,30 @@
     Merged with Export Import
     fixed backbone - g-drop-pane-tools in makeRecordPanel
     2/5/2019
+    New fixes for 2/11/19 :
+    openSearch
+    Export single collection only
+    export file timestanp
+    clear button
+    search results title bar
+    better reload management
+    all results selction
+    Create New collection button
+
+    Bug fixes - 2/11/19 - 6PM
+    bug fixes - page count, export file format... - 7pm
+
 */
 
 var container= $('#collectionPanel');
 var mdRecordsId = "uniqName_9_24";
 var collectionPanelId = "uniqName_9_22";
 var recordsDropPaneId = "dijit_TitlePane_10";
-//var container= $('#collectionContent');
+var colDropPaneId = "dijit_TitlePane_20";
+
+$('.g-item-card').each(function(d) {
+    $(this).remove();
+});
 
 
 leftPanel(container);
@@ -19,8 +36,15 @@ var mdArray = [];
 var curPage = 0;
 var sType = "local";
 var search = "";
+var totRecords = 0;
 
 function leftPanel(container) {
+
+    var lpTest = container.find('.g-search-pane-left');
+    if ( lpTest ) {
+        lpTest.empty();
+        lpTest.remove();
+    }
 
     var lPanel = $('<div class="g-search-pane-left" style="padding: 4px 10px; margin: 10px;">');
     var lp =  $('<div class="g-drop-pane dijitTitlePane dijitTitlePaneFocused dijitFocused" id="dijit_TitlePane_0" widgetid="dijit_TitlePane_0">');
@@ -43,7 +67,7 @@ function makeSearchPanel() {
 
     var uniq = $('<div id="uniqName_9_20" widgetid="uniqName_9_20" >');
     var cp =   $('<div class="g-drop-pane dijitTitlePane" id="dijit_TitlePane_0" widgetid="dijit_TitlePane_0">');
-    var tb =  $('<div data-dojo-attach-event="ondijitclick:_onTitleClick, onkeydown:_onTitleKey" class="dijitTitlePaneTitle dijitTitlePaneTitleOpen dijitOpen" data-dojo-attach-point="titleBarNode" id="dijit_TitlePane_0_titleBarNode">').html('Saved Searches');
+    var tb =  $('<div data-dojo-attach-event="ondijitclick:_onTitleClick, onkeydown:_onTitleKey" class="dijitTitlePaneTitle dijitTitlePaneTitleOpen dijitOpen" data-dojo-attach-point="titleBarNode" id="dijit_TitlePane_0_titleBarNode9">').html('Saved Searches');
     var tb2 = $('<div class="dijitTitlePaneTitleFocus" data-dojo-attach-point="focusNode" role="button" aria-controls="dijit_TitlePane_0_pane" tabindex="0" aria-pressed="true">');
     var sp1 = $('<span data-dojo-attach-point="arrowNode" class="dijitInline dijitArrowNode" role="presentation"></span>');
     var sp2 = $('<span data-dojo-attach-point="arrowNodeInner" class="dijitArrowNodeInner"></span>');
@@ -73,14 +97,14 @@ function makeSearchPanel() {
     }
     var bDiv =  $('<div id="searchButtons" class="dijitTitlePaneContentOuter" data-dojo-attach-point="hideNode" role="presentation" />');
 
-    var seaBtn = $('<button id="addBtn" class="btn" onclick="show_cinergi(0)">Go To ..</button>')
+    var seaBtn = $('<button id="addBtn" class="btn" onclick="show_cinergi(0)">Show Search Results</button>')
         .css("height", "20px" )
         .css("padding","4px 16px")
         .css("margin", "10px")
         .css("color", "#ffffff")
         .css("font-size", "11px")
         .css("background-color", "#1E84A8");
-    var addBtn = $('<button id="addBtn" class="btn" onclick="_addSearch(this)">Save Current</button>')
+    var addBtn = $('<button id="addBtn" class="btn" onclick="_addSearch(this)">Save Current Search</button>')
         .css("height", "20px" )
         .css("padding","4px 16px")
         .css("margin", "10px")
@@ -97,8 +121,8 @@ function makeSearchPanel() {
         .css("background-color", "#1E84A8");
 
     op.append(gCard);
-    bDiv.append(seaBtn);
     bDiv.append(addBtn);
+    bDiv.append(seaBtn);
     bDiv.append(clrBtn);
     op.append(bDiv);
     cp.append(op);
@@ -155,8 +179,8 @@ function makeCollectionPanel(){
     var col = getCollections();
 
     var uniq = $('<div id="'+ collectionPanelId + '" widgetid="'+ collectionPanelId + '" >');
-    var cp =   $('<div class="g-drop-pane dijitTitlePane" id="'+recordsDropPaneId+'" widgetid="'+recordsDropPaneId+'">');
-    var tb =  $('<div data-dojo-attach-event="ondijitclick:_onTitleClick, onkeydown:_onTitleKey" class="dijitTitlePaneTitle dijitTitlePaneTitleOpen dijitOpen" data-dojo-attach-point="titleBarNode" id="dijit_TitlePane_0_titleBarNode">').html('Saved Collections');
+    var cp =   $('<div class="g-drop-pane dijitTitlePane" id="'+colDropPaneId+'" widgetid="'+colDropPaneId+'">');
+    var tb =  $('<div data-dojo-attach-event="ondijitclick:_onTitleClick, onkeydown:_onTitleKey" class="dijitTitlePaneTitle dijitTitlePaneTitleOpen dijitOpen" data-dojo-attach-point="titleBarNode" id="dijit_TitlePane_9_titleBarNode">').html('Saved Collections');
     var tb2 = $('<div class="dijitTitlePaneTitleFocus" data-dojo-attach-point="focusNode" role="button" aria-controls="dijit_TitlePane_0_pane" tabindex="0" aria-pressed="true">');
     var sp1 = $('<span data-dojo-attach-point="arrowNode" class="dijitInline dijitArrowNode" role="presentation"></span>');
     var sp2 = $('<span data-dojo-attach-point="arrowNodeInner" class="dijitArrowNodeInner"></span>');
@@ -173,9 +197,10 @@ function makeCollectionPanel(){
     uniq.append(cp);
 
     var gCard = $('<select id ="gSvCollection" class="form-control" style="background-color: white;" />');
-
-    var colOpt1 = $('<option value="default" >Select a Collection ... show default</option>');
+    var colOpt1 = $('<option value="default" >Unnassigned Results </option>');
+    var colOpt2 = $('<option value="All" >Show All</option>');
     gCard.append(colOpt1);
+    gCard.append(colOpt2);
 
     for (var k in col) {
         var colk = col[k].val
@@ -192,7 +217,7 @@ function makeCollectionPanel(){
         .css("background-color", "#1E84A8");
 
     var gColInput = $('<input type="text"  class="form-control" id="gSvInpCol" placeholder="Enter a New Collection Name" size="30" />');
-    var addBtn = $('<button id="addBtn" class="btn" onclick="_addCollection(this)">Add</button>')
+    var addBtn = $('<button id="addBtn" class="btn" onclick="_addCollection(this)">Create New Collection</button>')
         .css("height", "20px" )
         .css("padding","4px 16px")
         .css("color", "#ffffff")
@@ -209,7 +234,6 @@ function makeCollectionPanel(){
 
     cp.append(gCard);
     cp.append(vBtn);
-    //cp.append(gColLabel);
     cp.append(gColInput);
     cp.append(addBtn);
     cp.append(clrBtn);
@@ -231,15 +255,38 @@ function _selCollection(colVal) {
     sType = "local";
 
     var ColID = $('#gSvCollection').find(":selected").val();
-    console.log('Show records in the collection ..' + ColID);
+    var coltxt =  $('#gSvCollection').find(":selected").text(); //dijit_TitlePane_0_titleBarNode
+    if ( ColID !== "default") {
 
-    $('.g-item-card').each(function(d){
+        var sb = container.find('#dijit_TitlePane_0_titleBarNode');
+        var tlab = sb[0].childNodes[0];
+        tlab.nodeValue =" Saved Results for Collection   "+coltxt;
+
+        sb.hide();
+        sb.show();
+
+        console.log('Show records in the collection ..' + coltxt);
+
+    }
+
+    container.find('.g-item-card').each(function(d){
         $(this).remove();
     });
 
     var uniq = $('#'+mdRecordsId);
-    var cp =  $('<div class="g-drop-pane dijitTitlePane" id="'+recordsDropPaneId+'" widgetid="'+recordsDropPaneId+'">');
-    var mda = getMdRecords("collections",ColID);
+    var cp =  $('<div class="g-drop-pane dijitTitlePane" id="'+colDropPaneId+'" widgetid="'+colDropPaneId+'">');
+
+
+    if ( ColID == "default" ) {
+        var mda = getMdRecords("collections","default");
+
+    } else if ( ColID == "All" ){
+        var mda = getMdRecords("collections","");
+    } else {
+        var mda = getMdRecords("collections",ColID);
+    }
+
+    totRecords = mda.length;
 
     if (mda.length > pageRec ) {
         startAt = pageRec;
@@ -267,6 +314,9 @@ function _selCollection(colVal) {
 
     }
     uniq.append(cp);
+
+
+
     uniq.show();
 
 }
@@ -291,36 +341,47 @@ function _removeCollection(C){
 
     var ColID = $('#gSvCollection').find(":selected").val();
 
-    var mdRem  = getMdRecords("collections", ColID );
+    if ( ColID !== "default" && colID !== "All" ) {
 
-    for ( var k in mdRem ) {
-        var mCol = mdRem[k].val.collections;
-        var mid = mdRem[k].val.id;
-        var saveMe = false;
-        if ( mCol.length < 2 ) {
-            localStorage.removeItem("mdRec-"+mid);
-        } else {
-            for ( var c in mCol ) {
+        var mdRem  = getMdRecords("collections", ColID );
 
-                if ( mCol[c].match(ColID) ) {
-                    mCol.splice(c, 1);
-                    saveMe = true;
-                    //results.push({key:mkey,val:mkr});
+        for ( var k in mdRem ) {
+            var mCol = mdRem[k].val.collections;
+            var mid = mdRem[k].val.id;
+            var saveMe = false;
+            if ( mCol.length < 2 ) {
+                localStorage.removeItem("mdRec-"+mid);
+            } else {
+                for ( var c in mCol ) {
+
+                    if ( mCol[c].match(ColID) ) {
+                        mCol.splice(c, 1);
+                        saveMe = true;
+                        //results.push({key:mkey,val:mkr});
+                    }
                 }
+                if ( saveMe ) { localStorage.setItem("mdRec-"+mid, JSON.stringify(mdRem)); }
             }
-            if ( saveMe ) { localStorage.setItem("mdRec-"+mid, JSON.stringify(mdRem)); }
         }
-    }
 
-    localStorage.removeItem("cItem-"+ColID);
-    $('#gSvCollection').find(":selected").remove();
-    $('#gSvCollection').val('default');
-    makeRecordPanel();
+        localStorage.removeItem("cItem-"+ColID);
+        $('#gSvCollection').find(":selected").remove();
+        $('#gSvCollection').val('default');
+        makeRecordPanel();
+        gCard.append(colOpt1);
+    }
 
 
 }
 
 function rightPanel(container) {
+
+    var rpTest = container.find('.g-search-pane-right');
+    if ( rpTest ) {
+        rpTest.empty();
+        rpTest.remove();
+    }
+
 
     var rPanel = $('<div class="g-search-pane-right" style="margin:2px;" >');
     var rp =  $('<div class="g-drop-pane dijitTitlePane dijitTitlePaneFocused dijitFocused" id="dijit_TitlePane_0" widgetid="dijit_TitlePane_0">');
@@ -344,7 +405,7 @@ function makeRecordPanel(rp, qf, q) {
 
     var uniq = $('<div id="'+mdRecordsId+'" widgetid="'+mdRecordsId+'" >');
     var cp =   $('<div class="g-drop-pane dijitTitlePane" id="'+recordsDropPaneId+'" widgetid="'+recordsDropPaneId+'">');
-    var tb =  $('<div data-dojo-attach-event="ondijitclick:_onTitleClick, onkeydown:_onTitleKey" class="dijitTitlePaneTitle dijitTitlePaneTitleOpen dijitOpen" data-dojo-attach-point="titleBarNode" id="dijit_TitlePane_0_titleBarNode">')
+    var tb =  $('<div data-dojo-attach-event="ondijitclick:_onTitleClick, onkeydown:_onTitleKey" class="dijitTitlePaneTitle dijitTitlePaneTitleOpen dijitOpen" data-dojo-attach-point="titleBarNode" id='+recordsDropPaneId+'_titleBarNode">')
         .html('Saved Results');
     var gdpt = $('<span class="g-drop-pane-tools">');
     var pag0 =  $('<span id="PageTotals" >Total Records</span>');
@@ -375,7 +436,7 @@ function makeRecordPanel(rp, qf, q) {
     }
 
     if ( mda.length ){
-
+        totRecords = mda.length;
         $("#PageTotals").html("Total Records " + mda.length);
     }
     return uniq;
@@ -480,13 +541,17 @@ function _removeRecord(cObj) {
 
 }
 
-
 function page_records(dir){
 
     var ld = dir.id;
 
+    var maxPage = totRecords/10;
+
     if ( ld == "pageNext" ) {
-        curPage++;
+        if ( curPage < maxPage ) {
+            curPage++;
+        }
+
     } else {
         if ( curPage > 0 ) {
             curPage--;
@@ -507,10 +572,7 @@ function page_records(dir){
 
 }
 
-
 function show_cinergi(sp, savedSearch ) {
-
-    var baseRef="http://132.249.238.169:8080/geoportal/csw?service=CSW&request=GetRecords&f=json&size=10";
     // Show DDH records on search page
     sType = "csw";
     var aggUrl;
@@ -521,22 +583,21 @@ function show_cinergi(sp, savedSearch ) {
         $("#PageCnt").html("Page " + curPage);
     }
 
+    var bref = 'http://132.249.238.169:8080/geoportal/opensearch?f=json&from='+startP+'&size=10&sort=sys_modified_dt:desc&esdsl={"query":{"bool":{"must":[{"query_string":{"analyze_wildcard":true,"query":"';
+    var eref = '","fields":["_source.title^5","_source.*_cat^10","_all"],"default_operator":"and"}}]}}}';
 
     if ( savedSearch ) {
         aggUrl = savedSearch;
     } else {
         var inp = $("#gSvSearch option:selected").text();
-        //var inp = 'coral reef';
+
         var inJ = inp.split(" ").join('+');
         var inParams = '&from='+startP+'&q='+inJ;
-        var xSrchUrl = encodeURI(baseRef+inParams);
-        sSrchUrl = xSrchUrl.replace(/=/g,'-#-');
-        aggUrl = baseRef+inParams;
+
+        aggUrl = bref+inJ+eref;
     }
 
-
-
-    $('.g-item-card').each(function(d){
+    container.find('.g-item-card').each(function(d){
         $(this).remove();
     });
 
@@ -552,7 +613,7 @@ function show_cinergi(sp, savedSearch ) {
         data: { "datatype" : "query"},
         contentType: 'application/json',
         success: function(data) {
-            console.log(data);
+            //console.log(data);
             var ha = [];
 
             if ( data.hits ) {
@@ -564,6 +625,7 @@ function show_cinergi(sp, savedSearch ) {
                 var hal = data.total;
             }
 
+            totRecords = hal;
 
             $("#PageTotals").html("Total Records " + hal);
             for (i = 0; i < ha.length; i++) {
@@ -590,15 +652,22 @@ function show_cinergi(sp, savedSearch ) {
             uniq.append(cp);
             uniq.show();
 
+            var sb = $('#'+recordsDropPaneId+'_titleBarNode');
+            var tlab = sb[0].childNodes[0];
+            tlab.nodeValue = "Results - DDS Records for Saved Search  "+inp;
+
+            sb.hide();
+
+            sb.show();
+
         },
         error: function (xhr, status, error) {
             console.log(xhr);
-
         }
-
-
     });
 };
+
+
 
 /* lib region */
 
@@ -669,8 +738,14 @@ function getMdRecords(qField, query) {
             if ( qField == "collections") {
                 if ( query == "default" )
                 {
-                    results.push({key:mkey,val:mkr});
+                    var mCol = mkr.collections;
+                    // only bring back if only in default
+                    if ( mCol.length == 1 & mCol[0] == "default") {
+                        results.push({key:mkey,val:mkr});
+                    }
 
+                } else if ( query == "all") {
+                    results.push({key:mkey,val:mkr});
 
                 } else {
                     var mCol = mkr.collections;
@@ -738,7 +813,20 @@ function expInp(container) {
         .css("height", "44px" )
         .css("width", "80px");
 
-    var ex2Btn = $('<a  href="data:application/octet-stream,field1%2Cfield2%0Afoo%2Cbar%0Agoo%2Cgai%0A" id="export-href" onclick="expAll2(this);" class="btn" download="exportCollection.csv">Export CSV</a>')
+    var Dcb = $('<div >')
+        .css("margin", "4px" )
+        .css("height", "44px" )
+        .css("width", "120px");
+
+    var clrBtn = $('<a id="clear-local-btn" onclick="clearLocalRecords(this);" class="btn" >Clear Saved Results</a>')
+        .css("height", "20px" )
+        .css("padding","4px 16px")
+        .css("margin", "10px")
+        .css("color", "#ffffff")
+        .css("font-size", "11px")
+        .css("background-color", "#1E84A8");
+
+    var ex2Btn = $('<a  href="data:application/octet-stream,field1%2Cfield2%0Afoo%2Cbar%0Agoo%2Cgai%0A" id="export-href" onclick="expAll2(this);" class="btn" download="exportCollection.csv">Export Collection</a>')
         .css("height", "20px" )
         .css("padding","4px 16px")
         .css("margin", "10px")
@@ -763,7 +851,7 @@ function expInp(container) {
         .css("font-size", "11px")
         .css("background-color", "#1E84A8");
 
-    var ifl = $('<label id="fileLabel" onclick="importAll(this)" for="import-all">Import CSV</label>')
+    var ifl = $('<label id="fileLabel" onclick="importAll(this)" for="import-all">Import Collection</label>')
         .css("display", "inline-block" )
         .css("height", "20px" )
         .css("width", "90px")
@@ -783,57 +871,74 @@ function expInp(container) {
 
     dFUB.append(ifu);
     dFUB.append(ifl);
+    //Dexp.append(clrBtn);
     Dexp.append(ex2Btn);
     Dib.append(dFUB);
 
     //container.append(ex2Btn);
     container.append(Dexp);
+
     container.append(Dib);
     container.append(mrge);
     container.append(ovi);
+    Dcb.append(clrBtn)
+    container.append(Dcb);
 }
 
 
 function expAll2(e) {
 
+    var fn = "exportCollection" + $.now() + ".csv";
+
+    var x = $(e).attr("download", fn);
+
     var ez = getExpAll();
+
     var exFile = "data:application/octet-stream," + encodeURIComponent(ez);
     $(e).attr("href", exFile);
 
 }
 
 function getExpAll() {
+    //exports selected collection
+    var ColID = $('#gSvCollection').find(":selected").val();
+
     var coLabel = "Collection,";
     var colText = "COLLECTION, NAME, ID, DESCRIPTION\n";
-    var sc = findLocalItems("cItem");
-    if ( Array.isArray(sc) ) {
-        for ( var c in sc ) {
-            var cId = sc[c].key;
-            var cName = sc[c].val.colName;
-            var cDesc = sc[c].val.colDesc;
-            var cIndex = cId.substr(6);
-            colText = colText + coLabel + cName +  ',' + cIndex + ',' + cDesc + '\n';
+
+    if ( ColID == "default" ) {
+        colText = colText + coLabel + 'default,default,Records not in a Collection\n';
+
+    } else if ( ColID == "all" ) {
+        alert("Select a collection ");
+        return;
+
+    } else {
+        var sc = findLocalItems("cItem-"+ColID)
+
+        //var sc = findLocalItems("cItem-"+ColID);
+
+        if ( Array.isArray(sc) ) {
+            for ( var c in sc ) {
+                var cId = sc[c].key;
+                var cName = sc[c].val.colName;
+                var cDesc = sc[c].val.colDesc;
+                var cIndex = cId.substr(6);
+                colText = colText + coLabel + cName +  ',' + cIndex + ',' + cDesc + '\n';
+            }
         }
     }
 
-    var srchLabel = "Saved Search,";
-    var srchText = "SAVED SEARCH, NAME, ID, URL\n";
-    var ss = findLocalItems("sItem");
-    if ( Array.isArray(ss) ) {
-        for ( var c in ss ) {
-            var sKey = ss[c].val.id;
-            var SName = ss[c].val.searchText;
-            SName = SName.replace(/,/g, '|');
-            var sDesc = ss[c].val.searchUrl;
-
-            srchText = srchText + srchLabel + SName + ',' + sKey + ',' + sDesc + '\n';
-        }
-
-    }
 
     var mdLabel= "Saved Record,";
-    var mdText = "SAVED RECORD, TITLE, URL, ID, FILEID, COLLECTION ID, CITATION\n";
-    var md =  findLocalItems("mdRec");
+    var mdText = "SAVED RECORD, TITLE, URL, ID, FILEID, COLLECTION_IDS, CITATION\n";
+    if ( ColID == "default" ) {
+        var md =  findLocalItems("mdRec");
+    } else {
+        var md = getMdRecords('collections', ColID);
+    }
+
+
     if ( Array.isArray(md) ) {
         for ( var c in md ) {
 
@@ -850,11 +955,24 @@ function getExpAll() {
 
             var xol = md[c].val.collections;
             var col = xol.join('|');
-            mdText = mdText + mdLabel + mName +  ',' + mLink + ',' + mId + ',' + fId  +  ',' + col +  ',' + mDesc + '\n';
+
+            if ( ColID == "default" ) {
+                if ( xol.length == 1 && xol[0]=="default") {
+                    mdText = mdText + mdLabel + mName +  ',' + mLink + ',' + mId + ',' + fId  +  ',' + col +  ',Citation_Description\n';
+                }
+
+            } else {
+                mdText = mdText + mdLabel + mName +  ',' + mLink + ',' + mId + ',' + fId  +  ',' + col +  ',Citation_Description\n';
+            }
+
+
+
+
+
         }
     }
 
-    var xft =  colText + srchText + mdText;
+    var xft =  colText + mdText;
     return xft;
 
 }
@@ -961,12 +1079,38 @@ function getCollections(qField, query) {
     return col;
 }
 
+function clearLocalRecords() {
+
+    if ( confirm ("Are you sure you want to overwrite your current collection records ? ") ) {
+        // clear out records here;
+        var ca =[];
+        for (var i = 0; i < localStorage.length; i++){
+            if (localStorage.key(i) !== 'saveSearch') {
+                ca.push(localStorage.key(i));
+            }
+        }
+        for (var z = 0; z < ca.length; z++ ) {
+            localStorage.removeItem(ca[z]);
+        }
+
+        leftPanel(container);
+        rightPanel(container);
+
+    } else {
+        return;
+    }
+
+}
+
 function parseImport(csvData) {
 
     var ovi = $('input[name=uniqName_9_2_radio]:checked').val();
+
     if ( ovi == 'over') {
         if ( confirm ("Are you sure you want to overwrite your current collection records ? ") ) {
+            ovi = 'over';
             // clear out records here;
+            /*
             var ca =[];
             for (var i = 0; i < localStorage.length; i++){
                 if (localStorage.key(i) !== 'saveSearch') {
@@ -976,10 +1120,13 @@ function parseImport(csvData) {
             for (var z = 0; z < ca.length; z++ ) {
                 localStorage.removeItem(ca[z]);
             }
+            */
         } else {
-            return;
+            ovi = 'not-over';
         }
     }
+    var defaultLoad = false;
+    var oneCID="default";
 
     var rArr = csvData.split('\n');
     if ( rArr.length )  {
@@ -989,10 +1136,17 @@ function parseImport(csvData) {
                 var rowA = row.split(',');
                 if ( rowA[0] == "Collection"  ) {
 
+                    var cname = rowA[1];
                     var cid = rowA[2];
+                    oneCID = cid;
+                    if ( cname == "Default" ) {
+                        defaultLoad = true;
+                    }
                     var cx = _getCollections("id", cid);
-                    if ( cx.length ) {
+                    if ( cx.length && ovi == 'over' ) {
                         // already there
+                        var cItem = collectionItem(rowA[2], rowA[1]);
+                        saveCollectionItem(cItem);
                         var nop ="";
 
                     } else {
@@ -1002,12 +1156,15 @@ function parseImport(csvData) {
                     }
 
                 }
+                /*
                 if ( rowA[0] == "Saved Search"  ) {
 
                     var sid = rowA[2];
                     var sx = _getSavedSearches("id", sid);
-                    if ( sx.length ) {
+                    if ( sx.length && ovi == 'over' ) {
                         // already here
+                         var sItem = searchItem(rowA[2], rowA[1], rowA[3], params);
+                        saveSearchItem(sItem);
                         var nop ="";
                     } else {
                         var params = {};
@@ -1017,22 +1174,47 @@ function parseImport(csvData) {
                     }
 
                 }
+                */
                 if ( rowA[0] == "Saved Record"  ) {
 
                     var rid = rowA[3];
                     var rx = getMdRecords("id", rid);
+
                     if ( rx.length ) {
-                        // collections may have changed reload
-                        localStorage.removeItem("mdRec-"+rid);
+                        if (defaultLoad) {
+                            var nop = true;
+                        } else {
+                            // collections may have changed reload
+                            var storeCol = rx.collections;
+                            //storeCol.split()
+                            storeCol.push(oneCID);
+                            var rtitle = rowA[1];
+                            var rUrl = rowA[2];
+                            var fid = rowA[4];
+                            var des = row[6];
+
+                            localStorage.removeItem("mdRec-"+rid);
+
+                            var rItem = mdRecord( rid, fid, rtitle, rUrl, des, collections );
+                            saveMdRecord(rItem);
+
+
+                        }
+
+                    } else {
+
+                        var rtitle = rowA[1];
+                        var rUrl = rowA[2];
+                        var fid = rowA[4];
+                        var collections = rowA[5];
+                        ( collections.length == 0 ) ? collections = "default" : collections = collections.split('|');
+                        var des = row[6];
+                        var rItem = mdRecord( rid, fid, rtitle, rUrl, des, collections );
+                        saveMdRecord(rItem);
+
                     }
-                    var rtitle = rowA[1];
-                    var rUrl = rowA[2];
-                    var fid = rowA[4];
-                    var collections = rowA[5];
-                    ( collections.length == 0 ) ? collections = "default" : collections = collections.split('|');
-                    var des = row[6];
-                    var rItem = mdRecord( rid, fid, rtitle, rUrl, des, collections );
-                    saveMdRecord(rItem);
+
+
 
                 }
 
