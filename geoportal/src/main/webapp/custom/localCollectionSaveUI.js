@@ -1,23 +1,14 @@
-/*  Saved Collections, Searches and Results
-    GH
-    1/11/2019
+/*  Saved Collections, Searches and Results -
+    localCollectionSaveUI.js
+    Merged with Export Import
+    fixed backbone - g-drop-pane-tools in makeRecordPanel
+    2/5/2019
 */
-
-// $(".navbar-logo").click(function() {
-//     var container= $('.g-search-pane-right');
-//     searchPanel(container);
-//
-// });
-// // $(".navbar-logo").click(function() {
-//     var container= $('#collectionPanel');
-//     searchPanel(container);
-// //
-// // });
-
 
 var container= $('#collectionPanel');
 var mdRecordsId = "uniqName_9_24";
 var collectionPanelId = "uniqName_9_22";
+var recordsDropPaneId = "dijit_TitlePane_10";
 //var container= $('#collectionContent');
 
 
@@ -41,24 +32,7 @@ function leftPanel(container) {
     var colset = makeCollectionPanel();
     lPanel.append(colset);
 
-    var expBtn = $('<button id="export-all" class="btn" onclick="exportAll(this)">Export CSV</button>')
-        .css("height", "20px" )
-        .css("padding","4px 16px")
-        .css("margin", "10px")
-        .css("color", "#ffffff")
-        .css("font-size", "11px")
-        .css("background-color", "#1E84A8");
-
-    lPanel.append(expBtn);
-
-    var inpBtn = $('<button id="export-all" class="btn" onclick="exportAll(this)">Import CSV</button>')
-        .css("height", "20px" )
-        .css("padding","4px 16px")
-        .css("margin", "10px")
-        .css("color", "#ffffff")
-        .css("font-size", "11px")
-        .css("background-color", "#1E84A8");
-    lPanel.append(inpBtn);
+    expInp(lPanel);
 
     lPanel.show();
     container.append(lPanel);
@@ -181,7 +155,7 @@ function makeCollectionPanel(){
     var col = getCollections();
 
     var uniq = $('<div id="'+ collectionPanelId + '" widgetid="'+ collectionPanelId + '" >');
-    var cp =   $('<div class="g-drop-pane dijitTitlePane" id="dijit_TitlePane_0" widgetid="dijit_TitlePane_0">');
+    var cp =   $('<div class="g-drop-pane dijitTitlePane" id="'+recordsDropPaneId+'" widgetid="'+recordsDropPaneId+'">');
     var tb =  $('<div data-dojo-attach-event="ondijitclick:_onTitleClick, onkeydown:_onTitleKey" class="dijitTitlePaneTitle dijitTitlePaneTitleOpen dijitOpen" data-dojo-attach-point="titleBarNode" id="dijit_TitlePane_0_titleBarNode">').html('Saved Collections');
     var tb2 = $('<div class="dijitTitlePaneTitleFocus" data-dojo-attach-point="focusNode" role="button" aria-controls="dijit_TitlePane_0_pane" tabindex="0" aria-pressed="true">');
     var sp1 = $('<span data-dojo-attach-point="arrowNode" class="dijitInline dijitArrowNode" role="presentation"></span>');
@@ -263,8 +237,8 @@ function _selCollection(colVal) {
         $(this).remove();
     });
 
-    var uniq = $('#'+collectionPanelId);
-    var cp =  $('<div class="g-drop-pane dijitTitlePane" id="dijit_TitlePane_0" widgetid="dijit_TitlePane_0">');
+    var uniq = $('#'+mdRecordsId);
+    var cp =  $('<div class="g-drop-pane dijitTitlePane" id="'+recordsDropPaneId+'" widgetid="'+recordsDropPaneId+'">');
     var mda = getMdRecords("collections",ColID);
 
     if (mda.length > pageRec ) {
@@ -339,7 +313,6 @@ function _removeCollection(C){
     }
 
     localStorage.removeItem("cItem-"+ColID);
-
     $('#gSvCollection').find(":selected").remove();
     $('#gSvCollection').val('default');
     makeRecordPanel();
@@ -352,7 +325,6 @@ function rightPanel(container) {
     var rPanel = $('<div class="g-search-pane-right" style="margin:2px;" >');
     var rp =  $('<div class="g-drop-pane dijitTitlePane dijitTitlePaneFocused dijitFocused" id="dijit_TitlePane_0" widgetid="dijit_TitlePane_0">');
 
-
     rPanel.append(rp);
     var mr = makeRecordPanel();
     rPanel.append(mr);
@@ -361,41 +333,38 @@ function rightPanel(container) {
 }
 function refeshMdPanel(container) {
 
-   // var mdPanel = $('#'+mdRecordsId);
-
     var mr = makeRecordPanel();
     $('#'+mdRecordsId).replaceWith(mr);
-
 
 }
 
 function makeRecordPanel(rp, qf, q) {
-//UI for the mdRecords Panel
+// UI for the mdRecords Panel
+// fixed backbone problem -- gpdt 2/5
 
     var uniq = $('<div id="'+mdRecordsId+'" widgetid="'+mdRecordsId+'" >');
-    var cp =   $('<div class="g-drop-pane dijitTitlePane" id="dijit_TitlePane_0" widgetid="dijit_TitlePane_0">');
+    var cp =   $('<div class="g-drop-pane dijitTitlePane" id="'+recordsDropPaneId+'" widgetid="'+recordsDropPaneId+'">');
     var tb =  $('<div data-dojo-attach-event="ondijitclick:_onTitleClick, onkeydown:_onTitleKey" class="dijitTitlePaneTitle dijitTitlePaneTitleOpen dijitOpen" data-dojo-attach-point="titleBarNode" id="dijit_TitlePane_0_titleBarNode">')
         .html('Saved Results');
-
-    var pag0 =  $('<span id="PageTotals" style="margin-left:800px;margin-right:10px;">Total Records</span>');
+    var gdpt = $('<span class="g-drop-pane-tools">');
+    var pag0 =  $('<span id="PageTotals" >Total Records</span>');
     var pag1 =  $('<button class="arrow-button" style="margin-left: 10px;" onclick="page_records(this);"  id="pagePrev"> < </button>');
     var pag2 =  $('<span id="PageCnt" style="margin-left: 10px;" >Page 0</span>');
     var pag3 =  $('<button class="arrow-button" style="margin-left: 10px;" onclick="page_records(this);" id="pageNext"> > </button>');
     var op = $('<div class="dijitTitlePaneContentOuter" data-dojo-attach-point="hideNode" role="presentation">');
 
+    tb.append(gdpt);
 
-    tb.append(pag0);
-    tb.append(pag1);
-    tb.append(pag2);
-    tb.append(pag3);
+    gdpt.append(pag0);
+    gdpt.append(pag1);
+    gdpt.append(pag2);
+    gdpt.append(pag3);
 
     cp.append(tb);
     uniq.append(cp);
 
     var opc = 0;
     var mda = getMdRecords(qf, q);
-
-
     for (var k in mda) {
         if ( opc < 10 ) {
             var mdRec = mda[k];
@@ -410,8 +379,6 @@ function makeRecordPanel(rp, qf, q) {
         $("#PageTotals").html("Total Records " + mda.length);
     }
     return uniq;
-
-
 }
 
 function recordPanelItem(md) {
@@ -477,7 +444,6 @@ function _addToCollection(cObj) {
     }
 
 }
-
 
 function _removeRecord(cObj) {
     // Remove from collection if multiple, else remove record entirely
@@ -576,8 +542,8 @@ function show_cinergi(sp, savedSearch ) {
 
     mdArray = [];
 
-    var uniq = $('#'+collectionPanelId);
-    var cp =  $('<div class="g-drop-pane dijitTitlePane" id="dijit_TitlePane_0" widgetid="dijit_TitlePane_0">');
+    var uniq = $('#'+mdRecordsId);
+    var cp =  $('<div class="g-drop-pane dijitTitlePane" id="'+recordsDropPaneId+'" widgetid="'+recordsDropPaneId+'">');
 
     $.ajax({
         type: "GET",
@@ -635,7 +601,6 @@ function show_cinergi(sp, savedSearch ) {
 };
 
 /* lib region */
-
 
 var mdRecord = function (id, fileId, title, link, description, collections ) {
     var mdRec = { "id" : id,
@@ -735,40 +700,6 @@ function getMdRecords(qField, query) {
     return md;
 }
 
-function getCollections(qField, query) {
-    var col = findLocalItems("cItem");
-    // If there is a query
-    if ( typeof(qField) !== "undefined" && typeof(query) !== "undefined"  ) {
-        results = [];
-        for (var k in col){
-            var kid = md[k][qField];
-            if ( kid.match(query) ) {
-                results.push({key:i,val:col[k]});
-            }
-        }
-        col = results;
-
-    }
-
-    return col;
-}
-
-function getSavedSearches(qField, query) {
-    var sea = findLocalItems("sItem");
-    if ( typeof(qField) !== "undefined" && typeof(query) ) {
-        results = [];
-        for (var k in sea){
-            var kid = sea[k][qField];
-            if ( kid.match(query) ) {
-                results.push({key:i,val:sea[k]});
-            }
-        }
-        sea = results;
-    }
-
-    return sea;
-
-}
 
 function findLocalItems (query) {
     var i, results = [];
@@ -798,3 +729,317 @@ function createUUID() {
     return uuid;
 }
 
+//Export Import ---------------------------------------------------------------------
+
+function expInp(container) {
+
+    var Dexp = $('<div >')
+        .css("margin", "4px" )
+        .css("height", "44px" )
+        .css("width", "80px");
+
+    var ex2Btn = $('<a  href="data:application/octet-stream,field1%2Cfield2%0Afoo%2Cbar%0Agoo%2Cgai%0A" id="export-href" onclick="expAll2(this);" class="btn" download="exportCollection.csv">Export CSV</a>')
+        .css("height", "20px" )
+        .css("padding","4px 16px")
+        .css("margin", "10px")
+        .css("color", "#ffffff")
+        .css("font-size", "11px")
+        .css("background-color", "#1E84A8");
+
+    var Dib = $('<div class="file-upload">')
+        .css("margin", "10px" )
+        .css("height", "44px" )
+        .css("width", "80px");
+
+    var dFUB =  $('<div class="file-upload-button">')
+        .css("display", "inline-block" );
+
+    var ifu = $('<input type="file" name="File Upload" id="import-all-file" accept=".csv"  />')
+        .css("display", "none")
+        .css("width", "190px")
+        .css("padding","4px 6px")
+        .css("margin", "4px")
+        .css("color", "#ffffff")
+        .css("font-size", "11px")
+        .css("background-color", "#1E84A8");
+
+    var ifl = $('<label id="fileLabel" onclick="importAll(this)" for="import-all">Import CSV</label>')
+        .css("display", "inline-block" )
+        .css("height", "20px" )
+        .css("width", "90px")
+        .css("padding","4px 6px")
+        .css("margin", "4px")
+        .css("color", "#ffffff")
+        .css("font-size", "11px")
+        .css("background-color", "#1E84A8");
+
+    var fun = $('<div class="file-upload-name" id="filename">No file chosen</div>')
+        .css("width", "200px")
+        .css("display", "inline-block" );
+
+    var mrge = $('<span class="g-spatial-filter-relation"><input id="uniqName_9_99" type="radio" name="uniqName_9_2_radio" data-op="merge" value="merge" checked><label style="width:60px" for="uniqName_9_99">Merge</label></span>');
+    var ovi = $('<span class="g-spatial-filter-relation"><input id="uniqName_9_90" type="radio" name="uniqName_9_2_radio" data-op="overwrite" value="over"><label style="width:60px" for="uniqName_9_90">Overwrite</label></span>');
+
+
+    dFUB.append(ifu);
+    dFUB.append(ifl);
+    Dexp.append(ex2Btn);
+    Dib.append(dFUB);
+
+    //container.append(ex2Btn);
+    container.append(Dexp);
+    container.append(Dib);
+    container.append(mrge);
+    container.append(ovi);
+}
+
+
+function expAll2(e) {
+
+    var ez = getExpAll();
+    var exFile = "data:application/octet-stream," + encodeURIComponent(ez);
+    $(e).attr("href", exFile);
+
+}
+
+function getExpAll() {
+    var coLabel = "Collection,";
+    var colText = "COLLECTION, NAME, ID, DESCRIPTION\n";
+    var sc = findLocalItems("cItem");
+    if ( Array.isArray(sc) ) {
+        for ( var c in sc ) {
+            var cId = sc[c].key;
+            var cName = sc[c].val.colName;
+            var cDesc = sc[c].val.colDesc;
+            var cIndex = cId.substr(6);
+            colText = colText + coLabel + cName +  ',' + cIndex + ',' + cDesc + '\n';
+        }
+    }
+
+    var srchLabel = "Saved Search,";
+    var srchText = "SAVED SEARCH, NAME, ID, URL\n";
+    var ss = findLocalItems("sItem");
+    if ( Array.isArray(ss) ) {
+        for ( var c in ss ) {
+            var sKey = ss[c].val.id;
+            var SName = ss[c].val.searchText;
+            SName = SName.replace(/,/g, '|');
+            var sDesc = ss[c].val.searchUrl;
+
+            srchText = srchText + srchLabel + SName + ',' + sKey + ',' + sDesc + '\n';
+        }
+
+    }
+
+    var mdLabel= "Saved Record,";
+    var mdText = "SAVED RECORD, TITLE, URL, ID, FILEID, COLLECTION ID, CITATION\n";
+    var md =  findLocalItems("mdRec");
+    if ( Array.isArray(md) ) {
+        for ( var c in md ) {
+
+            var mName = md[c].val.title;
+            mName = mName.replace(/,/g, '|');
+            var mLink = md[c].val.mdlink;
+            var mId =  md[c].val.id;
+            var fId =  md[c].val.fileId;
+            var mDesc ="";
+            if ( md[c].val.hasOwnProperty("description") ) {
+                var mDesc = md[c].val.description;
+                ( typeof mDesc !== "undefined" ) ? mDesc = mDesc.replace(/,/g, '|'): mDesc ="";
+            }
+
+            var xol = md[c].val.collections;
+            var col = xol.join('|');
+            mdText = mdText + mdLabel + mName +  ',' + mLink + ',' + mId + ',' + fId  +  ',' + col +  ',' + mDesc + '\n';
+        }
+    }
+
+    var xft =  colText + srchText + mdText;
+    return xft;
+
+}
+
+$("#import-all-file").change(function(e){
+    changeDataFromUpload(e, function(data){
+        console.log(data);
+    });
+});
+
+function importAll(o) {
+    $("#import-all-file").trigger("click");
+
+}
+
+function changeDataFromUpload(evt, cb){
+    if (!browserSupportFileUpload()) {
+        console.error("The File APIs are not fully supported in this browser!");
+    } else {
+        var data = null;
+        var file = evt.target.files[0];
+        var fileName = file.name;
+        $("#filename").html(fileName);
+
+        if (file !== "") {
+            var reader = new FileReader();
+
+            reader.onload = function(event) {
+                var csvData = event.target.result;
+                parseImport(csvData);
+
+            };
+            reader.onerror = function() {
+                console.error("Unable to read " + file.fileName);
+            };
+        }
+
+        reader.readAsText(file);
+
+    }
+}
+
+// Method that checks that the browser supports the HTML5 File API
+function browserSupportFileUpload() {
+    var isCompatible = false;
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+        isCompatible = true;
+    }
+    return isCompatible;
+}
+
+// Parse the CSV input into JSON
+function csvToJson(data) {
+    var cols = data[0];
+    var out = [];
+    for (var i = 1; i < data.length; i++){
+        var obj = {};
+        var row = data[i];
+        cols.forEach(function(col, index){
+            obj[col] = row[index];
+        });
+        out.push(obj);
+    }
+    return out;
+}
+
+function getSavedSearches(qField, query) {
+    var sea = findLocalItems("sItem");
+    if ( typeof(qField) !== "undefined" && typeof(query) ) {
+        results = [];
+
+        for (var k in sea){
+            var kd = sea[k].val;
+            var kid = kd[qField];
+            var cleanKid = kid.replace(/[|&;$%@"<>()+,]/g, "");
+            if ( cleanKid.match(query) ) {
+                results.push({key:k,val: kd });
+            }
+        }
+        sea = results;
+    }
+    return sea;
+
+}
+
+function getCollections(qField, query) {
+    var col = findLocalItems("cItem");
+    // If there is a query
+    if ( typeof(qField) !== "undefined" && typeof(query) !== "undefined"  ) {
+        results = [];
+        for (var k in col){
+            var kd = col[k].val;
+            var kid = kd[qField];
+            var cleanKid = kid.replace(/[|&;$%@"<>()+,]/g, "");
+            var cleanQry = query.replace(/[|&;$%@"<>()+,]/g, "");
+            if ( cleanKid.match(cleanQry) ) {
+                results.push({key:k,val: kd });
+            }
+        }
+        col = results;
+
+    }
+
+    return col;
+}
+
+function parseImport(csvData) {
+
+    var ovi = $('input[name=uniqName_9_2_radio]:checked').val();
+    if ( ovi == 'over') {
+        if ( confirm ("Are you sure you want to overwrite your current collection records ? ") ) {
+            // clear out records here;
+            var ca =[];
+            for (var i = 0; i < localStorage.length; i++){
+                if (localStorage.key(i) !== 'saveSearch') {
+                    ca.push(localStorage.key(i));
+                }
+            }
+            for (var z = 0; z < ca.length; z++ ) {
+                localStorage.removeItem(ca[z]);
+            }
+        } else {
+            return;
+        }
+    }
+
+    var rArr = csvData.split('\n');
+    if ( rArr.length )  {
+        for (var k = 0; k < rArr.length; k++) {
+            var row = rArr[k];
+            if ( typeof row !== "undefined" ) {
+                var rowA = row.split(',');
+                if ( rowA[0] == "Collection"  ) {
+
+                    var cid = rowA[2];
+                    var cx = _getCollections("id", cid);
+                    if ( cx.length ) {
+                        // already there
+                        var nop ="";
+
+                    } else {
+                        var cItem = collectionItem(rowA[2], rowA[1]);
+                        saveCollectionItem(cItem);
+
+                    }
+
+                }
+                if ( rowA[0] == "Saved Search"  ) {
+
+                    var sid = rowA[2];
+                    var sx = _getSavedSearches("id", sid);
+                    if ( sx.length ) {
+                        // already here
+                        var nop ="";
+                    } else {
+                        var params = {};
+                        var sItem = searchItem(rowA[2], rowA[1], rowA[3], params);
+                        saveSearchItem(sItem);
+
+                    }
+
+                }
+                if ( rowA[0] == "Saved Record"  ) {
+
+                    var rid = rowA[3];
+                    var rx = getMdRecords("id", rid);
+                    if ( rx.length ) {
+                        // collections may have changed reload
+                        localStorage.removeItem("mdRec-"+rid);
+                    }
+                    var rtitle = rowA[1];
+                    var rUrl = rowA[2];
+                    var fid = rowA[4];
+                    var collections = rowA[5];
+                    ( collections.length == 0 ) ? collections = "default" : collections = collections.split('|');
+                    var des = row[6];
+                    var rItem = mdRecord( rid, fid, rtitle, rUrl, des, collections );
+                    saveMdRecord(rItem);
+
+                }
+
+            }
+        }
+    }
+
+    console.log('import completed ');
+
+}

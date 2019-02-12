@@ -36,12 +36,14 @@ var mdRecord = function (id, fileId, title, link, description, collections) {
 }
 
 
-var searchItem = function (id, searchText, sUrl, params) {
+var searchItem = function (id, searchText, sUrl, params, query) {
     var mdSS = {
         "id": id,
         "searchText": searchText,
         "searchUrl": sUrl,
-        "params": params
+        "params": params,
+        "query": query,
+
     };
     return mdSS;
 
