@@ -17,8 +17,9 @@ define(["dojo/_base/declare",
         "dojo/_base/array",
         "dojo/io-query",
         "app/search/SearchComponent",
+        "app/search/QClause",
     "app/etc/util"],
-function(declare, lang, array, ioQuery, SearchComponent,Util) {
+function(declare, lang, array, ioQuery, SearchComponent,QClause, Util) {
   
   var oThisClass = declare([SearchComponent], {
     
@@ -28,6 +29,8 @@ function(declare, lang, array, ioQuery, SearchComponent,Util) {
       this.inherited(arguments);
       
       var self = this, uri = window.location.href;
+      this.queries = [];
+      this.activeQClauses = [];
       if (uri.indexOf("?") !== -1) {
         var s = uri.substring(uri.indexOf("?")+1,uri.length);
         var hash = s.substring(s.indexOf("#")+1,s.length);
@@ -48,15 +51,28 @@ function(declare, lang, array, ioQuery, SearchComponent,Util) {
     
     _addQuery: function(v) {
       if (typeof v === "string") {
+
         v = Util.escapeForLucene(lang.trim(v));
         //v = v.replace(/:/g,"\\:");
          // v = v.replace(/\//g,"\\\/");
           if (v.length > 0) {
-          this.queries.push({"query_string": {
-            "analyze_wildcard": true,
-            "query": v
-          }});
-        }
+              var query = {"query_string": {
+                      "analyze_wildcard": true,
+                      "query": v
+                  }};
+          this.queries.push(query);
+              var qClause = new QClause({
+              label: "URLQuery",
+                 tip: v,
+                  parentQComponent: this,
+                  removable: false,
+                  urlParameterName: "filter",
+                  urlParameterValue: v,
+                  query: query
+              });
+              this.addQClause(qClause);
+          }
+
       }
     },
       _addFileIdQuery: function(v) {
@@ -65,24 +81,49 @@ function(declare, lang, array, ioQuery, SearchComponent,Util) {
               //v = v.replace(/:/g,"\\:");
               //v = v.replace(/\//g,"\\\/");
               if (v.length > 0) {
-                  this.queries.push({"query_string": {
+                  var query = {"query_string": {
                           "default_field": "fileid",
                           "query": v
-                      }});
+                      }};
+                  this.queries.push(query);
+
+                  var qClause = new QClause({
+                      label: "fileid",
+                      tip: v,
+                      parentQComponent: this,
+                      removable: false,
+                      urlParameterName: "q",
+                      urlParameterValue: v,
+                      query: query
+                  });
+                  this.addQClause(qClause);
+
               }
           }
       },
-    
+    addQClause: function(qClause){
+        if (this.activeQClauses === null ){
+            this.activeQClauses = [qClause];
+          } else {
+            this.activeQClauses.push(qClause);
+        }
+    },
     /* SearchComponent API ============================================= */
     
     appendQueryParams: function(params) {
-      if (this.queries && this.queries.length > 0) {
-        if (!params.queries) params.queries = [];
-        array.forEach(this.queries,function(query){
-          //params.hasScorable = true; TODO??
-          params.queries.push(query);
-        });
-      } 
+      // if (this.queries && this.queries.length > 0) {
+      //   if (!params.queries) params.queries = [];
+      //   array.forEach(this.queries,function(query){
+      //     //params.hasScorable = true; TODO??
+      //     params.queries.push(query);
+      //   });
+      // }
+        if (this.activeQClauses && this.activeQClauses.length > 0) {
+
+           // array.forEach(this.qClauses,function(qClause){
+                this.appendQClauses(params);
+          //  });
+        }
     }
 
   });
