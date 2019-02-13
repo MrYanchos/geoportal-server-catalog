@@ -17,6 +17,7 @@ import com.esri.geoportal.context.AppRequest;
 import com.esri.geoportal.context.AppResponse;
 import com.esri.geoportal.context.GeoportalContext;
 import com.esri.geoportal.lib.elastic.ElasticContext;
+import com.esri.geoportal.lib.elastic.http.ElasticClient;
 import com.esri.geoportal.lib.elastic.util.AccessUtil;
 import com.esri.geoportal.lib.elastic.util.Scroller;
 
@@ -41,8 +42,10 @@ public class BulkRequest extends AppRequest {
   private boolean adminOnly = true;
   private int docsPerRequest = 1000;
   private String processMessage;
+  private String responseStatusAction = "updated";
   private int retryOnConflict = 1;
   private int scrollerPageSize = 1000;
+  private boolean useHttpClient = false;
     
   /** Constructor. */
   public BulkRequest() {
@@ -76,6 +79,15 @@ public class BulkRequest extends AppRequest {
     this.processMessage = processMessage;
   }
   
+  /** The response status action (e.g. updated or deleted) */
+  public String getResponseStatusAction() {
+    return responseStatusAction;
+  }
+  /** The response status action (e.g. updated or deleted) */
+  public void setResponseStatusAction(String responseStatusAction) {
+    this.responseStatusAction = responseStatusAction;
+  }
+  
   /** How many retries for a version conflict. */
   public int getRetryOnConflict() {
     return retryOnConflict;
@@ -94,18 +106,93 @@ public class BulkRequest extends AppRequest {
     this.scrollerPageSize = scrollerPageSize;
   }
   
+  /** Use the HTTP client if true. */
+  public boolean getUseHttpClient() {
+    return this.useHttpClient;
+  }
+  /** Use the HTTP client if true. */
+  public void setUseHttpClient(boolean useHttpClient) {
+    this.useHttpClient = useHttpClient;
+  }
+  
   /** Methods =============================================================== */
   
   /**
-   * Append the scroller hit to the buld request.
+   * Append the scroller hit to the bulk request.
    * @param ec the Elastic context
    * @param request the request
    * @param hit the hit
    */
   protected void appendHit(ElasticContext ec, BulkRequestBuilder request, SearchHit hit) {}
   
+  /**
+   * Append the scroller hit to the bulk request (HTTP).
+   * @param ec the Elastic context
+   * @param request the request
+   * @param hit the hit
+   */
+  protected void appendHit(ElasticContext ec, StringBuilder data, com.esri.geoportal.lib.elastic.http.util.SearchHit hit) {}
+  
   @Override
   public AppResponse execute() throws Exception {
+    if (getUseHttpClient()) {
+      return executeWithHttpClient();
+    } else {
+      return executeWithTransportClient();
+    }
+  }
+  
+  private AppResponse executeWithHttpClient() throws Exception {
+    AppResponse response = new AppResponse();
+    ElasticContext ec = GeoportalContext.getInstance().getElasticContext();
+    AccessUtil au = new AccessUtil();
+    if (getAdminOnly()) {
+      au.ensureAdmin(getUser());
+    } 
+    long tStart = System.currentTimeMillis();
+    AtomicLong count = new AtomicLong();
+    AtomicLong loopCount = new AtomicLong();
+    int docsPerRequest = getDocsPerRequest();
+    com.esri.geoportal.lib.elastic.http.util.Scroller scroller = newHttpScroller(ec);
+    scroller.scroll(
+      new Consumer<com.esri.geoportal.lib.elastic.http.util.SearchHit>(){
+        StringBuilder data = new StringBuilder();
+        @Override
+        public void accept(com.esri.geoportal.lib.elastic.http.util.SearchHit hit) {
+          try {
+            count.incrementAndGet();
+            loopCount.incrementAndGet();
+            boolean last = isLast();
+            appendHit(ec,data,hit);
+            if (last || loopCount.get() >= docsPerRequest) {
+              // TODO what about partial failures??
+              if (data.length() > 0) {
+                // TODO reuse the client?
+                ElasticClient client = ElasticClient.newClient();
+                String url = client.getBulkUrl(ec.getIndexName());
+                //System.out.println("bulk.url=\r\n"+url);
+                //System.out.println("bulk.post=\r\n"+data);
+                client.sendPost(url,data.toString(),"application/x-ndjson");
+              }
+              loopCount.set(0);
+              data = new StringBuilder();
+              logFeedback(tStart,count.get(),scroller.getTotalHits(),last);
+            }
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+        public boolean isLast() {
+          return count.get() >= scroller.getTotalHits() || count.get() >= scroller.getMaxDocs();
+        }
+      }
+    );
+    
+    writeOk(response,count.get());
+    return response;
+  }
+  
+  private AppResponse executeWithTransportClient() throws Exception {
     AppResponse response = new AppResponse();
     ElasticContext ec = GeoportalContext.getInstance().getElasticContext();
     AccessUtil au = new AccessUtil();
@@ -167,6 +254,15 @@ public class BulkRequest extends AppRequest {
   }
   
   /**
+   * Create the HTTP scroller.
+   * @param ec the Elastic context
+   * @return the scroller
+   */
+  protected com.esri.geoportal.lib.elastic.http.util.Scroller newHttpScroller(ElasticContext ec) {
+    return null;
+  }
+  
+  /**
    * Create the scroller.
    * @param ec the Elastic context
    * @return the scroller
@@ -183,7 +279,7 @@ public class BulkRequest extends AppRequest {
   public void writeOk(AppResponse response, long count) {
     JsonObjectBuilder jsonBuilder = Json.createObjectBuilder();
     jsonBuilder.add("count",count);
-    jsonBuilder.add("status","updated");
+    jsonBuilder.add("status",this.getResponseStatusAction());
     response.writeOkJson(this,jsonBuilder);
   }
   

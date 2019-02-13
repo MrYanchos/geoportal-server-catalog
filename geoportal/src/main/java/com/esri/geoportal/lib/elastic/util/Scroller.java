@@ -38,6 +38,7 @@ public class Scroller {
   private String indexName;
   private String indexType;
   private int keepAliveMillis = 600000;//60000;
+  
   private long maxDocs = Long.MAX_VALUE;
   private int pageSize = 100;
   private AtomicLong processed = new AtomicLong();

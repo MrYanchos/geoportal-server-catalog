@@ -4,15 +4,20 @@ body {
 }
 
 /* chrome */
+
+
+/* outline: none commented out for accessibility*/
+/*
 :focus {
   outline: none;
-}
+}*/
 
 .calcite .dijitTitlePaneTitle, .calcite .dijitTitlePaneTextNode {
   font-size: 12px;
 }
 .calcite .dijitTitlePaneTitle {
   padding: 4px 6px;
+  overflow-y: hidden;
 }
 .calcite .dijitTitlePaneContentInner {
   padding: 8px;
@@ -23,6 +28,24 @@ body {
 .calcite .dijitTitlePaneContentOuter {
 	/*border-top: 1px solid #ebebeb;*/
 	border: none;
+}
+
+/*
+.calcite .modal-dialog .modal-content .modal-header .close {
+  font-size: 21px;
+}
+*/
+
+.g-indent {
+	margin-left: 20px;
+}
+
+.g-loading {
+	margin-right: 4px;
+  width: 16px;
+  height: 16px;
+  background-image: url("images/LoadingAnimation16_Trans.gif");
+  vertical-align: middle;
 }
 
 .g-modal-plot .modal-dialog {
@@ -63,7 +86,7 @@ body {
 }
 
 .navbar-inverse {
-  background-color: #196fa6;
+  background-color: #005e95;
 }
 .navbar-inverse .navbar-nav > .active > a, 
 .navbar-inverse .navbar-nav > .active > a:hover, 
@@ -91,13 +114,11 @@ body {
   background-image: none;
   transition: none;
   background-color: transparent;
-  outline: none;
 }
 .g-app > .navbar-inverse .navbar-nav > li.active > a {
   background-image: linear-gradient(to bottom, transparent 90%, #cfe1ec 91%, #cfe1ec 100%);
   transition: color 150ms linear 0s, text-decoration 150ms linear 0s;
   background-color: transparent;
-  outline: none;
 }
 .g-app > .navbar-inverse .navbar-nav > li > a:hover {
   outline: thin dotted;
@@ -266,6 +287,13 @@ body {
 	height: 60px;
 }
 
+/* Style for descriptions creates a cap of a few lines of text  */
+.g-item-card .g-item-description {
+  max-height: 46px;
+  overflow: hidden;
+  width: 85%;
+}
+
 .g-item-card .g-item-actions {
   padding: 2px;
   clear: both;
@@ -276,7 +304,7 @@ body {
 }
 
 .g-item-card .g-item-actions > .dropdown > .dropdown-menu {
-	max-height: 200px;
+	max-height: 300px;
 	overflow-y: auto;
 	padding-right: 20px;
 }
@@ -320,7 +348,7 @@ body {
 }
 .g-labels-right .control-label {
 	text-align: right;
-	color: #a6a6a6;
+	color: #6e6e6e;
 }
 
 .calcite .gxePrimaryToolbar > .gxeTabs > .gxeTabButton {
@@ -397,3 +425,91 @@ body {
   z-index: 99;
 }
 
+.dijitTooltipContainer, .dijitTooltipContainer > div, 
+.dijitTooltipContainer > div > div, 
+.dijitTooltipContainer > div > div > div {
+  width: 100%;
+  height: 100%;
+}
+
+.g-preview-error {
+  position: absolute; 
+  color: black; 
+  background-color: white; 
+  left: 32%; 
+  right: 32%;
+  top: 50%; 
+  z-index: 1; 
+  padding: 3px;
+  border: #000000 solid thin;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.g-access-groups {
+	margin: 0px;
+	padding: 5px;
+  max-height: 100px;
+  overflow-y: auto;
+  border: 1px solid #cccccc;
+  list-style-type: none;
+}
+
+.modal-dialog .navbar {
+	min-height: 0px;
+	margin-bottom: 8px;
+}
+
+/* Accessibility Changes */
+.btn-success {
+    color: #ffffff;
+    background-color: #338033;
+    border-color: #50834f;
+}
+
+a {
+    color: #005e95;
+    text-decoration: none;
+}
+
+a.dropdown-toggle:focus {
+    outline: 5px auto -webkit-focus-ring-color;
+}
+
+.pagination > .disabled > span, .pagination > .disabled > span:hover, .pagination > .disabled > span:focus, .pagination > .disabled > a, .pagination > .disabled > a:hover, .pagination > .disabled > a:focus {
+    color: #595959;
+    background-color: #ffffff;
+    border-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.offscreen {
+	position: absolute;
+	height: 1px;
+	width: 1px;
+	overflow: hidden;
+	clip-path: inset(1px 1px 1px 1px);
+	clip-path: inset(1px, 1px, 1px, 1px);
+}
+
+.skip-to-content.offscreen:focus {
+	position: relative;
+	display: inline-block;
+	height: auto;
+	width: auto;
+	padding: 0.625em 1.25em;
+	background-color: #005e95;
+	color: #fff;
+	overflow: visible;
+	clip-path: none;
+	text-decoration: none;
+}
+
+.g-open-search-result-links {
+  float: right;
+  padding: 1em;
+}
+
+.g-open-search-result-link {
+  margin-left: 1em;
+}

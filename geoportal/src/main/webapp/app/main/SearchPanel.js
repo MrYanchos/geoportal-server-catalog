@@ -28,7 +28,8 @@ define(["dojo/_base/declare",
         "app/search/HierarchyAggregation",
         "app/search/AppliedFilters",
         "app/search/ResultsPane",
-    "app/prov/Prov"],
+        "app/search/OpenSearchLinksPane"
+      ], 
 function(declare, lang, Templated, template, i18n) {
 
   var oThisClass = declare([Templated], {

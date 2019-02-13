@@ -24,6 +24,7 @@ G.evaluators.iso = {
     this.evalTemporal(task);
     this.evalInspire(task);
     this.evalOther(task);
+    this.evalLinks(task);
   },
 
   evalBase: function(task) {
@@ -66,7 +67,7 @@ G.evaluators.iso = {
       G.evalDate(task, item, iden, "apiso_RevisionDate_dt", "gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date[../../gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='revision'] | gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:DateTime[../../gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='revision']");
       G.evalDate(task, item, iden, "apiso_PublicationDate_dt", "gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date[../../gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='publication'] | gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:DateTime[../../gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='publication']");
 
-    /* language */
+      /* language */
     G.evalCode(task,item,root,"apiso_Language_s","gmd:language/gmd:LanguageCode");
     G.evalCode(task,item,iden,"apiso_ResourceLanguage_s","gmd:language/gmd:LanguageCode");
 
@@ -219,6 +220,16 @@ G.evaluators.iso = {
 
       if (params) G.analyzeTimePeriod(task,params);
     }); 
+  },
+  
+  evalLinks: function(task) {
+    var item = task.item, root = task.root;
+    G.evalProp(task,item,root,"url_thumbnail_s","gmd:identificationInfo/gmd:MD_DataIdentification/gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString");
+    G.evalProp(task,item,root,"url_website_s","gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty[1]/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:onlineResource/gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
+    G.evalProp(task,item,root,"url_project_metadata_s","gmd:distributionInfo/gmd:MD_Distribution/gmd:distributor/gmd:MD_Distributor/gmd:distributorTransferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource[contains(gmd:name/gco:CharacterString,'Project Metadata')]/gmd:linkage/gmd:URL");
+    G.evalProp(task,item,root,"url_granule_s","gmd:distributionInfo/gmd:MD_Distribution/gmd:distributor/gmd:MD_Distributor/gmd:distributorTransferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource[contains(gmd:name/gco:CharacterString,'Granule Search')]/gmd:linkage/gmd:URL");
+    G.evalProp(task,item,root,"url_http_download_s","gmd:distributionInfo/gmd:MD_Distribution/gmd:distributor/gmd:MD_Distributor/gmd:distributorTransferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
+    G.evalProp(task,item,root,"url_ftp_download_s","gmd:distributionInfo/gmd:MD_Distribution/gmd:distributor/gmd:MD_Distributor/gmd:distributorTransferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource[contains(gmd:protocol/gco:CharacterString,'FTP')]/gmd:linkage/gmd:URL");
   }
 
 };

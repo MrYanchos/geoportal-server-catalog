@@ -25,33 +25,40 @@ load("classpath:metadata/js/EvaluatorFor_ArcGIS.js");
 load("classpath:metadata/js/EvaluatorFor_DC.js");
 load("classpath:metadata/js/EvaluatorFor_FGDC.js");
 load("classpath:metadata/js/EvaluatorFor_ISO.js");
-load("classpath:metadata/js/EvaluatorFor_ISO_CINERGI.js");
+load("classpath:metadata/js/EvaluatorFor_ISO_extended.js"); // add  extended class
 
 G._metadataTypes =  {
-    "iso19115-CINERGI": {
-        key: "iso19115-CINERGI",
-        evaluator: G.evaluators.cinergi,
-        //interrogationXPath: "/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString[text()='Earthcube CINERGI Metadata Pipeline']",
-        interrogationXPath: "/gmi:MI_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString[text()='Earthcube CINERGI Metadata Pipeline']",
-        //identifier: "http://www.isotc211.org/2005/gmi",
-        identifier: "CINERGI_ISO19115",
-   //     detailsXslt: "metadata/details/iso-details/xml-to-html-ISO.xsl",
-        detailsXslt: "metadata/details/iso-details/ISO19139ToHTMLwMap.xsl",
-        xsdLocation: null,
-        schematronXslt: null
-    },
-    "iso19115": {
-    	// smr 2018-03-30 make interrogation path // instead of /
-    	// change the details XSLT to the USGIN presentation
-        key: "iso19115",
-        evaluator: G.evaluators.iso,
-        interrogationXPath: "//gmd:MD_Metadata",
-        identifier: "http://www.isotc211.org/2005/gmd",
-        detailsXslt: "metadata/details/iso-details/ISO19139ToHTMLwMap.xsl",
-        xsdLocation: null,
-        //schematronXslt: "metadata/schematron/Gemini2_R2r2-schematron.xslt",
-        toKnownXslt: null
-    	
+  "iso19115base": {
+    key: "iso19115",
+    evaluator: G.evaluators.iso,
+    interrogationXPath: "", // will never be triggered. We will just extend it.
+    identifier: "http://www.isotc211.org/2005/gmd",
+    detailsXslt: "metadata/details/iso-details/xml-to-html-ISO.xsl",
+    //xsdLocation: "http://www.ngdc.noaa.gov/metadata/published/xsd/schema.xsd",
+    //schematronXslt: "metadata/schematron/Gemini2_R2r2-schematron.xslt",
+    toKnownXslt: null
+  },
+  /* example extension of the ISO evaluator
+   */
+  "iso19115extended": {
+    key: "iso19115extended",
+    evaluator: G.evaluators.isoextended,
+    interrogationXPath: "/gmd:MD_Metadata/gmd:dataSetURI/gco:CharacterString[starts-with(text(),'https://www.sciencebase.gov/catalog/')] | /gmi:MI_Metadata/gmd:dataSetURI/gco:CharacterString[starts-with(text(),'https://www.sciencebase.gov/catalog/')]",
+    identifier: "http://www.isotc211.org/2005/gmd",
+    detailsXslt: "metadata/details/iso-details/xml-to-html-ISO.xsl",
+    //xsdLocation: "http://www.ngdc.noaa.gov/metadata/published/xsd/schema.xsd",
+    //schematronXslt: "metadata/schematron/Gemini2_R2r2-schematron.xslt",
+    toKnownXslt: null
+  },
+  "iso19115": {
+    key: "iso19115",
+    evaluator: G.evaluators.iso,
+    interrogationXPath: "/gmd:MD_Metadata",
+    identifier: "http://www.isotc211.org/2005/gmd",
+    detailsXslt: "metadata/details/iso-details/xml-to-html-ISO.xsl",
+    //xsdLocation: "http://www.ngdc.noaa.gov/metadata/published/xsd/schema.xsd",
+    //schematronXslt: "metadata/schematron/Gemini2_R2r2-schematron.xslt",
+    toKnownXslt: null
   },
 /*  "iso19115-2": {
     key: "iso19115-2",
@@ -91,6 +98,7 @@ G._metadataTypes =  {
     interrogationXPath: "/rdf:RDF/rdf:Description/dc:title",
     identifier: "http://purl.org/dc/elements/1.1/",
     detailsXslt: "metadata/details/rdf-details.xslt",
+    //toKnownXslt: "metadata/xslt/qualifiedDCToISO19139v1.0.xslt",
   },
   "arcgis": {
     key: "arcgis",
@@ -99,13 +107,14 @@ G._metadataTypes =  {
     identifier: "ArcGIS-Metadata",
     detailsXslt: "metadata/details/arcgis-details.xslt",
   },
-    "oai_dc": {
-        key: "oai_dc",
-        evaluator: G.evaluators.dc,
-        interrogationXPath: "/oai_dc:dc/dc:title",
-        identifier: "http://www.openarchives.org/OAI/2.0/oai_dc/",
-        //detailsXslt: "metadata/details/rdf-details.xslt",
-    }*/
+  "oai_dc": {
+    key: "oai_dc",
+    evaluator: G.evaluators.dc,
+    interrogationXPath: "/oai_dc:dc/dc:title",
+    identifier: "http://www.openarchives.org/OAI/2.0/oai_dc/",
+    detailsXslt: "metadata/details/rdf-details.xslt",
+    //toKnownXslt: "metadata/xslt/qualifiedDCToISO19139v1.0.xslt",
+  }
 };
 
 G._initializeTask = function(mdoc) {

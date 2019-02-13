@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.json.JsonObjectBuilder;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.xml.transform.TransformerException;
 
 import org.slf4j.Logger;
@@ -43,11 +44,17 @@ public class AppResponse {
   /** Instance variables. */
   private Map<String,Object> data = new LinkedHashMap<String,Object>();
   private Object entity;
+  private Map<String,String> headers = new LinkedHashMap<>();
   private MediaType mediaType;
   private Response.Status status;
 
   /** Constructor */
   public AppResponse() {}
+  
+  /** A free form object map associated with this response. */
+  public void addHeader(String name, String value) {
+    headers.put(name,value);
+  }
   
   /** A free form object map associated with this response. */
   public Map<String,Object> getData() {
@@ -86,7 +93,20 @@ public class AppResponse {
   
   /** Build the rest response. */
   public Response build() {
-    return Response.status(getStatus()).entity(getEntity()).type(getMediaType()).build();
+    ResponseBuilder r = Response.status(getStatus()).entity(getEntity()).type(getMediaType());
+    for (Map.Entry<String,String> entry: headers.entrySet()) {
+      r.header(entry.getKey(),entry.getValue());
+    }
+    return r.build();
+  }
+  
+  /**
+   * Build a deprecated response, HTTP 501.
+   * @param message the message
+   */
+  public Response buildDeprecated(String message) {
+    this.writeDeprecated(message);
+    return this.build();
   }
   
   /**
@@ -143,6 +163,17 @@ public class AppResponse {
     setEntity(json);
     setMediaType(MediaType.APPLICATION_JSON_TYPE.withCharset("UTF-8"));
     setStatus(Response.Status.BAD_REQUEST);
+  }
+  
+  /**
+   * Write a deprecated message to the response, HTTP 501.
+   * @param message the message
+   */
+  public void writeDeprecated(String message) {
+    String json = JsonUtil.newErrorResponse(message,true);
+    setEntity(json);
+    setMediaType(MediaType.APPLICATION_JSON_TYPE.withCharset("UTF-8"));
+    setStatus(Response.Status.NOT_IMPLEMENTED);
   }
   
   /**

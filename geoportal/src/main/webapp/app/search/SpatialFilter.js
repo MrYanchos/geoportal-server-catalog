@@ -51,12 +51,13 @@ define(["dojo/_base/declare",
         "esri/dijit/PopupTemplate",
         "esri/InfoTemplate",
         "esri/dijit/Search",
-        "dijit/Tooltip"],
+        "dojo/Deferred",
+        "esri/tasks/locator"], 
 function(declare, lang, array, aspect, djQuery, on, domConstruct, domClass, domGeometry, domStyle, djNumber, 
     topic, appTopics, template, i18n, SearchComponent, DropPane, QClause, GeohashEx, util, Settings, Map, 
     ArcGISTiledMapServiceLayer, GraphicsLayer, webMercatorUtils, Extent, Point, SpatialReference, 
     SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol, PictureMarkerSymbol, ClassBreaksRenderer, 
-    SimpleRenderer, Graphic, Color, PopupTemplate, InfoTemplate, SearchWidget,Tooltip) {
+    SimpleRenderer, Graphic, Color, PopupTemplate, InfoTemplate, SearchWidget, Deferred, Locator) {
   
   var oThisClass = declare([SearchComponent], {
     
@@ -231,6 +232,36 @@ function(declare, lang, array, aspect, djQuery, on, domConstruct, domClass, domG
       this._tmpHandles = [];      
     },
     
+    _convertConfig: function(config) {
+      var sources = [];
+      array.forEach(config.sources, lang.hitch(this, function(source) {
+        if (source && source.url && source.type === 'locator') {
+          var _source = {
+            locator: new Locator(source.url || ""),
+            outFields: ["*"],
+            singleLineFieldName: source.singleLineFieldName || "",
+            name: source.name || "",
+            placeholder: source.placeholder || "",
+            countryCode: source.countryCode || "",
+            maxSuggestions: source.maxSuggestions,
+            maxResults: source.maxResults || 6,
+            zoomScale: source.zoomScale || 50000,
+            useMapExtent: !!source.searchInCurrentMapExtent
+          };
+          if (source.enableLocalSearch) {
+            _source.localSearchOptions = {
+              minScale: source.localSearchMinScale,
+              distance: source.localSearchDistance
+            };
+          }
+          sources.push(_source);
+        } else if (source && source.url && source.type === 'query') {
+          // not supported
+        }
+      }));
+      return sources;
+    },
+    
     equalInterval: function(min,max) {
       var newsym = function(size) {
         var olclr = Color.fromHex("#7A7A7A");
@@ -346,7 +377,14 @@ function(declare, lang, array, aspect, djQuery, on, domConstruct, domClass, domG
       if (!cfgParams && AppContext.appConfig.searchMap) {
         cfgParams = AppContext.appConfig.searchMap.locatorParams;
       }
-      if (cfgParams) lang.mixin(params,cfgParams);
+      if (cfgParams) {
+        var sources = this._convertConfig(cfgParams);
+        if (sources && sources.length > 0) {
+          lang.mixin(params,cfgParams);
+          params.sources = sources;
+        }
+      }
+      //if (cfgParams) lang.mixin(params,cfgParams);
       var locator = new SearchWidget(params,this.searchWidgetNode);
       locator.startup();
       domClass.add(locator.domNode,"g-spatial-filter-locator");
@@ -404,19 +442,18 @@ function(declare, lang, array, aspect, djQuery, on, domConstruct, domClass, domG
         qry.geo_shape[field] = {"shape":shp,"relation":relation};
         
         // TODO
-        qry = {"geo_bounding_box": {
-          "envelope_cen_pt" : {
-            "top_left" : {
-              "lat" : env.ymax,
-              "lon" : env.xmin
-            },
-            "bottom_right" : {
-              "lat" : env.ymin,
-              "lon" : env.xmax
-            }
-          }
-        }};
-       
+//        qry = {"geo_bounding_box": {
+//          "envelope_cen_pt" : {
+//            "top_left" : {
+//              "lat" : env.ymax,
+//              "lon" : env.xmin
+//            },
+//            "bottom_right" : {
+//              "lat" : env.ymin,
+//              "lon" : env.xmax
+//            }
+//          }
+//        }};
         
         return qry;
       };

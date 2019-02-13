@@ -46,9 +46,13 @@ public class GeoportalContext implements ApplicationContextAware {
   
   /** Instance variables. */
   private ApplicationContext applicationContext;
+  private String defaultAccessLevel;
+  private String defaultApprovalStatus;
   private ElasticContext elasticContext;
   private HarvesterContext harvesterContext;
-  private String version = "2.5";
+  private boolean supportsApprovalStatus = false;
+  private boolean supportsGroupBasedAccess = false;
+  private String version = "2.6.0";
   
   /** Constructor */
   public GeoportalContext() {}
@@ -79,6 +83,24 @@ public class GeoportalContext implements ApplicationContextAware {
       }
     }
   }
+  
+  /** Default access level. */
+  public String getDefaultAccessLevel() {
+    return defaultAccessLevel;
+  }
+  /** Default access level . */
+  public void setDefaultAccessLevel(String defaultAccessLevel) {
+    this.defaultAccessLevel = defaultAccessLevel;
+  }
+  
+  /** Default approval status. */
+  public String getDefaultApprovalStatus() {
+    return defaultApprovalStatus;
+  }
+  /** Default approval status. */
+  public void setDefaultApprovalStatus(String defaultApprovalStatus) {
+    this.defaultApprovalStatus = defaultApprovalStatus;
+  }
  
   /** The Elasticsearch context. */
   public ElasticContext getElasticContext() {
@@ -96,13 +118,30 @@ public class GeoportalContext implements ApplicationContextAware {
   public HarvesterContext getHarvesterContext() {
     return harvesterContext;
   }
-
   /**
    * Sets harvester context.
    * @param harvesterContext harvester context 
    */
   public void setHarvesterContext(HarvesterContext harvesterContext) {
     this.harvesterContext = harvesterContext;
+  }
+  
+  /** Support for document approval status. */
+  public boolean getSupportsApprovalStatus() {
+    return supportsApprovalStatus;
+  }
+  /** Support for document approval status. */
+  public void setSupportsApprovalStatus(boolean supportsApprovalStatus) {
+    this.supportsApprovalStatus = supportsApprovalStatus;
+  }
+  
+  /** Support for group based document access. */
+  public boolean getSupportsGroupBasedAccess() {
+    return supportsGroupBasedAccess;
+  }
+  /** Support for group based document access. */
+  public void setSupportsGroupBasedAccess(boolean supportsGroupBasedAccess) {
+    this.supportsGroupBasedAccess = supportsGroupBasedAccess;
   }
   
   /** The version. */

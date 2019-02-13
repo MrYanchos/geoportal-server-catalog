@@ -27,6 +27,24 @@ public class FieldNames {
   
   /* sys (item) ==================================================== */
   
+  /** FIELD_SRC_SOURCE_REF = "src_source_ref_s" */
+  public static String FIELD_SRC_SOURCE_REF = "src_source_ref_s";
+  
+  /** FIELD_SRC_SOURCE_URI = "src_source_uri_s" */
+  public static String FIELD_SRC_SOURCE_URI = "src_source_uri_s";
+  
+  /** FIELD_SRC_TASK_REF = "src_task_ref_s" */
+  public static String FIELD_SRC_TASK_REF = "src_task_ref_s";
+
+  /** FIELD_SYS_ACCESS = "sys_access_s" */
+  public static String FIELD_SYS_ACCESS = "sys_access_s";
+  
+  /** FIELD_SYS_ACCESS_GROUPS = "sys_access_groups_s" */
+  public static String FIELD_SYS_ACCESS_GROUPS = "sys_access_groups_s";
+  
+  /** FIELD_SYS_APPROVAL_STATUS = "sys_approval_status_s" */
+  public static String FIELD_SYS_APPROVAL_STATUS = "sys_approval_status_s";
+  
   /** FIELD_SYS_CREATED = "sys_created_dt" */
   public static String FIELD_SYS_CREATED = "sys_created_dt";
   
@@ -41,6 +59,12 @@ public class FieldNames {
   
   /** FIELD_SYS_SOURCEURI = "sys_sourceuri_s" */
   public static String FIELD_SYS_SOURCEURI = "sys_sourceuri_s";
+  
+  /** FIELD_SYS_XML = "sys_xml_clob" */
+  public static String FIELD_SYS_XML = "sys_xml_clob";
+  
+  /** FIELD_SYS_XMLMETA = "sys_xmlmeta_obj" */
+  public static String FIELD_SYS_XMLMETA = "sys_xmlmeta_obj";
   
   /** FIELD_SYS_XMLMODIFIED = "sys_xmlmodified_dt" */
   public static String FIELD_SYS_XMLMODIFIED = "sys_xmlmodified_dt";

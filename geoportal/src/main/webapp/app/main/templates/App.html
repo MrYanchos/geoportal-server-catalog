@@ -1,4 +1,5 @@
 <div class="g-app" data-dojo-attach-point="contentNode">
+        <a class="offscreen skip-to-content" href="#searchBox">Skip to main content</a>
 	<nav class="navbar navbar-inverse">
     <!-- <div class="navbar-header"><a class="navbar-brand" href="#">${i18n.nav.brand}</a></div>-->
 	  <ul class="nav navbar-nav">
@@ -9,10 +10,9 @@
 	    <li class="nav-item">
 	      <a class="nav-link" href="#mapPanel" data-toggle="tab">${i18n.nav.map}</a>
 	    </li>
-
-		  <li class="nav-item">
-			  <a class="nav-link" href="#workbenchPanel" data-toggle="tab">Workbench</a>
-		  </li>
+	    <li class="nav-item">
+	      <a class="nav-link" href="#aboutPanel" data-toggle="tab">${i18n.nav.about}</a>
+	    </li>
 	  </ul>
 	  
 	  <div class="g-tools pull-right">
@@ -22,7 +22,7 @@
 	      data-dojo-attach-event="onclick: signInClicked"
 	      >${i18n.nav.signIn}</a>
 		  <div id="idAppDropdown" class="dropdown pull-right g-options">
-		    <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+		    <a href="#" class="dropdown-toggle" aria-label="Dropdown Menu" data-toggle="dropdown"
 		      ><span class="glyphicon glyphicon-menu-hamburger"></span></a>
 	      <ul class="dropdown-menu">
 	         <li class="divider"></li>
@@ -65,8 +65,8 @@
     <div id="mapPanel" role="tabpanel" class="tab-pane fade" >
       <div data-dojo-type="app/main/MapPanel" data-dojo-attach-point="mapPanel"></div>
     </div>
-	  <div id="workbenchPanel" role="tabpanel" class="tab-pane fade" >
-		  <div data-dojo-type="app/main/WorkbenchPanel" data-dojo-attach-point="workbenchPanel"></div>
-	  </div>
+    <div id="aboutPanel" role="tabpanel" class="tab-pane fade" >
+      <div data-dojo-type="app/main/AboutPanel" data-dojo-attach-point="aboutPanel"></div>
+    </div>
   </div>
 </div>

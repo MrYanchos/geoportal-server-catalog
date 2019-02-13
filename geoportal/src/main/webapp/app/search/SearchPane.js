@@ -39,8 +39,12 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
     i18n: i18n,
     templateString: template,
     
-    searchOnStart: true,
     defaultSort: null,
+    searchOnStart: true,
+    
+    lastQuery: null,
+    lastQueryCount: 0,
+    lastQueryWasMyContent: false,
     
     _dfd: null,
     
@@ -78,9 +82,10 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
       //var components = [this.searchBox,this.resultsPane];
       var components = [];
       array.forEach(this.getChildren(),function(child){
-        if (child.isSearchComponent) components.push(child);
+        if (child.isSearchComponent && !child.conditionallyDisabled) {
+          components.push(child);
+        }
       });
-      
       return components;
     },
     
@@ -99,8 +104,12 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
       var url = "./elastic/"+AppContext.geoportal.metadataIndexName+"/item/_search";
       var v, postData = null;
 
-      //var client = new AppClient();
-      //url = client.appendAccessToken(url);
+      if (AppContext.geoportal.supportsApprovalStatus || 
+          AppContext.geoportal.supportsGroupBasedAccess) {
+        var client = new AppClient();
+        url = client.appendAccessToken(url); 
+      }
+      
       var sProp = null, oProp = null, props = params.urlParams;
       for (sProp in props) {
         if (props.hasOwnProperty(sProp)) {
@@ -125,9 +134,7 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
       if (params.queries && params.queries.length > 0) {
         if (postData === null) postData = {};
         postData.query = {"bool":{"must":params.queries}};
-      } else {
-
-      }
+      } 
       if (params.aggregations) {
         if (postData === null) postData = {};
         postData.aggregations = params.aggregations;
@@ -150,6 +157,13 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
       dfd.then(function(response) {
         if (!dfd.isCanceled()) {
           //console.warn("search-response",response);
+          self.lastQueryCount = 0;
+          self.lastQueryWasMyContent = !!params.wasMyContent;
+          if (postData && postData.query) {
+            self.lastQuery = JSON.stringify({"query": postData.query});
+          } else {
+            self.lastQuery = null;
+          }
           response.urlParams = params.urlParams;
           array.forEach(components,function(component){
             component.processResults(response);
