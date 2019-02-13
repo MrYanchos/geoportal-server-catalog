@@ -14,10 +14,7 @@
         <beans:property name="rolePrefix" value="ROLE_"/>
         <beans:property name="allUsersCanPublish" value="true" />
      </beans:bean>
-    <beans:bean id="adapterDeploymentContext"
-                class="org.keycloak.adapters.springsecurity.AdapterDeploymentContextFactoryBean">
-        <beans:constructor-arg value="WEB-INF/classes/config/keycloak.json"/>
-    </beans:bean>
+
     <security:authentication-manager id="authenticationManager" alias="authenticationManager">
 	  <security:authentication-provider ref="keycloakAuthenticationProvider"/>
 	</security:authentication-manager>
