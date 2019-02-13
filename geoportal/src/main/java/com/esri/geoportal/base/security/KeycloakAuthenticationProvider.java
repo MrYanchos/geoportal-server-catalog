@@ -1,16 +1,7 @@
 package com.esri.geoportal.base.security;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.json.JsonObject;
-
 import com.esri.geoportal.base.util.JsonUtil;
-
+import com.esri.geoportal.base.util.Val;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -30,14 +21,21 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
-import com.esri.geoportal.base.util.Val;
+
+import javax.json.JsonObject;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Authentication for Keycloak OAuth2.
  */
 @Component
 public class KeycloakAuthenticationProvider implements AuthenticationProvider {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ArcGISAuthenticationProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeycloakAuthenticationProvider.class);
     /*
      * Instance variables
      */
@@ -182,6 +180,8 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
         * @throws AuthenticationException
        */
       private List<GrantedAuthority> executeGetRoles(String username, String token, String referer) 
+       /*
+       */
       throws AuthenticationException {
         List<GrantedAuthority> roles=new ArrayList<>();
         String pfx = Val.chkStr(this.getrolePrefix(),"").trim();

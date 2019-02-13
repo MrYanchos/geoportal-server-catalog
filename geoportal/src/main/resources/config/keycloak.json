@@ -1,7 +1,26 @@
 {
-  "realm": "Geoportal",
-  "auth-server-url": "http://localhost:8843/auth",
-  "ssl-required": "external",
-  "resource": "geoportal",
-  "public-client": true
+  "realm" : "Geoportal",
+  "resource" : "dds-geoportal",
+  "auth-server-url" : "https://localhost:8443/auth",
+  "ssl-required" : "external",
+  "use-resource-role-mappings" : false,
+  "enable-cors" : true,
+  "cors-max-age" : 1000,
+  "cors-allowed-methods" : "POST, PUT, DELETE, GET",
+  "cors-exposed-headers" : "WWW-Authenticate, My-custom-exposed-Header",
+  "bearer-only" : false,
+  "enable-basic-auth" : true,
+  "expose-token" : true,
+  "credentials" : {
+    "secret" : "234234-234234-234234"
+  },
+
+  "connection-pool-size" : 20,
+
+  "allow-any-hostname" : true,
+
+  "token-minimum-time-to-live" : 10,
+  "min-time-between-jwks-requests" : 10,
+  "public-key-cache-ttl": 86400
+
 }

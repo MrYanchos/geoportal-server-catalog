@@ -15,6 +15,8 @@ function(declare, lang, appConfig, AppUser, esriBasemaps) {
     constructor: function (args) {
       lang.mixin(this, args);
       this.appUser = new AppUser();
+      
+      
       if (esriBasemaps && this.appConfig && this.appConfig.searchMap && 
           typeof this.appConfig.searchMap.basemap === "string") {
         var basemap = this.appConfig.searchMap.basemap;
