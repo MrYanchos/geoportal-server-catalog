@@ -19,12 +19,12 @@
 */
 
 var container= $('#collectionPanel');
-var mdRecordsId = "uniqName_9_24";
+var mdRecordsId = "uniqName_9_94";
 var collectionPanelId = "uniqName_9_22";
 var recordsDropPaneId = "dijit_TitlePane_10";
 var colDropPaneId = "dijit_TitlePane_20";
 
-$('.g-item-card').each(function(d) {
+$( "#"+mdRecordsId).find('.g-item-card').each(function(d) {
     $(this).remove();
 });
 
@@ -40,7 +40,7 @@ var totRecords = 0;
 
 function leftPanel(container) {
 
-    var lpTest = container.find('.g-search-pane-left');
+    var lpTest = $(container).find('.g-search-pane-left');
     if ( lpTest ) {
         lpTest.empty();
         lpTest.remove();
@@ -258,7 +258,7 @@ function _selCollection(colVal) {
     var coltxt =  $('#gSvCollection').find(":selected").text(); //dijit_TitlePane_0_titleBarNode
     if ( ColID !== "default") {
 
-        var sb = container.find('#dijit_TitlePane_0_titleBarNode');
+        var sb = container.find('#'+recordsDropPaneId);
         var tlab = sb[0].childNodes[0];
         tlab.nodeValue =" Saved Results for Collection   "+coltxt;
 
@@ -341,7 +341,7 @@ function _removeCollection(C){
 
     var ColID = $('#gSvCollection').find(":selected").val();
 
-    if ( ColID !== "default" && colID !== "All" ) {
+    if ( ColID !== "default" && ColID !== "All" ) {
 
         var mdRem  = getMdRecords("collections", ColID );
 
@@ -376,7 +376,7 @@ function _removeCollection(C){
 
 function rightPanel(container) {
 
-    var rpTest = container.find('.g-search-pane-right');
+    var rpTest = $(container).children('.g-search-pane-right');
     if ( rpTest ) {
         rpTest.empty();
         rpTest.remove();
