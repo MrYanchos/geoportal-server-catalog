@@ -134,8 +134,9 @@ function makeSearchPanel() {
 function _addSearch(cObj) {
     // Puts a record into saved search
 
-    var sUrl='http://cinergi.sdsc.edu/geoportal/?q=';
-
+    //var sUrl='http://cinergi.sdsc.edu/geoportal/?q=';
+    let port = location.port === 80? "": ':'+location.port;
+    let sUrl=location.protocol +"//" + location.hostname +port  +location.pathname + '?q=';
     var ss = JSON.parse(localStorage.getItem("saveSearch") );
     var sa =  ss.query.bool.must;
     var sQry ='';
