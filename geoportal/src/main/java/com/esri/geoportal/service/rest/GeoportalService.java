@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 package com.esri.geoportal.service.rest;
+
 import com.esri.geoportal.base.security.ArcGISAuthenticationProvider;
 import com.esri.geoportal.base.security.Group;
 import com.esri.geoportal.context.AppRequest;
 import com.esri.geoportal.context.AppResponse;
 import com.esri.geoportal.context.AppUser;
 import com.esri.geoportal.context.GeoportalContext;
-
-import java.util.List;
+import org.sciencegateways.geoportal.base.security.KeycloakAuthenticationProvider;
 
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
@@ -32,6 +32,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.util.List;
 
 /**
  * Handles /rest/geoportal requests.
@@ -108,7 +109,18 @@ public class GeoportalService {
           jso.add("createAccountUrl",ap.getCreateAccountUrl());
         }
       }
-      
+      KeycloakAuthenticationProvider kp = gc.getBeanIfDeclared("keycloakAuthenticationProvider",
+              KeycloakAuthenticationProvider.class,null);
+      if (kp != null) {
+        jso.add("keyCloakOAuth",Json.createObjectBuilder()
+                .add("appId",kp.getclient_id())
+
+
+        );
+        if (kp.getCreateAccountUrl() != null && kp.getCreateAccountUrl().length() > 0) {
+          jso.add("createAccountUrl",kp.getCreateAccountUrl());
+        }
+      }
       response.writeOkJson(request,jso);
       return response.build();      
     } catch (Throwable t) {

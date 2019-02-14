@@ -1,0 +1,19 @@
+version: '3'
+services:
+  keycloak:
+     image: jboss/keycloak:2.5.4.Final
+     command:
+      - "-b"
+      - "0.0.0.0"
+      - "-Dkeycloak.migration.action=export"
+      - "-Dkeycloak.migration.provider=dir"
+      - "-Dkeycloak.migration.dir=/config/"
+      - "-Dkeycloak.migration.strategy=IGNORE_EXISTING"
+     volumes:
+       - ./config:/config/
+     environment:
+       - KEYCLOAK_USER=admin
+       - KEYCLOAK_PASSWORD=password
+     ports:
+       - "8843:8080"
+     
