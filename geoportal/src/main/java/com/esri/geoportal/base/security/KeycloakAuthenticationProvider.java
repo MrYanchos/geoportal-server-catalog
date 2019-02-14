@@ -147,7 +147,11 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
                 throw new BadCredentialsException("Invalid credentials.");
             }
             else if(response_code==HttpStatus.SC_OK){
+<<<<<<< HEAD
                 JsonObject json_response = (JsonObject)JsonUtil.toJsonStructure(EntityUtils.toString(response.getEntity(), "UTF-8"));
+=======
+                JsonObject json_response = (JsonObject) JsonUtil.toJsonStructure(EntityUtils.toString(response.getEntity(), "UTF-8"));
+>>>>>>> 37cb27a1a25b75746ee5e806cb4d7d928f93b9b3
                 if (json_response.containsKey("access_token")){
                     access_token=json_response.getString("access_token");
                     
