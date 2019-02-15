@@ -182,6 +182,53 @@
             }
           }
         },
+        "cited_individual" : {
+          "type" : "keyword",
+          "fields": {
+            "trigram": {
+              "type": "text",
+              "analyzer": "trigram"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },"cited_organization" : {
+          "type" : "keyword",
+          "fields": {
+            "trigram": {
+              "type": "text",
+              "analyzer": "trigram"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "publisher_individual" : {
+          "type" : "keyword",
+          "fields": {
+            "trigram": {
+              "type": "text",
+              "analyzer": "trigram"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "publisher_organization" : {
+          "type" : "keyword",
+          "fields": {
+            "trigram": {
+              "type": "text",
+              "analyzer": "trigram"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
         "place_keywords" : {
           "type" : "keyword",
           "fields": {
@@ -194,7 +241,7 @@
             }
           }
         },
-        "categories_cat": {
+        "hierarchies": {
           "type": "text",
           "analyzer": "category_analyzer",
           "fielddata": true,
@@ -336,7 +383,7 @@
           "_cat": {
             "match": "*_cat",
             "mapping": {
-              "type": "string",
+              "type": "text",
               "fielddata": true,
               "analyzer": "category_analyzer",
               "search_analyzer": "category_analyzer"
@@ -347,7 +394,7 @@
           "_hier": {
             "match": "*_hier",
             "mapping": {
-              "type": "string",
+              "type": "text",
               "fielddata": true,
               "analyzer": "hierarchy_analyzer",
               "search_analyzer": "hierarchy_analyzer"

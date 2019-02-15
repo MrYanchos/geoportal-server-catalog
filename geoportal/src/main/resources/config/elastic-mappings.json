@@ -72,7 +72,115 @@
         },
         "description": {
           "type": "text"
+        },
+        "keyword" : {
+          "type" : "keyword",
+          "fields": {
+            "trigram": {
+              "type": "text",
+              "analyzer": "trigram"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "tags" : {
+          "type" : "keyword",
+          "fields": {
+            "trigram": {
+              "type": "text",
+              "analyzer": "trigram"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "contact_people" : {
+          "type" : "keyword",
+          "fields": {
+            "trigram": {
+              "type": "text",
+              "analyzer": "trigram"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "contact_organizations" : {
+          "type" : "keyword",
+          "fields": {
+            "trigram": {
+              "type": "text",
+              "analyzer": "trigram"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "cited_individual" : {
+          "type" : "keyword",
+          "fields": {
+            "trigram": {
+              "type": "text",
+              "analyzer": "trigram"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },"cited_organization" : {
+          "type" : "keyword",
+          "fields": {
+            "trigram": {
+              "type": "text",
+              "analyzer": "trigram"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "publisher_individual" : {
+          "type" : "keyword",
+          "fields": {
+            "trigram": {
+              "type": "text",
+              "analyzer": "trigram"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "publisher_organization" : {
+          "type" : "keyword",
+          "fields": {
+            "trigram": {
+              "type": "text",
+              "analyzer": "trigram"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+        "place_keywords" : {
+          "type" : "keyword",
+          "fields": {
+            "trigram": {
+              "type": "text",
+              "analyzer": "trigram"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
         }
+
       },
       "dynamic_templates":[
         {

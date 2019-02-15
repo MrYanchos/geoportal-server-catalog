@@ -81,17 +81,18 @@ G.evaluators.cinergi = {
         /* ResponsibleParty who have role author, creator, principal (or principle) Investigator, originator
         filter for responsible party in identification; sometimes the author is put in identificationInformation
             point of contact */
-        this.clearProps(task,"cited_individual_s");
-        G.evalProps(task, item, iden, "cited_individual_s", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:individualName[not(contains(gco:CharacterString,'issing'))]/*/text()");
+        this.clearProps(task,"cited_individual");
         G.evalProps(task, item, iden, "cited_individual", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:individualName[not(contains(gco:CharacterString,'issing'))]/*/text()");
-        this.clearProps(task,"cited_organization_s");
-        G.evalProps(task, item, iden, "cited_organization_s", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/*/text()");
-        G.evalProps(task, item, iden, "cited_organization", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/*/text()");
+        this.clearProps(task,"cited_organization");
+         G.evalProps(task, item, iden, "cited_organization", "//gmd:identificationInfo//gmd:CI_RoleCode[contains(text(),'rincip') or contains(@codeListValue, 'uthor') or contains(@codeListValue, 'riginator') or contains(@codeListValue, 'reator') or contains(@codeListValue, 'rincip')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/*/text()");
 
-        /* to generate facet for place names
+        G.evalProps(task, item, iden, "publisher_individual", "gmd:citation//gmd:CI_RoleCode[contains(text(),'ublisher')]/../../gmd:individualName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+         G.evalProps(task, item, iden, "publisher_organization", "gmd:citation//gmd:CI_RoleCode[contains(text(),'ublisher')]/../../gmd:organisationName[not(contains(gco:CharacterString,'issing'))]/gco:CharacterString");
+
+       /* to generate facet for place names
          * dwv 2018-08-28 add named places */
-        this.clearProps(task,"place_keywords_s");
-        G.evalProps(task, item, root, "place_keywords_s",
+        this.clearProps(task,"place_keywords");
+        G.evalProps(task, item, root, "place_keywords",
             "//gmd:MD_KeywordTypeCode[contains(@codeListValue,'lace')]/../../gmd:keyword/*/text() | //gmd:geographicIdentifier//gmd:code/*/text() |" +
             " //gmd:geographicElement/../gmd:description/*/text()");
         G.evalProps(task, item, root, "place_keywords",
@@ -99,7 +100,6 @@ G.evaluators.cinergi = {
             " //gmd:geographicElement/../gmd:description/*/text()");
         /* facet for all non-CINERGI controlled keywords, except place */
         this.clearProps(task,"tags_s");
-        G.evalProps(task, item, root, "tags_s", "//gmd:MD_Keywords[not(descendant::*[contains(text(),'Cinergi')]) and //gmd:MD_KeywordTypeCode[not(contains(@codeListValue,'lace') )]]/gmd:keyword/*/text()");
         G.evalProps(task, item, root, "tags", "//gmd:MD_Keywords[not(descendant::*[contains(text(),'Cinergi')]) and //gmd:MD_KeywordTypeCode[not(contains(@codeListValue,'lace') )]]/gmd:keyword/*/text()");
 
         this.clearProps(task,"distribution_links_s");
@@ -269,7 +269,7 @@ G.evaluators.cinergi = {
                 if (kwds[i].hierarchy.getString().contains("Unassigned")) {
                     continue;
                 }
-                G.writeMultiProp(task.item, "hierarchies_cat", "Category > " + kwds[i].hierarchy.getString());
+                G.writeMultiProp(task.item, "hierarchies", "Category > " + kwds[i].hierarchy.getString());
                 //print (task.item.hierarchies_cat);
             }
 
