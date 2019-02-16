@@ -1,4 +1,4 @@
-package com.esri.geoportal.base.security;
+package org.sciencegateways.geoportal.base.security;
 
 import com.esri.geoportal.base.util.JsonUtil;
 import com.esri.geoportal.base.util.Val;
@@ -46,6 +46,9 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
     private String client_id;
     private String rolePrefix;
     private String adminPassword;
+    private String createAccountUrl;
+    private String geoportalAdministratorsGroupId;
+    private String geoportalPublishersGroupId;
 
     /** True if all authenticated users shoudl have a Publisher role. */
     public boolean getallUsersCanPublish() {
@@ -86,8 +89,26 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
     public String getadminPassword(){
         return adminPassword;
     }
+
     public void setadminPassword(String adminPassword){
         this.adminPassword=adminPassword;
+    }
+    /** The id of the ArcGIS group containing Geoportal administrators (optional). */
+    public String getGeoportalAdministratorsGroupId() {
+        return geoportalAdministratorsGroupId;
+    }
+    /** The id of the ArcGIS group containing Geoportal administrators (optional). */
+    public void setGeoportalAdministratorsGroupId(String geoportalAdministratorsGroupId) {
+        this.geoportalAdministratorsGroupId = geoportalAdministratorsGroupId;
+    }
+
+    /** The id of the ArcGIS group containing Geoportal publishers (optional). */
+    public String getGeoportalPublishersGroupId() {
+        return geoportalPublishersGroupId;
+    }
+    /** The id of the ArcGIS group containing Geoportal publishers (optional). */
+    public void setGeoportalPublishersGroupId(String geoportalPublishersGroupId) {
+        this.geoportalPublishersGroupId = geoportalPublishersGroupId;
     }
 
     public String getclient_id() {
@@ -104,6 +125,14 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
     public void setrolePrefix(String rolePrefix) {
         this.rolePrefix = rolePrefix;
       }
+    /** The create account URL. */
+    public String getCreateAccountUrl() {
+        return createAccountUrl;
+    }
+    /** The create account URL. */
+    public void setCreateAccountUrl(String createAccountUrl) {
+        this.createAccountUrl = createAccountUrl;
+    }
 
     private String getThisReferer() {
         try {
