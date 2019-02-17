@@ -215,7 +215,7 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
         List<GrantedAuthority> roles=new ArrayList<>();
         String pfx = Val.chkStr(this.getrolePrefix(),"").trim();
         roles.add(new SimpleGrantedAuthority(pfx+"ADMIN"));
-        roles.add(new SimpleGrantedAuthority(pfx+"PUBLISH"));
+        roles.add(new SimpleGrantedAuthority(pfx+"PUBLISHER"));
         roles.add(new SimpleGrantedAuthority(pfx+"USER"));
 
 
