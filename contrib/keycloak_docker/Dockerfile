@@ -1,1 +1,1 @@
-FROM jboss/keycloak:2.5.4.Final
+FROM jboss/keycloak:4.8.3.Final

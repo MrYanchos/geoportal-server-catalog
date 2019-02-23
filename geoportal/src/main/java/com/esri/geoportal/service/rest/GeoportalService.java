@@ -113,7 +113,7 @@ public class GeoportalService {
               KeycloakAuthenticationProvider.class,null);
       if (kp != null) {
         jso.add("keyCloakOAuth",Json.createObjectBuilder()
-                .add("appId",kp.getclient_id())
+                .add("appId",kp.getClient_id())
 
 
         );
