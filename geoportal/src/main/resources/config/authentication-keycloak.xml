@@ -5,14 +5,19 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
     http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd">
-    <beans:bean id="keycloakAuthenticationProvider" class="com.esri.geoportal.base.security.KeycloakAuthenticationProvider">
+    <beans:bean id="keycloakAuthenticationProvider" class="org.sciencegateways.geoportal.base.security.KeycloakAuthenticationProvider">
+
         <beans:property name="realmName" value="Geoportal"/>
-        <beans:property name="authorizeURL" value="http://localhost:8843/auth/realms/Geoportal/protocol/openid-connect/token"/>
-        <beans:property name="adminUserName" value="admin"/>
-        <beans:property name="adminPassword" value="password"/>
+        <beans:property name="realmUrl" value="http://localhost:8843/auth/realms/Geoportal"/>
         <beans:property name="client_id" value="geoportal"/>
+        <beans:property name="client_secret" value="e17b6228-b79b-4bfb-85b8-9acc39293017"/>
         <beans:property name="rolePrefix" value="ROLE_"/>
-        <beans:property name="allUsersCanPublish" value="true" />
+        <beans:property name="allUsersCanPublish" value="false" />
+        <beans:property name="redirectUri" value="http://localhost:8081/geoportal" />
+    <!--    <beans:property name="geoportalAdministratorsGroupId" value="true" />
+        <beans:property name="geoportalPublishersGroupId" value="true" />
+        -->
+
      </beans:bean>
 
     <security:authentication-manager id="authenticationManager" alias="authenticationManager">

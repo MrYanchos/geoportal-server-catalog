@@ -6,10 +6,11 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
     http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd">
 
-  <!-- One and only one of the authentication methods must be implemented. -->
-  <!-- <beans:import resource="authentication-arcgis.xml"/> -->
+  <!--&lt;!&ndash; One and only one of the authentication methods must be implemented. &ndash;&gt;-->
+   <!--<beans:import resource="authentication-arcgis.xml"/>-->
   <!-- <beans:import resource="authentication-ldap.xml"/> -->
   <!-- <beans:import resource="authentication-simple.xml"/> -->
+<<<<<<< HEAD
 <<<<<<< HEAD
 <!--  <beans:import resource="authentication-simple.xml"/> -->
   <beans:import resource="authentication-keycloak.xml"/>
@@ -17,6 +18,10 @@
   <!--<beans:import resource="authentication-keycloak.xml"/>-->
   <beans:import resource="authentication-simple.xml"/>
 >>>>>>> 37cb27a1a25b75746ee5e806cb4d7d928f93b9b3
+=======
+  <beans:import resource="authentication-keycloak.xml"/>
+  <!--<beans:import resource="authentication-simple.xml"/>-->
+>>>>>>> 8ce17f5db402adda81b66b773bc50afd761b5cbc
 
   <beans:import resource="app-oauth.xml"/>
   <security:http realm="Geoportal" pattern="/**" authentication-manager-ref="authenticationManager">
