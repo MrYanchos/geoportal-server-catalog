@@ -4,23 +4,39 @@ define(["dojo/_base/declare",
         "dojo/topic",
         "app/context/app-topics",
         "dojo/i18n!app/nls/resources",
+        "esri/kernel",
         "app/context/AppClient",
         "app/common/SignIn",
+        "esri/ServerInfo",
+        "esri/IdentityManagerDialog",
         "esri/IdentityManager",
         "esri/arcgis/OAuthInfo",
         "esri/arcgis/Portal",
-        "esri/arcgis/utils"], 
-function(declare, lang, Deferred, topic, appTopics, i18n, AppClient, SignIn, 
-    esriId, OAuthInfo, arcgisPortal, arcgisUtils) {
+        "esri/arcgis/utils",
+       "app/contrib/keycloak/keycloak", // keycloak adds itself to the global variables
+      // "app/contrib/keycloak/IndenityManagerKeycloak",
+        "app/contrib/keycloak/OauthSignInHandlerKeycloak",
+    ],
+function(declare, lang, Deferred, topic, appTopics, i18n, kernel, AppClient, SignIn, esriServerInfo,
+   esriIdDialog, esriId, OAuthInfo, arcgisPortal, arcgisUtils
+        , kc, imk
+) {
 	
   var oThisClass = declare(null, {
 
     appToken: null,
     arcgisPortalUser: null,
     geoportalUser: null,
-    
+    kc:null,
     constructor: function(args) {
       lang.mixin(this,args);
+
+       // this.kc =  Keycloak("custom/keycloak.json");
+       //  this.kc.init().success(function(authenticated) {
+       //      alert(authenticated ? 'authenticated' : 'not authenticated');
+       //  }).error(function(ex) {
+       //      alert('failed to initialize');
+       //  });
     },
     
     getArcGISPortalUrlForLink: function() {
@@ -105,12 +121,105 @@ function(declare, lang, Deferred, topic, appTopics, i18n, AppClient, SignIn,
         });
       });
     },
-    
+      _showKeycloakOAuthSignIn: function(oauth) {
+          var self = this;
+
+          var portalURL = oauth.realmUrl;
+
+       //   var keycloakjs  = KeyCloak.Keycloakbj;
+       //    //script(KeyCloak.keycloakjson));
+       //    this.kc =  Keycloak("custom/keycloak.json");
+       //    console.info ("keycloak: " + this.kc.hasResourceRole("ROLE_USER", "geoportal") );
+      //    window.keycloak.init({ onLoad: 'login-required' });
+       //
+       //    this.kc.init({checkLoginIframe:false,
+       //        flow: 'hybrid' }).success(function(authenticated) {
+       //        alert(authenticated ? 'authenticated' : 'not authenticated');
+       //    }).error(function(ex) {
+       //        alert('failed to initialize');
+       //    });
+       //    this.kc.login();
+          var info = new OAuthInfo({
+              appId: oauth.appId,
+              // Uncomment the next line and update if using your own portal
+              portalUrl: oauth.portalUrl,
+              // Uncomment the next line to prevent the user's signed in state from being shared
+              // with other apps on the same domain with the same authNamespace value.
+              authNamespace: "geoportal",
+              popup: true
+          });
+          esriId.registerOAuthInfos([info]);
+
+          var oAuthInfo = esriId.findOAuthInfo(portalURL);
+          console.log(oAuthInfo.toJson());
+
+
+          var serverInfo = new esriServerInfo();
+          serverInfo.server = oauth.realmUrl;
+          serverInfo.tokenServiceUrl = oauth.realmUrl + "/protocol/openid-connect/token";
+          serverInfo.adminTokenServiceUrl = oauth.realmUrl + "/protocol/openid-connect/token";
+          esriId.registerServers([serverInfo]);
+          imk.oAuthSignIn("http://localhost:8081/geportal",serverInfo,info,null)
+              .then(function(portalUser){
+                  //console.warn("portalUser",portalUser);
+                  self.arcgisPortalUser = portalUser;
+                  var u = portalUser.username;
+                  var p = "__rtkn__:"+portalUser.credential.token;
+                  self.signIn(u,p).then(function(){
+                  }).otherwise(function(error){
+                      // TODO handle
+                      console.warn("Error occurred while signing in:",error);
+                  });
+              }).otherwise(function(error){
+              // TODO handle
+              console.warn("Error occurred while signing in:",error);
+          });
+          // esriId.setRedirectionHandler(function(info) {
+          //     // Execute custom logic then perform redirect
+          //     window.location = info.signInPage   "?"
+          //     info.returnUrlParamName   "="   window.location.href;
+          // });
+         //  esriId.setRedirectionHandler(function(info) {
+         //      // Execute custom logic then perform redirect
+         //      window.location = oauth.realmUrl + "/protocol/openid-connect/login"   ?
+         //      oauth.redirectUri  :  window.location.href;
+         //  });
+         //
+         //  // , portalUrl = oauth.portalUrl;
+         //  //arcgisUtils.arcgisUrl = portalUrl;  // PortalImplementation
+         //  esriId.getCredential(info.portalUrl,{oAuthPopupConfirmation:false})
+         // // esriId.oAuthSignIn(resUrl, serverInfo, OAuthInfo, options?);
+         //  esriId.oAuthSignIn(oauth.redirectUri, serverInfo, info);
+
+          // esriId.getCredential(portalUrl,{oAuthPopupConfirmation:false}).then(function (){
+          //     var portal = new arcgisPortal.Portal(portalUrl);
+          //     portal.signIn().then(function(portalUser){
+          //         //console.warn("portalUser",portalUser);
+          //         self.arcgisPortalUser = portalUser;
+          //         var u = portalUser.username;
+          //         var p = "__rtkn__:"+portalUser.credential.token;
+          //         self.signIn(u,p).then(function(){
+          //         }).otherwise(function(error){
+          //             // TODO handle
+          //             console.warn("Error occurred while signing in:",error);
+          //         });
+          //     }).otherwise(function(error){
+          //         // TODO handle
+          //         console.warn("Error occurred while signing in:",error);
+          //     });
+          // });
+      },
     showSignIn: function() {
       var ctx = window.AppContext;
       if (ctx.geoportal && ctx.geoportal.arcgisOAuth && ctx.geoportal.arcgisOAuth.appId) {
         this._showAgsOAuthSignIn(ctx.geoportal.arcgisOAuth);
-      } else {
+      }
+      // Generic Oauth
+      else if (ctx.geoportal && ctx.geoportal.keycloakOauth && ctx.geoportal.keycloakOauth.appId){
+          //this._showAgsOAuthSignIn(ctx.geoportal.genericOauth);
+          this._showKeycloakOAuthSignIn( ctx.geoportal.keycloakOauth);
+      }
+      else {
         (new SignIn()).show();
       }
     },
@@ -153,8 +262,12 @@ function(declare, lang, Deferred, topic, appTopics, i18n, AppClient, SignIn,
     
     whenAppStarted: function() {
       var self = this, dfd = new Deferred(), ctx = window.AppContext, oauth;
-      if (ctx.geoportal) oauth = ctx.geoportal.arcgisOAuth; 
-      
+      if (ctx.geoportal && ctx.geoportal.arcgisOAuth) oauth = ctx.geoportal.arcgisOAuth;
+        if (ctx.geoportal && ctx.geoportal.keycloakOauth && ctx.geoportal.keycloakOauth.appId) {
+            esriIdDialog = new esriIdDialog;
+            kernel.id = declare.safeMixin(esriIdDialog, imk);
+            oauth = ctx.geoportal.keycloakOauth;
+        }
       if (oauth && oauth.appId) {
         var portalUrl = oauth.portalUrl;
         arcgisUtils.arcgisUrl = portalUrl;  // PortalImplementation

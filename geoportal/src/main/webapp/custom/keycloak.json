@@ -1,0 +1,14 @@
+{
+  "realm": "geoportal",
+  "auth-server-url": "http://localhost:8843/auth/",
+  "ssl-required": "external",
+  "resource": "geoportal",
+  "verify-token-audience": true,
+  "credentials": {
+    "secret": "9de6fd7b-028e-4eb7-9e34-a56300e56eaf"
+  },
+  "confidential-port": 0,
+  "policy-enforcer": {},
+  "token-store": "cookie",
+  "loginIframe": false
+}

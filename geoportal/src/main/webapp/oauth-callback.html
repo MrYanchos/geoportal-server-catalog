@@ -3,18 +3,35 @@
 <head>
   <script>
     function loadHandler() {
-      if (opener) {
-        //opener.console.log("oauth callback href:", location.href);
-        if (location.hash) {
-          opener.require("esri/kernel").id.setOAuthResponseHash(location.hash);
-          close();
+        console.log("oathLoadHandleCallback.html");
+        setTimeout(function(){
+            console.log('opener:' +opener);
+        },10000);
+
+        if (opener) {
+        opener.console.log("oauth callback href:", location.href);
+            opener.console.log("oauth callback hash:", location.hash);
+         if (location.hash) {
+             opener.console.log(location.hash)
+
+             opener.require("esri/kernel").id.setOAuthResponseHash(location.hash);
+             debugger;
+             close();
         }
       } else {
-        close();
+
+            setTimeout(function(){
+                console.log('oathLoadHandleCallback.html closed without calling setOAuthResponseHash');
+            },10000);
+            close();
       }
+
+        setTimeout(function(){
+            console.log('oathLoadHandleCallback.html closed no opener');
+        },10000);
     }
   </script>
 </head>
-<body onload="loadHandler();">
+<body onload="debugger;loadHandler();">
 </body>
 </html>

@@ -1,0 +1,18 @@
+This branch is an attempt to create a modified mix-in to do the Keycloak-oauth via a pop-up dialog
+Making it the equivalent of the ArcGIS.
+
+This is stuck at where the oauth-callback.html calls
+ opener.require("esri/kernel").id.setOAuthResponseHash(location.hash);
+
+ theere is a problem in setOAuthResponseHash where this._oAuthDfd is not set in the OauthSiginInHandlerKeycloak,
+ but is set in the non-overridded version
+ this._oAuthDfd;
+ (line 47155 in init.js;
+ line 72 in OauthSiginInHandlerKeycloak.js)
+
+This appears to be set in the IdentityManagerBase
+_enqueue: line 45716,
+Called in _doSignIn
+45888
+and refreshToken
+46028
