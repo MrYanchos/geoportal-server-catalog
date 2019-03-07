@@ -7,10 +7,10 @@
     http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd">
     <beans:bean id="keycloakAuthenticationProvider" class="org.sciencegateways.geoportal.base.security.KeycloakAuthenticationProvider">
 
-        <beans:property name="realmName" value="Geoportal"/>
-        <beans:property name="realmUrl" value="http://localhost:8843/auth/realms/Geoportal"/>
+        <beans:property name="realmName" value="geoportal"/>
+        <beans:property name="realmUrl" value="http://localhost:8843/auth/realms/geoportal"/>
         <beans:property name="client_id" value="geoportal"/>
-        <beans:property name="client_secret" value="e17b6228-b79b-4bfb-85b8-9acc39293017"/>
+        <beans:property name="client_secret" value="9de6fd7b-028e-4eb7-9e34-a56300e56eaf"/>
         <beans:property name="rolePrefix" value="ROLE_"/>
         <beans:property name="allUsersCanPublish" value="false" />
         <beans:property name="redirectUri" value="http://localhost:8081/geoportal" />
