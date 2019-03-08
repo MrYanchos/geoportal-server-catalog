@@ -22,14 +22,11 @@ define(["dojo/_base/declare",
         "app/etc/util",
         "app/main/SearchPanel",
         "app/main/MapPanel",
-        "app/main/ContributePanel",
         "app/main/AboutPanel",
         "app/content/MetadataEditor",
-        "app/content/UploadMetadata",
-        "app/main/CollectionPanel"
-    ],
+        "app/content/UploadMetadata"], 
 function(declare, lang, topic, appTopics, Templated, template, i18n, util, SearchPanel, MapPanel, AboutPanel,
-    MetadataEditor, UploadMetadata, CollectionPane1) {
+    MetadataEditor, UploadMetadata) {
 
   var oThisClass = declare([Templated], {
 
@@ -54,9 +51,6 @@ function(declare, lang, topic, appTopics, Templated, template, i18n, util, Searc
       $("a[href='#aboutPanel']").on("shown.bs.tab",function(e) {
         location.hash = '#aboutPanel';
       });
-        $("a[href='#collectionPanel']").on("shown.bs.tab",function(e) {
-            location.hash = '#collectionPanel';
-        });
       topic.subscribe(appTopics.AddToMapClicked,function(params){
         if (self.mapPanel.mapWasInitialized) {
           $("a[href='#mapPanel']").tab("show");

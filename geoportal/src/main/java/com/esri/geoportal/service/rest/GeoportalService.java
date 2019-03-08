@@ -13,13 +13,14 @@
  * limitations under the License.
  */
 package com.esri.geoportal.service.rest;
+
 import com.esri.geoportal.base.security.ArcGISAuthenticationProvider;
-import com.esri.geoportal.base.security.GPTOauth2AuthenticationProvider;
 import com.esri.geoportal.base.security.Group;
 import com.esri.geoportal.context.AppRequest;
 import com.esri.geoportal.context.AppResponse;
 import com.esri.geoportal.context.AppUser;
 import com.esri.geoportal.context.GeoportalContext;
+import org.sciencegateways.geoportal.base.security.KeycloakAuthenticationProvider;
 
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
@@ -108,23 +109,16 @@ public class GeoportalService {
           jso.add("createAccountUrl",ap.getCreateAccountUrl());
         }
       }
-/* ArcGISAuthenticationProvider returns null,
-while
-Oauth2AuthenticationProvider returns an object
-commenting out until this is figured out
-  */
-      GPTOauth2AuthenticationProvider oa2p = gc.getBeanIfDeclared("oauth2AuthenticationProvider",
-              GPTOauth2AuthenticationProvider.class,null);
-      if (oa2p != null) {
-        jso.add("OAuth",Json.createObjectBuilder()
-                .add("appId",oa2p.getAppId())
-                .add("portalUrl",oa2p.getPortalUrl())
-               // .add("restUrl",oa2p.getRestUrl())
-                .add("expirationMinutes",oa2p.getExpirationMinutes())
-                .add("showMyProfileLink",oa2p.getShowMyProfileLink())
+      KeycloakAuthenticationProvider kp = gc.getBeanIfDeclared("keycloakAuthenticationProvider",
+              KeycloakAuthenticationProvider.class,null);
+      if (kp != null) {
+        jso.add("keyCloakOAuth",Json.createObjectBuilder()
+                .add("appId",kp.getClient_id())
+                .add("showMyProfileLink",kp.getShowMyProfileLink())
+                .add("loginUrl",kp.getLoginUrl())
         );
-        if (oa2p.getCreateAccountUrl() != null && oa2p.getCreateAccountUrl().length() > 0) {
-          jso.add("createAccountUrl",oa2p.getCreateAccountUrl());
+        if (kp.getCreateAccountUrl() != null && kp.getCreateAccountUrl().length() > 0) {
+          jso.add("createAccountUrl",kp.getCreateAccountUrl());
         }
       }
       response.writeOkJson(request,jso);
