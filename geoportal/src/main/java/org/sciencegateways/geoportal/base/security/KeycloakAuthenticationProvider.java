@@ -13,6 +13,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -176,7 +177,8 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
         }
 
         String rest_url = String.format(tokenTemplate,this.getRealmUrl() ) ;
-        HttpHost targetHost = new HttpHost("localhost",8843,"http");
+        HttpHost targetHost = new HttpHost(this.getRealmUrl(),-1);
+        // System.out.println("TARGET_HOST:"+targetHost);
         UsernamePasswordCredentials creds = new UsernamePasswordCredentials(this.getClient_id(), this.getClient_secret());
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         credsProvider.setCredentials(
@@ -192,7 +194,10 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
         localContext.setAuthCache(authCache);
 
         HttpClient client = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+        System.out.println("REST_URL:"+rest_url);
         HttpPost post = new HttpPost(rest_url);
+        
+
         try {
 
             List<BasicNameValuePair> urlParameters = new ArrayList<BasicNameValuePair>();
@@ -206,6 +211,7 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
             urlParameters.add(new BasicNameValuePair("scope", ""));
             post.setEntity(new UrlEncodedFormEntity(urlParameters));
         } catch (UnsupportedEncodingException exception) {
+            System.out.println(exception.toString());
             throw new AuthenticationServiceException("Error in encoding the api parameters");
         }
         try {
@@ -221,8 +227,6 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
 
                 if (json_response.has("access_token")){
                     access_token=json_response.get("access_token").asText();
-
-
                 }
                 else{
                     throw new AuthenticationServiceException("Unable to get access token from the service");
@@ -234,10 +238,12 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
             }
 
             else{
-                throw new AuthenticationServiceException("Error communicating with the authentication service.");
+                System.out.println(response.toString());
+                throw new AuthenticationServiceException("Error communicating with the authentication service");
             }
         } catch (IOException e) {
-            throw new AuthenticationServiceException("Error in communicating with authentication service");
+            System.out.println(e.toString());
+            throw new AuthenticationServiceException("Error communicating with the authentication service");
         }
         return access_token;
     }
