@@ -196,7 +196,7 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
         }
 
         String rest_url = String.format(tokenTemplate,this.getRealmUrl() ) ;
-        HttpHost targetHost = new HttpHost("localhost",8843,"http");
+        HttpHost targetHost = new HttpHost(this.getRealmUrl(),-1,"https");
         UsernamePasswordCredentials creds = new UsernamePasswordCredentials(this.getClient_id(), this.getClient_secret());
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         credsProvider.setCredentials(
