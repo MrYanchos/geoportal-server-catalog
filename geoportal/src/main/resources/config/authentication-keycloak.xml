@@ -7,10 +7,17 @@
     http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd">
     <beans:bean id="keycloakAuthenticationProvider" class="org.sciencegateways.geoportal.base.security.KeycloakAuthenticationProvider">
 
+<<<<<<< HEAD
         <beans:property name="realmName" value="ddstudio"/>
         <beans:property name="realmUrl" value="https://iam.scigap.org/auth/realms/ddstudio"/>
         <beans:property name="client_id" value="pga"/>
         <beans:property name="client_secret" value="f4a903a5-c44a-4465-ac11-0ff983ead785"/>
+=======
+        <beans:property name="realmName" value="geoportal"/>
+        <beans:property name="realmUrl" value="http://localhost:8843/auth/realms/geoportal"/>
+        <beans:property name="client_id" value="geoportal"/>
+        <beans:property name="client_secret" value="9de6fd7b-028e-4eb7-9e34-a56300e56eaf"/>
+>>>>>>> 7905d38bc74f14228f79fa27f5ad95486cfc18c3
         <beans:property name="rolePrefix" value="ROLE_"/>
         <beans:property name="allUsersCanPublish" value="false" />
         <beans:property name="redirectUri" value="https://ddstudio.scigap.org" />

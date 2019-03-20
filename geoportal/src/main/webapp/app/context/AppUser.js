@@ -46,15 +46,24 @@ function(declare, lang, Deferred, topic, appTopics, i18n, AppClient, SignIn,
     },
     
     getMyProfileUrl: function() {
-      if (AppContext.geoportal && AppContext.geoportal.arcgisOAuth && 
-          AppContext.geoportal.arcgisOAuth.showMyProfileLink) {
-        if (this.arcgisPortalUser) {
-          var v = this.getArcGISPortalUrlForLink();
-          if (v) {
-            return v+"/home/user.html?user="+encodeURIComponent(this.arcgisPortalUser.username);
-          } 
+      if (AppContext.geoportal && AppContext.geoportal.arcgisOAuth &&
+            AppContext.geoportal.arcgisOAuth.showMyProfileLink) {
+            if (this.arcgisPortalUser) {
+                var v = this.getArcGISPortalUrlForLink();
+                if (v) {
+                    return v+"/home/user.html?user="+encodeURIComponent(this.arcgisPortalUser.username);
+                }
+            }
         }
-      }
+        if (AppContext.geoportal && AppContext.geoportal.keyCloakOAuth &&
+            AppContext.geoportal.keyCloakOAuth.showMyProfileLink) {
+            if (this.arcgisPortalUser) {
+                var v = this.getArcGISPortalUrlForLink();
+                if (v) {
+                    return v+"/home/user.html?user="+encodeURIComponent(this.arcgisPortalUser.username);
+                }
+            }
+        }
       return null;
     },
     

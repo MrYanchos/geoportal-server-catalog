@@ -114,8 +114,8 @@ public class GeoportalService {
       if (kp != null) {
         jso.add("keyCloakOAuth",Json.createObjectBuilder()
                 .add("appId",kp.getClient_id())
-
-
+                .add("showMyProfileLink",kp.getShowMyProfileLink())
+                .add("loginUrl",kp.getLoginUrl())
         );
         if (kp.getCreateAccountUrl() != null && kp.getCreateAccountUrl().length() > 0) {
           jso.add("createAccountUrl",kp.getCreateAccountUrl());
