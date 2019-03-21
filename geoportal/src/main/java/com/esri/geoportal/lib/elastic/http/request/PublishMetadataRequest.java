@@ -21,7 +21,6 @@ import com.esri.geoportal.base.util.UuidUtil;
 import com.esri.geoportal.base.util.Val;
 import com.esri.geoportal.base.util.exception.UsageException;
 import com.esri.geoportal.base.xml.XmlUtil;
-import com.esri.geoportal.context.AppRequest;
 import com.esri.geoportal.context.AppResponse;
 import com.esri.geoportal.context.GeoportalContext;
 import com.esri.geoportal.lib.elastic.ElasticContext;
@@ -30,17 +29,14 @@ import com.esri.geoportal.lib.elastic.http.util.ItemUtil;
 import com.esri.geoportal.lib.elastic.util.FieldNames;
 import com.esri.geoportal.lib.elastic.util.ItemIO;
 import com.esri.geoportal.lib.elastic.util.MurmurUtil;
-
-import java.io.FileNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.stream.JsonParsingException;
-
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.FileNotFoundException;
 
 /**
  * Publish metadata.
@@ -155,7 +151,13 @@ public class PublishMetadataRequest extends com.esri.geoportal.lib.elastic.reque
     
     //LOGGER.trace("xmlHash="+mdoc.getXmlHash());
     //LOGGER.trace("requiresXmlWrite="+mdoc.getRequiresXmlWrite());
-    itemUtil.writeItem(ec,mdoc,ec.getItemIndexName());
+    try {
+      itemUtil.writeItem(ec, mdoc, ec.getItemIndexName());
+    } catch (Throwable t){
+      LOGGER.error("failed write:" + this.getId()+"="+mdoc.getJson());
+      LOGGER.trace("requiresXmlWrite="+mdoc.getRequiresXmlWrite());
+      throw t;
+    }
     this.writeOk(response,mdoc.getItemId());
     return response;
   }
