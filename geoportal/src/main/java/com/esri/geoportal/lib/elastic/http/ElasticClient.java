@@ -14,23 +14,22 @@
  */
 package com.esri.geoportal.lib.elastic.http;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
+import com.esri.geoportal.context.GeoportalContext;
+import com.esri.geoportal.lib.elastic.ElasticContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-
-import com.esri.geoportal.context.GeoportalContext;
-import com.esri.geoportal.lib.elastic.ElasticContext;
 
 /**
  * An HTTP client for Elasticsearch.
  */
 public class ElasticClient {
-  
+  /** Logger. */
+  public static final Logger LOGGER = LoggerFactory.getLogger(ElasticClient.class);
   /** Instance variables. */
   private String baseUrl;
   private String basicCredentials;
@@ -213,6 +212,11 @@ public class ElasticClient {
 //        ex1.printStackTrace();
 //      }
 //      throw ex;
+          } catch(IOException ex) {
+
+      LOGGER.error("ES Send error datasent:" + data );
+      throw ex;
+
     } finally {
       try {if (wr != null) wr.close();} catch(Exception ef) {ef.printStackTrace();}
       try {if (br != null) br.close();} catch(Exception ef) {ef.printStackTrace();}
