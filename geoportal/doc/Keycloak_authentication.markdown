@@ -103,15 +103,19 @@ ${kc_redirectUri:https://locahost:8081/geoportal} variable KC_REDIRECTURI
 
 ${gpt_publish:true} variable GPT_PUBLISH
 
-Dev
+# Dev
 ### Option 1: tomcat conf
-1. Add the following to [Tomcat8]/conf/catalina.properties, es_node is a comma separated list.      
+1. Add the following to [Tomcat8]/conf/catalina.properties.      
 
+```
 # Keycloak for Geoportal
 kc_realmName:geoportal
 kc_realmUrl:https://locahost:8843/auth/realms/geoportal
 kc_client_id:geoportal
 kc_client_secret:00000000-1111-2222-3333-99999999999
+kc_redirectUri:https://locahost:8081/geoportal
+gpt_publish:true
+```
 
 ### Option 2: Intellij Tomcat Startup/Stop 
 In run/debug configuration, tomcat server>your configuration>Startup/Stop
@@ -119,7 +123,7 @@ Set the environment variables
 
 ### Option 3: Use environment variables
 
-Production/docker
+# Production/docker
 ### Option 1: Use environment variables
 ### Option 2: pass environment variables in docker-compose/kubernetes
 
