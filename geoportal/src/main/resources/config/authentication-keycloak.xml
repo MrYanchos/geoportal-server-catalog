@@ -6,14 +6,24 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
     http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd">
     <beans:bean id="keycloakAuthenticationProvider" class="org.sciencegateways.geoportal.base.security.KeycloakAuthenticationProvider">
+<!-- USE ENVIRONMENT VARIABLES TO CONFIGURE THIS BEAN. At minimum,just change the default.
+ ${var_variable:defaultValue}
 
-        <beans:property name="realmName" value="geoportal"/>
-        <beans:property name="realmUrl" value="https://iam.scigap.org/auth/realms/ddstudio"/>
-        <beans:property name="client_id" value="pga"/>
-        <beans:property name="client_secret" value="f4a903a5-c44a-4465-ac11-0ff983ead785"/>
+${kc_realmName:geoportal} variable KC_REALMNAME
+${kc_realmUrl:https://locahost:8843/auth/realms/geoportal} variable KC_REALMURL
+${kc_client_id:geoportal} variable KC_CLIENT_ID
+${kc_client_secret:f4a903a5-c44a-4465-ac11-0ff983ead785} variable KC_CLIENT_SECRET
+${kc_redirectUri:https://locahost:8081/geoportal} variable KC_REDIRECTURI
+
+${gpt_publish:true} variable GPT_PUBLISH
+-->
+        <beans:property name="realmName" value="${kc_realmName:geoportal}"/>
+        <beans:property name="realmUrl" value="${kc_realmUrl:https://locahost:8843/auth/realms/geoportal}"/>
+        <beans:property name="client_id" value="${kc_client_id:geoportal-client}"/>
+        <beans:property name="client_secret" value="${kc_client_secret:f4a903a5-c44a-4465-ac11-0ff983ead785}"/>
         <beans:property name="rolePrefix" value="ROLE_"/>
-        <beans:property name="allUsersCanPublish" value="false" />
-        <beans:property name="redirectUri" value="https://ddstudio.scigap.org/" />
+        <beans:property name="allUsersCanPublish" value="${gpt_publish:true}" />
+        <beans:property name="redirectUri" value="${kc_redirectUri:https://locahost:8081/geoportal}" />
     <!--    <beans:property name="geoportalAdministratorsGroupId" value="true" />
         <beans:property name="geoportalPublishersGroupId" value="true" />
         -->

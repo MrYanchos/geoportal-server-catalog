@@ -33,6 +33,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -196,7 +198,14 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
         }
 
         String rest_url = String.format(tokenTemplate,this.getRealmUrl() ) ;
-        HttpHost targetHost = new HttpHost(this.getRealmUrl(),-1,"https");
+        URL realmURL = null;
+        try {
+             realmURL = new URL (this.getRealmUrl());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            throw new AuthenticationServiceException("RealmURL is not a URL");
+        }
+        HttpHost targetHost = new HttpHost(realmURL.getHost(),realmURL.getPort(),realmURL.getProtocol());
         UsernamePasswordCredentials creds = new UsernamePasswordCredentials(this.getClient_id(), this.getClient_secret());
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         credsProvider.setCredentials(
