@@ -9,8 +9,11 @@ services:
       - "-Dkeycloak.migration.provider=dir"
       - "-Dkeycloak.migration.dir=/config/"
       - "-Dkeycloak.migration.strategy=IGNORE_EXISTING"
+      - "-Dkeycloak.migration.usersExportStrategy=REALM_FILE"
+      - "-Dkeycloak.import=/opt/jboss/keycloak/Geoportal-realm.json"
      volumes:
        - ./config:/config/
+       - ./startup/Geoportal-realm.json:/opt/jboss/keycloak/Geoportal-realm.json
      environment:
        - KEYCLOAK_USER=admin
        - KEYCLOAK_PASSWORD=password
