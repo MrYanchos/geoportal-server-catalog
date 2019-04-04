@@ -73,6 +73,7 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
     private String logoutTemplate = "%s/protocol/openid-connect/logout";
     private String userProfileTemplate = "%s/protocol/openid-connect/userinfo&auth_token=%s";
     private Boolean popUpLoginWindow = false;
+    private String authCallback = null;
 
     /** True if all authenticated users shoudl have a Publisher role. */
     public boolean getAllUsersCanPublish() {
@@ -182,7 +183,13 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
             return "";
         }
     }
+    public Boolean getPopUpLoginWindow() {
+        return popUpLoginWindow;
+    }
 
+    public void setPopUpLoginWindow(Boolean popUpLoginWindow) {
+        this.popUpLoginWindow = popUpLoginWindow;
+    }
     /**
      * Get keycloak token
      * @param username username
@@ -349,11 +356,12 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
         return authentication.equals(UsernamePasswordAuthenticationToken.class);
     }
 
-    public Boolean getPopUpLoginWindow() {
-        return popUpLoginWindow;
+
+    public String getAuthCallback() {
+        return authCallback;
     }
 
-    public void setPopUpLoginWindow(Boolean popUpLoginWindow) {
-        this.popUpLoginWindow = popUpLoginWindow;
+    public void setAuthCallback(String authCallback) {
+        this.authCallback = authCallback;
     }
 }

@@ -24,7 +24,8 @@ ${gpt_publish:true} variable GPT_PUBLISH
         <beans:property name="rolePrefix" value="ROLE_"/>
         <beans:property name="allUsersCanPublish" value="${gpt_publish:true}" />
         <beans:property name="redirectUri" value="${kc_redirectUri:https://locahost:8081/geoportal/}" />
-        <!--<beans:property name="popupCallbackUrl" value="" />-->
+        <beans:property name="popUpLoginWindow" value="false" />
+        <!--<beans:property name="oauthCallback" value="" />-->
     <!--    <beans:property name="geoportalAdministratorsGroupId" value="true" />
         <beans:property name="geoportalPublishersGroupId" value="true" />
         -->

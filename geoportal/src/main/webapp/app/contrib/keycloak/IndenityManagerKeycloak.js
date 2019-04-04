@@ -1,4 +1,4 @@
-define(["esri/IdentityManagerDialog",
+define(["IdentityManagerDialogKeycloak",
     "esri/kernel",
     "app/contrib/keycloak/OauthSignInHandlerKeycloak",
     "dojo/_base/declare",

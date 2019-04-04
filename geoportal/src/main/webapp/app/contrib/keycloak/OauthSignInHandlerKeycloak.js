@@ -27,7 +27,7 @@ define("esri/Credential esri/domUtils esri/lang esri/urlUtils dijit/Dialog dijit
             resourceurl.show();
             return g;
         },
-        setOAuthResponseHash: function(a) {
+        setOAuthResponseHash: function(token) {
             /* esri:
             http://moonstone.sdsc.edu:8081/geoportal/oauth-callback.html#access_token=FoTwlAI9u9B7B2GLe2QvJ3wS1sFQnlzg6PAIE9Hw9FRg07k_4ETO2XUJbCegYJ0GLCaHJjTCCFa4WEDuQ3WbEYJ5BdLbS-vks6Lq2tj1UhuBCTZpyb7NqY78AFPx-dIPUjsa0N3oed9IFKQNzqhVQqy1AI30XEnMym1afZZ_wFtddxMKRQ2_KNt0-2x4IaJp&expires_in=7200&username=valentinedwv&state=%7B%22portalUrl%22%3A%22https%3A%2F%2Fwww.arcgis.com%22%7D
 
@@ -67,79 +67,91 @@ define("esri/Credential esri/domUtils esri/lang esri/urlUtils dijit/Dialog dijit
   "preferred_username": "gptuser"
 }
              */
-            var tokenJson = this._parseJwt(a)
-;            var b = this._oAuthDfd;
-            this._oAuthDfd = null;
-            if (b && a)
-                if (clearInterval(this._oAuthIntervalId),
-                "#" === a.charAt(0) && (a = a.substring(1)),
-                    a = ioquery.queryToObject(a),
-                    a.error)
-                    a = Error("access_denied" === a.error ? "ABORTED" : "OAuth: " + a.error + " - " + a.error_description),
-                        a.code = "IdentityManagerBase.2",
-                        a.log = !!baseconfig.isDebug,
-                        b.errback(a);
-                else {
-                    var c = b.oinfo_._oAuthCred
-                        , f = new credential({
-                        userId: a.azp,
-                        server: b.sinfo_.server,
-                        token: a.access_token,
-                        expires: (new Date).getTime() + 1E3 * Number(a.exp),
-                        ssl: "true" === a.ssl,
-                        _oAuthCred: c
-                    });
-                    c.storage = a.persist ? window.localStorage : window.sessionStorage;
-                    c.token = f.token;
-                    c.expires = f.expires;
-                    c.userId = f.userId;
-                    c.ssl = f.ssl;
-                    c.save();
-                    b.callback(f);
-                }
-        },
-        _parseJwt: function  (token) {
+           // var tokenJson = this._parseJwt(token)
             var base64Url = token.split('.')[1];
             var base64 = base64Url.replace('-', '+').replace('_', '/');
-            return JSON.parse(window.atob(base64));
+            var tokenJson = JSON.parse(window.atob(base64));
+            var b = this._oAuthDfd;
+/* this_oAuthDfd always null. not sure why. Does not happen in argcgis auth.
+it is needed below to create a credential. b.oinfo_ is null.
+and for the callback.
+*/
+
+            this._oAuthDfd = null;
+           // if (b && a) {  // this_oAuthDfd always null. not sure why. Does not happen in argcgis auth.
+                if ( token) {
+                    if (clearInterval(this._oAuthIntervalId),
+                    "#" === token.charAt(0) && (token = token.substring(1)),
+                        token = ioquery.queryToObject(token),
+                        token.error) {
+                        token = Error("access_denied" === token.error ? "ABORTED" : "OAuth: " + token.error + " - " + token.error_description),
+                            token.code = "IdentityManagerBase.2",
+                            token.log = !!baseconfig.isDebug,
+                            b.errback(token);
+                    }
+                    else {
+                        var c = b.oinfo_._oAuthCred
+                            , f = new credential({
+                            userId: token.azp,
+                            server: b.sinfo_.server,
+                            token: token.access_token,
+                            expires: (new Date).getTime() + 1E3 * Number(token.exp),
+                            ssl: "true" === token.ssl,
+                            _oAuthCred: c
+                        });
+                        c.storage = token.persist ? window.localStorage : window.sessionStorage;
+                        c.token = f.token;
+                        c.expires = f.expires;
+                        c.userId = f.userId;
+                        c.ssl = f.ssl;
+                        c.save();
+                        b.callback(f);
+                    }
+
+            }
         },
+        // _parseJwt: function  (token) {
+        //     var base64Url = token.split('.')[1];
+        //     var base64 = base64Url.replace('-', '+').replace('_', '/');
+        //     return JSON.parse(window.atob(base64));
+        // },
         _createOAuthDialog: function() {
             var b = this._nls
                 , c = lang.substitute(b, this._oAuthDialogContent)
-                , d = new dialog({
+                , authDialog = new dialog({
                 title: b.title,
                 content: c,
                 "class": "esriOAuthSignInDialog",
                 style: "min-width: 18em;",
                 esriIdMgr_: this,
                 execute_: function() {
-                    var a = d.esriIdMgr_._oAuthDfd;
-                    d.hide_();
-                    d.esriIdMgr_._doOAuthSignIn(a.resUrl_, a.sinfo_, a.oinfo_);
+                    var oauthdeffered = authDialog.esriIdMgr_._oAuthDfd;
+                    authDialog.hide_();
+                    authDialog.esriIdMgr_._doOAuthSignIn(oauthdeffered.resUrl_, oauthdeffered.sinfo_, oauthdeffered.oinfo_);
                 },
                 cancel_: function() {
-                    var a = d.esriIdMgr_._oAuthDfd;
-                    d.esriIdMgr_._oAuthDfd = null;
-                    d.hide_();
+                    var a = authDialog.esriIdMgr_._oAuthDfd;
+                    authDialog.esriIdMgr_._oAuthDfd = null;
+                    authDialog.hide_();
                     var b = Error("ABORTED");
                     b.code = "IdentityManager.2";
                     b.log = !!baseconfig.isDebug;
                     a.errback(b);
                 },
                 hide_: function() {
-                    domutils.hide(d.errMsg_);
-                    d.hide();
-                    dialog._DialogLevelManager.hide(d);
+                    domutils.hide(authDialog.errMsg_);
+                    authDialog.hide();
+                    dialog._DialogLevelManager.hide(authDialog);
                 }
             }),
-                 b = d.domNode;
-            d.btnSubmit_ = registry.byNode(kernel.query(".esriIdSubmit", b)[0]);
-            d.btnCancel_ = registry.byNode(kernel.query(".esriIdCancel", b)[0]);
-            d.errMsg_ = kernel.query(".esriErrorMsg", b)[0];
-            d.connect(d.btnSubmit_, "onClick", d.execute_);
-            d.connect(d.btnCancel_, "onClick", d.onCancel);
-            d.connect(d, "onCancel", d.cancel_);
-            return d;
+                 b = authDialog.domNode;
+            authDialog.btnSubmit_ = registry.byNode(kernel.query(".esriIdSubmit", b)[0]);
+            authDialog.btnCancel_ = registry.byNode(kernel.query(".esriIdCancel", b)[0]);
+            authDialog.errMsg_ = kernel.query(".esriErrorMsg", b)[0];
+            authDialog.connect(authDialog.btnSubmit_, "onClick", authDialog.execute_);
+            authDialog.connect(authDialog.btnCancel_, "onClick", authDialog.onCancel);
+            authDialog.connect(authDialog, "onCancel", authDialog.cancel_);
+            return authDialog;
         },
         _doOAuthSignIn: function(resurl, serverinfo, oauthinfo) {
             var self = this
