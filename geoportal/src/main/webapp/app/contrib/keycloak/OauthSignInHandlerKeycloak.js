@@ -7,24 +7,24 @@ define("esri/Credential esri/domUtils esri/lang esri/urlUtils dijit/Dialog dijit
         setOAuthRedirectionHandler: function(a) {
             this._oAuthRedirectFunc = a;
         },
-        oAuthSignIn: function(a, d, f, e) {
+        oAuthSignIn: function(resourceurl, serverinfo, oauthinfo, e) {
             var g = this._oAuthDfd = new deffered;
-            g.resUrl_ = a;
-            g.sinfo_ = d;
-            g.oinfo_ = f;
+            g.resUrl_ = resourceurl;
+            g.sinfo_ = serverinfo;
+            g.oinfo_ = oauthinfo;
             var h = !e || !1 !== e.oAuthPopupConfirmation;
-            if (!f.popup || !h)
-                return this._doOAuthSignIn(a, d, f),
+            if (!oauthinfo.popup || !h)
+                return this._doOAuthSignIn(resourceurl, serverinfo, oauthinfo),
                     g;
             this._nls || (this._nls = jsapi.identity);
             this.oAuthDialog || (this.oAuthDialog = this._createOAuthDialog());
-            a = this.oAuthDialog;
-            d = e && e.error;
+            resourceurl = this.oAuthDialog;
+            serverinfo = e && e.error;
             e = e && e.token;
-            domutils.hide(a.errMsg_);
-            d && 403 == d.code && e && (domattrib.set(a.errMsg_, "innerHTML", this._nls.forbidden),
-                domutils.show(a.errMsg_));
-            a.show();
+            domutils.hide(resourceurl.errMsg_);
+            serverinfo && 403 == serverinfo.code && e && (domattrib.set(resourceurl.errMsg_, "innerHTML", this._nls.forbidden),
+                domutils.show(resourceurl.errMsg_));
+            resourceurl.show();
             return g;
         },
         setOAuthResponseHash: function(a) {
@@ -141,31 +141,34 @@ define("esri/Credential esri/domUtils esri/lang esri/urlUtils dijit/Dialog dijit
             d.connect(d, "onCancel", d.cancel_);
             return d;
         },
-        _doOAuthSignIn: function(a, b, c) {
+        _doOAuthSignIn: function(resurl, serverinfo, oauthinfo) {
             var self = this
                 , k = {
-                client_id: c.appId,
+                client_id: oauthinfo.appId,
                 response_type: "token",
                 state: button.stringify({
-                    portalUrl: c.portalUrl
+                    portalUrl: oauthinfo.portalUrl
                 }),
-                expiration: c.expiration,
-                locale: c.locale,
-                redirect_uri: c.popup ? urlutils.getAbsoluteUrl(c.popupCallbackUrl) : window.location.href.replace(/#.*$/, "")
+                expiration: oauthinfo.expiration,
+                locale: oauthinfo.locale,
+                redirect_uri: oauthinfo.popup ? urlutils.getAbsoluteUrl(oauthinfo.popupCallbackUrl) : window.location.href.replace(/#.*$/, "")
             };
-            c.forceLogin && (k.force_login = !0);
+            oauthinfo.forceLogin && (k.force_login = !0);
           //  var p = domattrib.portalUrl.replace(/^http:/i, "https:") + "/sharing/oauth2/authorize"
           //  var p = getRealmUrl() + '/protocol/openid-connect/token'
             // is: http://localhost:8843/auth/realms/Geoportal/protocol/openid-connect/auth?response_type=token&state=%7B%7D&redirect_uri=http%3A%2F%2Flocalhost%3A8081%2Fgeoportal%2F
            // http://localhost:8843/auth/realms/Geoportal/protocol/openid-connect/auth?client_id=geoportal&scope=openid%20email&response_type=token&state=%7B%7D&redirect_uri=http%3A%2F%2Flocalhost%3A8081%2Fgeoportal%2F
             // needs to be
             //http://localhost:8843/auth/realms/geoportal/protocol/openid-connect/auth?client_id=geoportal&redirect_uri=http://localhost:8081&response_type=code&scope=openid%20email
-            var p = "http://localhost:8843/auth/realms/geoportal"+ '/protocol/openid-connect/auth?nonce=&client_id=geoportal&scope=openid email';
+          //  var p = "http://localhost:8843/auth/realms/geoportal"+ '/protocol/openid-connect/auth?nonce=&client_id=geoportal&scope=openid email';
+          // http://localhost:8843/auth/realms/Geoportal/protocol/openid-connect/auth?client_id=geoportal-client&redirect_uri=http://localhost:8081&response_type=code&scope=openid%20email
+          var p = serverinfo.tokenServiceUrl + "?nonce=&scope=openid email"; // in k &client_id="+oauthinfo.appId+"
+
             var  m = p + "&" + ioquery.objectToQuery(k);
-            if (c.popup) {
+            if (oauthinfo.popup) {
                 var n;
-                7 === json("ie") ? (n = window.open(c.popupCallbackUrl, "esriJSAPIOAuth", c.popupWindowFeatures),
-                    n.location = m) : n = window.open(m, "esriJSAPIOAuth", c.popupWindowFeatures);
+                7 === json("ie") ? (n = window.open(oauthinfo.popupCallbackUrl, "esriJSAPIOAuth", oauthinfo.popupWindowFeatures),
+                    n.location = m) : n = window.open(m, "esriJSAPIOAuth", oauthinfo.popupWindowFeatures);
                 n ? (n.focus(),
                     this._oAuthDfd.oAuthWin_ = n,
                     this._oAuthIntervalId = setInterval(function() {
@@ -179,17 +182,17 @@ define("esri/Credential esri/domUtils esri/lang esri/urlUtils dijit/Dialog dijit
                                 a.errback(b);
                             }
                         }
-                    }, 500)) : (a = Error("ABORTED"),
-                    a.code = "IdentityManager.2",
-                    a.log = !!baseconfig.isDebug,
-                    this._oAuthDfd.errback(a));
+                    }, 500)) : (resurl = Error("ABORTED"),
+                    resurl.code = "IdentityManager.2",
+                    resurl.log = !!baseconfig.isDebug,
+                    this._oAuthDfd.errback(resurl));
             } else
                 this._oAuthRedirectFunc ? this._oAuthRedirectFunc({
                     authorizeParams: k,
                     authorizeUrl: p,
-                    resourceUrl: a,
-                    serverInfo: b,
-                    oAuthInfo: c
+                    resourceUrl: resurl,
+                    serverInfo: serverinfo,
+                    oAuthInfo: oauthinfo
                 }) : window.location = m;
         }
     };

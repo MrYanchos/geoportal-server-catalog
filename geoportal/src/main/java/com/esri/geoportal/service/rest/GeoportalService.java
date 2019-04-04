@@ -112,16 +112,16 @@ public class GeoportalService {
       KeycloakAuthenticationProvider kp = gc.getBeanIfDeclared("keycloakAuthenticationProvider",
               KeycloakAuthenticationProvider.class,null);
       if (kp != null) {
-       // try genericOauth
-        jso.add("keycloakOauth",Json.createObjectBuilder()
+        jso.add("keycloakOAuth",Json.createObjectBuilder()
                 .add("appId",kp.getClient_id())
+                .add("authNamespace",kp.getRealmName())
                 .add("realmUrl",kp.getRealmUrl())
+                .add("popUpLoginWindow",kp.getPopUpLoginWindow())
                 .add("portalUrl",kp.getRealmUrl())// supposed to be an argis, but this is used in findOauthInfo
                .add("redirectUri",kp.getRedirectUri())
+                .add("showMyProfileLink",kp.getShowMyProfileLink())
+                .add("loginUrl",kp.getLoginUrl())
         );
-
-
-
         if (kp.getCreateAccountUrl() != null && kp.getCreateAccountUrl().length() > 0) {
           jso.add("createAccountUrl",kp.getCreateAccountUrl());
         }

@@ -33,6 +33,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +58,7 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
     private String rolePrefix;
 
     private String createAccountUrl;
-
+    private boolean showMyProfileLink = false;
 
 
     private String redirectUri;
@@ -64,10 +66,13 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
     private String geoportalPublishersGroupId;
 
     private String authorizeTemplate = "%s/protocol/openid-connect/auth";
+    private String authorizeLoginTemplate = "%s/protocol/openid-connect/auth?client_id=%s&redirect_uri=%s&response_type=code&scope=openid email";
+
     private String tokenTemplate = "%s/protocol/openid-connect/token";
     private String registerTemplate = "%s/protocol/openid-connect/registrations?client_id=%s&redirect_uri=%s&response_type=code&scope=openid email";
     private String logoutTemplate = "%s/protocol/openid-connect/logout";
-
+    private String userProfileTemplate = "%s/protocol/openid-connect/userinfo&auth_token=%s";
+    private Boolean popUpLoginWindow = false;
 
     /** True if all authenticated users shoudl have a Publisher role. */
     public boolean getAllUsersCanPublish() {
@@ -95,6 +100,14 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
         this.realmUrl = realmUrl;
     }
 
+    public String getLoginUrl() {
+        return
+                String.format(this.authorizeLoginTemplate, this.getRealmUrl(),this.getClient_id(), this.getRedirectUri());
+    }
+
+//    public void setRealmUrl(String realmUrl) {
+//        this.realmUrl = realmUrl;
+//    }
 
     /** The id of the ArcGIS group containing Geoportal administrators (optional). */
     public String getGeoportalAdministratorsGroupId() {
@@ -144,6 +157,16 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
 //    public void setCreateAccountUrl(String createAccountUrl) {
 //        this.createAccountUrl = createAccountUrl;
 //    }
+    /** If true, show My Profile link. */
+    public boolean getShowMyProfileLink() {
+        return false; // for now
+      //  return showMyProfileLink;
+    }
+    /** If true, show My Profile link. */
+    public void setShowMyProfileLink(boolean showMyProfileLink) {
+        this.showMyProfileLink = showMyProfileLink;
+    }
+
     public String getRedirectUri() {
         return redirectUri;
     }
@@ -176,7 +199,14 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
         }
 
         String rest_url = String.format(tokenTemplate,this.getRealmUrl() ) ;
-        HttpHost targetHost = new HttpHost("localhost",8843,"http");
+        URL realmURL = null;
+        try {
+             realmURL = new URL (this.getRealmUrl());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            throw new AuthenticationServiceException("RealmURL is not a URL");
+        }
+        HttpHost targetHost = new HttpHost(realmURL.getHost(),realmURL.getPort(),realmURL.getProtocol());
         UsernamePasswordCredentials creds = new UsernamePasswordCredentials(this.getClient_id(), this.getClient_secret());
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         credsProvider.setCredentials(
@@ -225,19 +255,32 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
 
                 }
                 else{
-                    throw new AuthenticationServiceException("Unable to get access token from the service");
+                    LOGGER.error("Unable to get access token:" + json_response.asText() );
+                    throw new AuthenticationServiceException("Unable to get access token from KeyCloak");
                 }
                 if (access_token == null || access_token.length() == 0) {
+                    LOGGER.info("Invalid credentials:" + json_response.asText());
                     throw new BadCredentialsException("Invalid credentials.");
                 }
 
             }
 
             else{
-                throw new AuthenticationServiceException("Error communicating with the authentication service.");
+                JsonNode json_response = (JsonNode) objectMapper.readTree(  EntityUtils.toString(response.getEntity()) );
+                String message;
+                if (json_response.has("error_description")) {
+                    message = "error_description from KeyCloak."
+                        + json_response.get("access_token").asText();
+                }
+                else{
+                    message = "Error response from KeyCloak.";
+                }
+
+                LOGGER.warn("AuthenticationErrors:" + response.getStatusLine() +":" + message);
+                throw new AuthenticationServiceException(message);
             }
         } catch (IOException e) {
-            throw new AuthenticationServiceException("Error in communicating with authentication service");
+            throw new AuthenticationServiceException("Error in communicating with KeyCloak");
         }
         return access_token;
     }
@@ -304,5 +347,13 @@ public class KeycloakAuthenticationProvider implements AuthenticationProvider {
     @Override
     public boolean supports(Class<?> authentication) {
         return authentication.equals(UsernamePasswordAuthenticationToken.class);
+    }
+
+    public Boolean getPopUpLoginWindow() {
+        return popUpLoginWindow;
+    }
+
+    public void setPopUpLoginWindow(Boolean popUpLoginWindow) {
+        this.popUpLoginWindow = popUpLoginWindow;
     }
 }

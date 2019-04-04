@@ -62,15 +62,24 @@ function(declare, lang, Deferred, topic, appTopics, i18n, kernel, AppClient, Sig
     },
     
     getMyProfileUrl: function() {
-      if (AppContext.geoportal && AppContext.geoportal.arcgisOAuth && 
-          AppContext.geoportal.arcgisOAuth.showMyProfileLink) {
-        if (this.arcgisPortalUser) {
-          var v = this.getArcGISPortalUrlForLink();
-          if (v) {
-            return v+"/home/user.html?user="+encodeURIComponent(this.arcgisPortalUser.username);
-          } 
+      if (AppContext.geoportal && AppContext.geoportal.arcgisOAuth &&
+            AppContext.geoportal.arcgisOAuth.showMyProfileLink) {
+            if (this.arcgisPortalUser) {
+                var v = this.getArcGISPortalUrlForLink();
+                if (v) {
+                    return v+"/home/user.html?user="+encodeURIComponent(this.arcgisPortalUser.username);
+                }
+            }
         }
-      }
+        if (AppContext.geoportal && AppContext.geoportal.keyCloakOAuth &&
+            AppContext.geoportal.keyCloakOAuth.showMyProfileLink) {
+            if (this.arcgisPortalUser) {
+                var v = this.getArcGISPortalUrlForLink();
+                if (v) {
+                    return v+"/home/user.html?user="+encodeURIComponent(this.arcgisPortalUser.username);
+                }
+            }
+        }
       return null;
     },
     
@@ -145,7 +154,7 @@ function(declare, lang, Deferred, topic, appTopics, i18n, kernel, AppClient, Sig
               portalUrl: oauth.portalUrl,
               // Uncomment the next line to prevent the user's signed in state from being shared
               // with other apps on the same domain with the same authNamespace value.
-              authNamespace: "geoportal",
+              authNamespace: oauth.authNamespace,
               popup: true
           });
           esriId.registerOAuthInfos([info]);
@@ -156,8 +165,8 @@ function(declare, lang, Deferred, topic, appTopics, i18n, kernel, AppClient, Sig
 
           var serverInfo = new esriServerInfo();
           serverInfo.server = oauth.realmUrl;
-          serverInfo.tokenServiceUrl = oauth.realmUrl + "/protocol/openid-connect/token";
-          serverInfo.adminTokenServiceUrl = oauth.realmUrl + "/protocol/openid-connect/token";
+          serverInfo.tokenServiceUrl = oauth.realmUrl + "/protocol/openid-connect/auth"; // not token, token returned
+          serverInfo.adminTokenServiceUrl = oauth.realmUrl + "/protocol/openid-connect/auth"; // not token, token returned
           esriId.registerServers([serverInfo]);
           imk.oAuthSignIn("http://localhost:8081/geportal",serverInfo,info,null)
               .then(function(portalUser){
@@ -214,10 +223,11 @@ function(declare, lang, Deferred, topic, appTopics, i18n, kernel, AppClient, Sig
       if (ctx.geoportal && ctx.geoportal.arcgisOAuth && ctx.geoportal.arcgisOAuth.appId) {
         this._showAgsOAuthSignIn(ctx.geoportal.arcgisOAuth);
       }
-      // Generic Oauth
-      else if (ctx.geoportal && ctx.geoportal.keycloakOauth && ctx.geoportal.keycloakOauth.appId){
+      // Keycloak Oauth.
+      else if (ctx.geoportal && ctx.geoportal.keycloakOAuth && ctx.geoportal.keycloakOAuth.appId
+          && ctx.geoportal.keycloakOAuth.popUpLoginWindow){
           //this._showAgsOAuthSignIn(ctx.geoportal.genericOauth);
-          this._showKeycloakOAuthSignIn( ctx.geoportal.keycloakOauth);
+          this._showKeycloakOAuthSignIn( ctx.geoportal.keycloakOAuth);
       }
       else {
         (new SignIn()).show();
@@ -263,10 +273,10 @@ function(declare, lang, Deferred, topic, appTopics, i18n, kernel, AppClient, Sig
     whenAppStarted: function() {
       var self = this, dfd = new Deferred(), ctx = window.AppContext, oauth;
       if (ctx.geoportal && ctx.geoportal.arcgisOAuth) oauth = ctx.geoportal.arcgisOAuth;
-        if (ctx.geoportal && ctx.geoportal.keycloakOauth && ctx.geoportal.keycloakOauth.appId) {
+        if (ctx.geoportal && ctx.geoportal.keycloakOAuth && ctx.geoportal.keycloakOAuth.appId) {
             esriIdDialog = new esriIdDialog;
             kernel.id = declare.safeMixin(esriIdDialog, imk);
-            oauth = ctx.geoportal.keycloakOauth;
+            oauth = ctx.geoportal.keycloakOAuth;
         }
       if (oauth && oauth.appId) {
         var portalUrl = oauth.portalUrl;
@@ -275,7 +285,7 @@ function(declare, lang, Deferred, topic, appTopics, i18n, kernel, AppClient, Sig
           appId: oauth.appId,
           // Uncomment this line to prevent the user's signed in state from being shared
           // with other apps on the same domain with the same authNamespace value.
-          //authNamespace: "portal_oauth_inline",
+          authNamespace: oauth.authNamespace,
           portalUrl: portalUrl,
           expiration: oauth.expirationMinutes,
           popup: true

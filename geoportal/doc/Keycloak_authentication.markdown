@@ -78,17 +78,57 @@ this can be a way to simplify application of appropriate roles.
 -- the publisher effective roles should include ``ROLE_USER```, ```ROLE_PUBLISHER``` and ```ROLE_ADMIN```
 
 ### Configure keycloak-authentication.xml
-- Configure the following bean properties:
-  - ```realmName``` :- ```Geoportal```
-  - ```authorizeURL``` :- http://localhost:8843/auth/realms/Geoportal/protocol/openid-connect/token
-  - ```client_id``` :- ```geoportal-client```
-  - ```client_secrete``` :- ```secrete from {{clients/{{geportal_client}}/credentials```
-  - ```rolePrefix``` :- ```ROLE_```
-  - ```allUsersCanPublish``` :- ```true```
-  - ```redirectUri``` :- ```HOST URL```
+- By default, the keycloak-authentication is configured with following bean properties:
+  - ```realmName : geoportal```
+  - ```authorizeURL : http://localhost:8843/auth/realms/geoportal/protocol/openid-connect/token```
+  - ```client_id : geoportal-client```
+  - ```client_secret : secret from {{clients/{{geportal_client}}/credentials```
+  - ```rolePrefix : ROLE_```
+  - ```allUsersCanPublish : true```
+  - ```redirectUri : https://locahost:8081/geoportal```
+  You should just need to set the ENVIRONMENT variable, kc_client_secret
   
 ### Update app-security.xml
 - Uncomment ```<beans:import resource="authentication-keycloak.xml"/>``` and comment out other  ```security imports```
 ### Maven build and test
 - Build a new war using the above changes and test the configuration with the user ```testuser``` and password ```password```.
 
+### Variable for testing and production
+Set the environment variables;
+${kc_realmName:geoportal} variable KC_REALMNAME
+${kc_realmUrl:https://locahost:8843/auth/realms/geoportal} variable KC_REALMURL
+${kc_client_id:geoportal} variable KC_CLIENT_ID
+${kc_client_secret:00000000-1111-2222-3333-99999999999} variable KC_CLIENT_SECRET
+${kc_redirectUri:https://locahost:8081/geoportal} variable KC_REDIRECTURI
+
+${gpt_publish:true} variable GPT_PUBLISH
+
+# Dev
+### Option 1: tomcat conf
+1. Add the following to [Tomcat8]/conf/catalina.properties.      
+
+```
+# Keycloak for Geoportal
+kc_realmName:geoportal
+kc_realmUrl:https://locahost:8843/auth/realms/geoportal
+kc_client_id:geoportal
+kc_client_secret:00000000-1111-2222-3333-99999999999
+kc_redirectUri:https://locahost:8081/geoportal
+gpt_publish:true
+```
+
+### Option 2: Intellij Tomcat Startup/Stop 
+In run/debug configuration, tomcat server>your configuration>Startup/Stop
+Set the environment variables
+
+### Option 3: Use environment variables
+
+# Production/docker
+### Option 1: Use environment variables
+### Option 2: pass environment variables in docker-compose/kubernetes
+
+
+# realm admin
+https://{{host}}auth/realms/{{realm}}/console
+
+https://iam.scigap.org/auth/realms/ddstudio/protocol/openid-connect/auth?client_id=security-admin-console&redirect_uri=https%3A%2F%2Fiam.scigap.org%2Fauth%2Fadmin%2Fddstudio%2Fconsole%2F&state=0f24707f-7ae7-4521-8021-3d5dc47f0cb9&nonce=21e876a2-7a1a-4a77-8e24-67ad73339eea&response_mode=fragment&response_type=code&scope=openid

@@ -41,13 +41,22 @@ If you have a cluster with multiple nodes, you can define it in one of two ways:
 es_cluster=myclustername
 es_node=host1,host2
     
-2. OR, update app-context.xml  
+2. OR, update app-context.xml, preserve ability to use ENVIRONMENT variables for deployments
+  <beans:bean id="elasticContext" class="com.esri.geoportal.db.elastic.ElasticContext">
+    <beans:property name="clusterName" value="${es_node:myclustername}" />
+    <beans:property name="nodes">
+      <beans:list>
+         <beans:value>${es_node:host1,host2}</beans:value>
+       </beans:list>
+    </beans:property>
+  </beans:bean>
+
+3. OR, update app-context.xml, fixed values
   <beans:bean id="elasticContext" class="com.esri.geoportal.db.elastic.ElasticContext">
     <beans:property name="clusterName" value="myclustername" />
     <beans:property name="nodes">
         <beans:value>host1</beans:value>
         <beans:value>host2</beans:value>
-      </beans:list>
     </beans:property>
   </beans:bean> 
 
