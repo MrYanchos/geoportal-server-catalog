@@ -15,7 +15,7 @@
 define(["dojo/_base/declare",
         "dojo/_base/lang",
         "app/common/Templated",
-        "dojo/text!./templates/ActionsPanel.html",
+        "dojo/text!./templates/CollectionImport.html",
         "dojo/i18n!../nls/resources",
     ],
     function(declare, lang, Templated, template, i18n) {

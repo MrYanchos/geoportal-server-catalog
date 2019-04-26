@@ -1,0 +1,31 @@
+<div>
+    <div class="g-drop-pane" data-dojo-type="app/search/DropPane"
+         data-dojo-attach-point="dropPane"
+         data-dojo-props="title:'${label}',open:${open}">
+        <div data-dojo-type="dijit/form/Select" data-dojo-attach-point="menuNode">
+            <span value="Your Saved Searches"><i>Your Saved Searches</i></span>
+        </div>
+        <button data-dojo-attach-point="saveBtn" data-dojo-type="dijit/form/Button" type="button">Save Current Search
+            <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+        require(["dojo/dom"], function(dom){
+            dom.byId("result2").innerHTML += "Thank you! ";
+        });
+    </script>
+        </button>
+        <button data-dojo-attach-point="showBtn" data-dojo-type="dijit/form/Button" type="button">Show Search Results
+            <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+        require(["dojo/dom"], function(dom){
+            dom.byId("result2").innerHTML += "Thank you! ";
+        });
+    </script>
+        </button>
+        <button data-dojo-attach-point="removeBtn" data-dojo-type="dijit/form/Button" type="button">REmove
+            <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+        require(["dojo/dom"], function(dom){
+            dom.byId("result2").innerHTML += "Thank you! ";
+        });
+    </script>
+        </button>
+
+    </div>
+</div>

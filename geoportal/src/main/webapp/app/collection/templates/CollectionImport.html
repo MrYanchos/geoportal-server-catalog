@@ -1,0 +1,25 @@
+<div>
+    <div class="g-drop-pane" data-dojo-type="app/search/DropPane"
+         data-dojo-attach-point="dropPane"
+         data-dojo-props="title:'${label}',open:${open}">
+        <form id="myform">
+            <input type="radio" data-dojo-type="dijit/form/RadioButton"
+                   name="exportFormat" id="radioOne" checked value="Merge"/>
+            <label for="radioOne">Merge</label> <br />
+            <input type="radio" data-dojo-type="dijit/form/RadioButton"
+                   name="exportFormat" id="radioTwo" value="Overwrite"/>
+            <label for="radioTwo">Overwrite</label>
+            <br />
+
+            <button data-dojo-type="dijit/form/Button" type="button">
+                Show form submit value
+                <script type="dojo/on" data-dojo-event="click">
+            require(["dojo/dom"], function(dom){
+                 with(dom.byId('myform'))with(elements[0])with(elements[checked?0:1])alert(name+'='+value);
+                 return false;
+            });
+        </script>
+            </button>
+        </form>
+    </div>
+</div>

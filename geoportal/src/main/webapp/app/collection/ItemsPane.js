@@ -17,22 +17,21 @@ define(["dojo/_base/declare",
         "dojo/_base/array",
         "dojo/aspect",
         "dojo/dom-construct",
-        "dojo/text!./templates/ItemsPanel.html",
+        "dojo/text!./templates/ItemsPane.html",
         "dojo/i18n!app/nls/resources",
-        "app/search/SearchComponent",
-        "app/search/ItemCard",
+        "app/Items/ItemCard",
         "app/search/DropPane",
-        "app/search/Paging",
-        "app/search/Paging2",
         "dojox/widget/Standby"],
-function(declare, lang, array, aspect, domConstruct, template, i18n, SearchComponent, ItemCard, DropPane, Paging, Paging2, Standby) {
+function(declare, lang, array, aspect, domConstruct, template, i18n,  ItemCard,
+         DropPane, Standby) {
   
-  var oThisClass = declare([SearchComponent], {
+  var oThisClass = declare([CollectionComponent], {
     
     i18n: i18n,
     templateString: template,
     
-    label: i18n.search.results.label,
+    label: "Collection Items",
+    // label: i18n.search.results.label,
     open: true,
     paging: null,
     sortField: null,
@@ -40,18 +39,8 @@ function(declare, lang, array, aspect, domConstruct, template, i18n, SearchCompo
     
     postCreate: function() {
       this.inherited(arguments);
-      this.addSort();
-      this.paging = new Paging({});
-      this.paging.placeAt(this.dropPane.toolsNode);
-      /*
-      // no longer needed
-      this.own(aspect.after(this.paging,"search",lang.hitch(this,function(){
-        this.search();
-      })));
-      */
-
-        document.body.appendChild(this.statusNode.domNode);
-        this.statusNode.target = this.dropPane.domNode;
+      document.body.appendChild(this.statusNode.domNode);
+      this.statusNode.target = this.dropPane.domNode;
     },
     
     addSort: function() {

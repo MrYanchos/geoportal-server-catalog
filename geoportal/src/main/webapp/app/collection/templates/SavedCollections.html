@@ -1,0 +1,41 @@
+<div>
+    <div class="g-drop-pane" data-dojo-type="app/search/DropPane"
+         data-dojo-attach-point="dropPane"
+         data-dojo-props="title:'${label}',open:${open}">
+        <div data-dojo-type="dijit/form/Select" data-dojo-attach-point="menuNode">
+            <span value="Unnassigned Results"><b>Unnassigned Results</b></span>
+        </div>
+        <button data-dojo-attach-point="viewBtn" data-dojo-type="dijit/form/Button" type="button">View
+            <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+        require(["dojo/dom"], function(dom){
+            dom.byId("result2").innerHTML += "Thank you! ";
+        });
+    </script>
+        </button>
+        <input type="text" name="newCollection" value="Enter a New Collection"
+               data-dojo-type="dijit/form/TextBox"
+               data-dojo-props="trim:true, propercase:true" id="newCollection" />
+        <button data-dojo-attach-point="viewBtn" data-dojo-type="dijit/form/Button" type="button">Create New Collection
+            <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+        require(["dojo/dom"], function(dom){
+            dom.byId("result2").innerHTML += "Thank you! ";
+        });
+    </script>
+        </button>
+        <button data-dojo-attach-point="removeBtn" data-dojo-type="dijit/form/Button" type="button">Remove
+            <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+        require(["dojo/dom"], function(dom){
+            dom.byId("result2").innerHTML += "Thank you! ";
+        });
+    </script>
+        </button>
+
+    </div>
+    <button data-dojo-attach-point="exportBtn" data-dojo-type="dijit/form/Button" type="button">Export Collection
+        <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+        require(["dojo/dom"], function(dom){
+            dom.byId("result2").innerHTML += "Thank you! ";
+        });
+    </script>
+    </button>
+</div>

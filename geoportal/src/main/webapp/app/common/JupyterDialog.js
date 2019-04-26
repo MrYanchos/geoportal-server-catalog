@@ -28,7 +28,7 @@ define(["dojo/_base/declare",
             templateString: template,
 
             dialog: null,
-            title: "Select Jupyter Hub",
+            title: "Use resource in DD Studio",
             okLabel: "Select",
             cancelLabel: i18n.general.cancel,
             okIconClass: null,
@@ -129,10 +129,7 @@ if ( user!== null && user.length > 0){
                 var self = this;
                 var m = registry.byId(self.hubMenu.id);
                 if (lang.isArray(this.jupyter_hubs.hubs)) {
-                    var optionsHub = [{label: "select a Hub",
-                        value: "" ,
-                    selected: true
-                    }];
+                    var optionsHub = [];
                     array.forEach(this.jupyter_hubs.hubs, function (hub) {
 
                        // var ddli = domConstruct.create("li", {}, ddul);
