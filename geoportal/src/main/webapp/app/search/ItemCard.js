@@ -52,13 +52,14 @@ define(["dojo/_base/declare",
   "app/preview/PreviewPane",
     "app/collection/CollectionScripts",
     "app/prov/Prov",
-    "dojo/text!./templates/jupyter_hubs.json"
+
+      "app/common/JupyterDialog",
     ],
 function(declare, lang, array, string, topic, xhr, request, on, appTopics, domClass, domConstruct,
   _WidgetBase,_AttachMixin, _TemplatedMixin, _WidgetsInTemplateMixin, Tooltip, TooltipDialog, popup,
   template, i18n, AppClient, ServiceType, util, ConfirmationDialog, ChangeOwner, DeleteItems,
   MetadataEditor, gxeConfig, SetAccess, SetApprovalStatus, SetField, UploadMetadata, 
-  PreviewUtil, PreviewPane, Collection, prov, hubs) {
+  PreviewUtil, PreviewPane, Collection, prov,JupyterDialog) {
   
   var oThisClass = declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
  
@@ -84,8 +85,8 @@ function(declare, lang, array, string, topic, xhr, request, on, appTopics, domCl
       "wms": "wms"
     },
      // "jupyter_hubs_file":require.toUrl("custom/jupyter_hubs.json"),
-      jupyter_hubs_json: hubs,
-      jupyter_hubs: dojo.fromJson(hubs),
+     //  jupyter_hubs_json: hubs,
+     //  jupyter_hubs: dojo.fromJson(hubs),
 
     postCreate: function() {
       this.intializeToolTip();
@@ -140,7 +141,8 @@ function(declare, lang, array, string, topic, xhr, request, on, appTopics, domCl
       this._renderServiceStatus(item);
       this._renderUrlLinks(item);
 
-        this._renderWorkbenchLinksDropdown(item,links);
+     //   this._renderWorkbenchLinksDropdown(item,links);
+      this._renderWbLink(item);
         this._renderCinergiLinks(hit._id,item);
         this._renderSchemaOrg(item);
       this._renderId(item);
@@ -889,40 +891,42 @@ function(declare, lang, array, string, topic, xhr, request, on, appTopics, domCl
           }
 
       },
-     _renderWorkbenchLinksDropdown: function(item,links) {
-          if ( ! Array.isArray(item.services_nst)) return;
-          if( item.services_nst.length === 0) return;
-          var dd = domConstruct.create("div",{
-              "class": "dropdown",
-              "style": "display:inline-block;"
-          },this.actionsNode);
-          var ddbtn = domConstruct.create("a",{
-              "class": "dropdown-toggle",
-              "href": "#",
-              "data-toggle": "dropdown",
-              "aria-haspopup": true,
-              "aria-expanded": true,
-              innerHTML: "Named Links"
-          },dd);
-          domConstruct.create("span",{
-              "class": "caret"
-          },ddbtn);
-          var ddul = domConstruct.create("ul",{
-              "class": "dropdown-menu",
-          },dd);
-          if (lang.isArray(item.services_nst)){
-              array.forEach(item.services_nst, function(u){
-                  var ddli = domConstruct.create("li",{},ddul);
-                  domConstruct.create("a",{
-                      "class": "small",
-                      href: u.url_s,
-                      target: "_blank",
-                      innerHTML: u.url_type_s
-                  },ddli);
-              });
-          }
-          this._mitigateDropdownClip(dd,ddul);
-      },
+
+
+     // _renderWorkbenchLinksDropdown: function(item,links) {
+     //      if ( ! Array.isArray(item.services_nst)) return;
+     //      if( item.services_nst.length === 0) return;
+     //      var dd = domConstruct.create("div",{
+     //          "class": "dropdown",
+     //          "style": "display:inline-block;"
+     //      },this.actionsNode);
+     //      var ddbtn = domConstruct.create("a",{
+     //          "class": "dropdown-toggle",
+     //          "href": "#",
+     //          "data-toggle": "dropdown",
+     //          "aria-haspopup": true,
+     //          "aria-expanded": true,
+     //          innerHTML: "Named Links"
+     //      },dd);
+     //      domConstruct.create("span",{
+     //          "class": "caret"
+     //      },ddbtn);
+     //      var ddul = domConstruct.create("ul",{
+     //          "class": "dropdown-menu",
+     //      },dd);
+     //      if (lang.isArray(item.services_nst)){
+     //          array.forEach(item.services_nst, function(u){
+     //              var ddli = domConstruct.create("li",{},ddul);
+     //              domConstruct.create("a",{
+     //                  "class": "small",
+     //                  href: u.url_s,
+     //                  target: "_blank",
+     //                  innerHTML: u.url_type_s
+     //              },ddli);
+     //          });
+     //      }
+     //      this._mitigateDropdownClip(dd,ddul);
+     //  },
     _renderCinergiLinks: function(itemId,item) {
           // if categories_cat exists, then these should exist
           if (item.categories_cat) {
@@ -1144,6 +1148,21 @@ function(declare, lang, array, string, topic, xhr, request, on, appTopics, domCl
 
       },
 
+    _renderWbLink: function(item) {
+      var actionsNode = this.actionsNode;
+
+      var link = domConstruct.create("a",{
+        // href: href,
+        //  target: "_blank",
+        "class": "g-item-status",
+        innerHTML: "Studio",
+        onclick: function(e) {
+          var dialog = new JupyterDialog();
+          dialog.show(item);
+        }
+      }, actionsNode);
+
+    },
 
   });
   

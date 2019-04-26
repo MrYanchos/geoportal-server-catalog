@@ -67,6 +67,7 @@ function makeSearchPanel() {
 
     var uniq = $('<div id="uniqName_9_20" widgetid="uniqName_9_20" >');
     var cp =   $('<div class="g-drop-pane dijitTitlePane" id="dijit_TitlePane_0" widgetid="dijit_TitlePane_0">');
+   // var tb =  $('<div data-dojo-attach-event="ondijitclick:_onTitleClick, onkeydown:_onTitleKey" class="dijitTitlePaneTitle dijitTitlePaneTitleOpen dijitOpen" data-dojo-attach-point="titleBarNode" id="dijit_TitlePane_0_titleBarNode9">').html('Saved Searches<span class="badge">?</span>');
     var tb =  $('<div data-dojo-attach-event="ondijitclick:_onTitleClick, onkeydown:_onTitleKey" class="dijitTitlePaneTitle dijitTitlePaneTitleOpen dijitOpen" data-dojo-attach-point="titleBarNode" id="dijit_TitlePane_0_titleBarNode9">').html('Saved Searches');
     var tb2 = $('<div class="dijitTitlePaneTitleFocus" data-dojo-attach-point="focusNode" role="button" aria-controls="dijit_TitlePane_0_pane" tabindex="0" aria-pressed="true">');
     var sp1 = $('<span data-dojo-attach-point="arrowNode" class="dijitInline dijitArrowNode" role="presentation"></span>');
@@ -97,27 +98,27 @@ function makeSearchPanel() {
     }
     var bDiv =  $('<div id="searchButtons" class="dijitTitlePaneContentOuter" data-dojo-attach-point="hideNode" role="presentation" />');
 
-    var seaBtn = $('<button id="addBtn" class="btn" onclick="show_cinergi(0)">Show Search Results</button>')
-        .css("height", "20px" )
-        .css("padding","4px 16px")
-        .css("margin", "10px")
-        .css("color", "#ffffff")
-        .css("font-size", "11px")
+    var seaBtn = $('<button id="addBtn" class="btn btn-primary btn-sm" onclick="show_cinergi(0)">Show Search Results</button>')
+        // .css("height", "20px" )
+        // .css("padding","4px 16px")
+        // .css("margin", "10px")
+        // .css("color", "#ffffff")
+        // .css("font-size", "11px")
         .css("background-color", "#1E84A8");
-    var addBtn = $('<button id="addBtn" class="btn" onclick="_addSearch(this)">Save Current Search</button>')
-        .css("height", "20px" )
-        .css("padding","4px 16px")
-        .css("margin", "10px")
-        .css("color", "#ffffff")
-        .css("font-size", "11px")
+    var addBtn = $('<button id="addBtn" class="btn btn-primary btn-sm" onclick="_addSearch(this)">Save Current Search</button>')
+        // .css("height", "20px" )
+        // .css("padding","4px 16px")
+        // .css("margin", "10px")
+        // .css("color", "#ffffff")
+        // .css("font-size", "11px")
         .css("background-color", "#1E84A8");
 
-    var clrBtn = $('<button id="rmBtn" class="btn" onclick="_removeSearch(this)">Remove</button>')
-        .css("height", "20px" )
-        .css("padding","4px 16px")
-        .css("color", "#ffffff")
-        .css("margin", "10px")
-        .css("font-size", "11px")
+    var clrBtn = $('<button id="rmBtn" class="btn btn-primary btn-sm" onclick="_removeSearch(this)">Remove</button>')
+        // .css("height", "20px" )
+        // .css("padding","4px 16px")
+        // .css("color", "#ffffff")
+        // .css("margin", "10px")
+        // .css("font-size", "11px")
         .css("background-color", "#1E84A8");
 
     op.append(gCard);
@@ -209,7 +210,7 @@ function makeCollectionPanel(){
         gCard.append(colOpt);
     }
 
-    var vBtn = $('<button id="vBtn" class="btn" onclick="_selCollection(this)">View</button>')
+    var vBtn = $('<button id="vBtn" class="btn btn-primary btn-sm" onclick="_selCollection(this)">View</button>')
         .css("height", "20px" )
         .css("padding","4px 16px")
         .css("color", "#ffffff")
@@ -218,14 +219,14 @@ function makeCollectionPanel(){
         .css("background-color", "#1E84A8");
 
     var gColInput = $('<input type="text"  class="form-control" id="gSvInpCol" placeholder="Enter a New Collection Name" size="30" />');
-    var addBtn = $('<button id="addBtn" class="btn" onclick="_addCollection(this)">Create New Collection</button>')
+    var addBtn = $('<button id="addBtn" class="btn btn-primary btn-sm" onclick="_addCollection(this)">Create New Collection</button>')
         .css("height", "20px" )
         .css("padding","4px 16px")
         .css("color", "#ffffff")
         .css("margin", "10px")
         .css("font-size", "11px")
         .css("background-color", "#1E84A8");
-    var clrBtn = $('<button id="rmBtn" class="btn" onclick="_removeCollection(this)">Remove</button>')
+    var clrBtn = $('<button id="rmBtn" class="btn btn-primary btn-sm" onclick="_removeCollection(this)">Remove</button>')
         .css("height", "20px" )
         .css("padding","4px 16px")
         .css("color", "#ffffff")
@@ -448,20 +449,20 @@ function recordPanelItem(md) {
     var gCard = $('<div id ="gCard-' + md.id + '" class="g-item-card" style="background-color: white;" />')
         .attr('title', md.description);
 
-    var addBtn = $('<button id="addRec-' + md.id + '" class="btn" onclick="_addToCollection(this)">Add to Collection</button>')
-        .css("height", "20px" )
-        .css("padding","4px 16px")
-        .css("margin", "10px")
-        .css("color", "#ffffff")
-        .css("font-size", "11px")
+    var addBtn = $('<button id="addRec-' + md.id + '" class="btn btn-primary btn-sm" onclick="_addToCollection(this)">Add to Collection</button>')
+        // .css("height", "20px" )
+        // .css("padding","4px 16px")
+        // .css("margin", "10px")
+        // .css("color", "#ffffff")
+        // .css("font-size", "11px")
         .css("background-color", "#1E84A8");
 
-    var clrBtn = $('<button id="remRec-' + md.id + '" class="btn" onclick="_removeRecord(this)">Remove</button>')
-        .css("height", "20px" )
-        .css("padding","4px 16px")
-        .css("color", "#ffffff")
-        .css("margin", "10px")
-        .css("font-size", "11px")
+    var clrBtn = $('<button id="remRec-' + md.id + '" class="btn btn-primary btn-sm" onclick="_removeRecord(this)">Remove</button>')
+        // .css("height", "20px" )
+        // .css("padding","4px 16px")
+        // .css("color", "#ffffff")
+        // .css("margin", "10px")
+        // .css("font-size", "11px")
         .css("background-color", "#1E84A8");
 
     var gTitle = $('<div class="g-item-title" data-dojo-attach-point="titleNode" >').append(
@@ -834,32 +835,43 @@ function expInp(container) {
         .css("color", "#ffffff")
         .css("font-size", "11px")
         .css("background-color", "#1E84A8");
+    /*
+
+
+     */
+    var ex2CollectionBtn = $('<a  href="data:application/octet-stream,field1%2Cfield2%0Afoo%2Cbar%0Agoo%2Cgai%0A" id="notebook-href" onclick="exp2Notebook(this);" class="btn" >Send Collection to Notebook</a>')
+        .css("height", "20px" )
+        .css("padding","4px 16px")
+        .css("margin", "10px")
+        .css("color", "#ffffff")
+        .css("font-size", "11px")
+        .css("background-color", "#1E84A8");
 
     var Dib = $('<div class="file-upload">')
         .css("margin", "10px" )
         .css("height", "44px" )
         .css("width", "80px");
 
-    var dFUB =  $('<div class="file-upload-button">')
+    var dFUB =  $('<div class="file-upload-button btn btn-sm">')
         .css("display", "inline-block" );
 
     var ifu = $('<input type="file" name="File Upload" id="import-all-file" accept=".csv"  />')
-        .css("display", "none")
-        .css("width", "190px")
-        .css("padding","4px 6px")
-        .css("margin", "4px")
-        .css("color", "#ffffff")
-        .css("font-size", "11px")
+        // .css("display", "none")
+        // .css("width", "190px")
+        // .css("padding","4px 6px")
+        // .css("margin", "4px")
+        // .css("color", "#ffffff")
+        // .css("font-size", "11px")
         .css("background-color", "#1E84A8");
 
     var ifl = $('<label id="fileLabel" onclick="importAll(this)" for="import-all">Import Collection</label>')
-        .css("display", "inline-block" )
-        .css("height", "20px" )
-        .css("width", "90px")
-        .css("padding","4px 6px")
-        .css("margin", "4px")
-        .css("color", "#ffffff")
-        .css("font-size", "11px")
+        // .css("display", "inline-block" )
+        // .css("height", "20px" )
+        // .css("width", "90px")
+        // .css("padding","4px 6px")
+        // .css("margin", "4px")
+        // .css("color", "#ffffff")
+        // .css("font-size", "11px")
         .css("background-color", "#1E84A8");
 
     var fun = $('<div class="file-upload-name" id="filename">No file chosen</div>')
@@ -874,6 +886,7 @@ function expInp(container) {
     dFUB.append(ifl);
     //Dexp.append(clrBtn);
     Dexp.append(ex2Btn);
+   // Dexp.append(ex2CollectionBtn);
     Dib.append(dFUB);
 
     //container.append(ex2Btn);
@@ -897,6 +910,98 @@ function expAll2(e) {
 
     var exFile = "data:application/octet-stream," + encodeURIComponent(ez);
     $(e).attr("href", exFile);
+
+}
+
+function exp2Notebook(e) {
+
+    var fn = "exportCollection" + $.now() + ".json";
+
+    var x = $(e).attr("download", fn);
+
+    var ez = getExpJson();
+
+    var exFile = "data:application/octet-stream," + encodeURIComponent(ez);
+    $(e).attr("href", exFile);
+
+}
+function getExpJson() {
+    //exports selected collection
+    var ColID = $('#gSvCollection').find(":selected").val();
+
+    var coLabel = "Collection,";
+    var colText = "COLLECTION, NAME, ID, DESCRIPTION\n";
+
+    if ( ColID == "default" ) {
+        colText = colText + coLabel + 'default,default,Records not in a Collection\n';
+
+    } else if ( ColID == "all" ) {
+        alert("Select a collection ");
+        return;
+
+    } else {
+        var sc = findLocalItems("cItem-"+ColID)
+
+        //var sc = findLocalItems("cItem-"+ColID);
+
+        if ( Array.isArray(sc) ) {
+            for ( var c in sc ) {
+                var cId = sc[c].key;
+                var cName = sc[c].val.colName;
+                var cDesc = sc[c].val.colDesc;
+                var cIndex = cId.substr(6);
+                colText = colText + coLabel + cName +  ',' + cIndex + ',' + cDesc + '\n';
+            }
+        }
+    }
+
+
+    var mdLabel= "Saved Record,";
+    var mdText = "SAVED RECORD, TITLE, URL, ID, FILEID, COLLECTION_IDS, CITATION\n";
+    if ( ColID == "default" ) {
+        var md =  findLocalItems("mdRec");
+    } else {
+        var md = getMdRecords('collections', ColID);
+    }
+
+    if ( Array.isArray(md) ) {
+        // for ( var c in md ) {
+        //
+        //     var mName = md[c].val.title;
+        //     mName = mName.replace(/,/g, '|');
+        //     var mLink = md[c].val.mdlink;
+        //     var mId =  md[c].val.id;
+        //     var fId =  md[c].val.fileId;
+        //     var mDesc ="";
+        //     if ( md[c].val.hasOwnProperty("description") ) {
+        //         var mDesc = md[c].val.description;
+        //         ( typeof mDesc !== "undefined" ) ? mDesc = mDesc.replace(/,/g, '|'): mDesc ="";
+        //     }
+        //
+        //     var xol = md[c].val.collections;
+        //     var col = xol.join('|');
+        //
+        //     if ( ColID == "default" ) {
+        //         if ( xol.length == 1 && xol[0]=="default") {
+        //             mdText = mdText + mdLabel + mName +  ',' + mLink + ',' + mId + ',' + fId  +  ',' + col +  ',Citation_Description\n';
+        //         }
+        //
+        //     } else {
+        //         mdText = mdText + mdLabel + mName +  ',' + mLink + ',' + mId + ',' + fId  +  ',' + col +  ',Citation_Description\n';
+        //     }
+        //
+        //
+        //
+        //
+        //
+        // }
+        var j = JSON.stringify(md);
+        return j;
+    }
+
+    // var xft =  colText + mdText;
+    // return xft;
+    return null;
 
 }
 

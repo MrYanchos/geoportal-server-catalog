@@ -26,8 +26,12 @@ function (lang) {
       return uri;
     },
     
-    escapeForLucene: function(value) {
-      var a = ['+', '-', '&', '!', '(', ')', '{', '}', '[', ']', '^', '"', '~', '*', '?', ':', '\\','/'];
+    escapeForLucene: function(value, allowWildcard) {
+      var a = ['+', '-', '&', '!', '(', ')', '{', '}', '[', ']', '^', '"', '~',   ':', '\\','/'];
+      if (!allowWildcard){
+        a.push("*");
+        a.push("?");
+      }
       var r = new RegExp("(\\" + a.join("|\\") + ")", "g");
       return value.replace(r, "\\$1");
     },

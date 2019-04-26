@@ -63,6 +63,7 @@ function(declare, lang, on, keys, domClass,query,
     
     appendQueryParams: function(params) {
       var v = this.searchTextBox.value;
+      var analyzewildcard=true;
       if (v !== null && lang.trim(v).length > 0) {
         var tipPattern = i18n.search.appliedFilters.tipPattern;
         var tip = tipPattern.replace("{type}",i18n.search.searchBox.search).replace("{value}",v);
@@ -70,15 +71,15 @@ function(declare, lang, on, keys, domClass,query,
         if (typeof useSimpleQueryString === "undefined" || useSimpleQueryString === null) {
           useSimpleQueryString = AppContext.appConfig.search.useSimpleQueryString;
         }
-         var q = Util.escapeForLucene(lang.trim(v));
+         var q = Util.escapeForLucene(lang.trim(v),analyzewildcard );
         if (useSimpleQueryString) {
           query = {"simple_query_string": {
-            "analyze_wildcard": true,
+            "analyze_wildcard": analyzewildcard,
             "query": q
           }};
         } else {
           query = {"query_string": {
-            "analyze_wildcard": true,
+            "analyze_wildcard": analyzewildcard,
             "query": q,
 
                   "fields": ["_source.title^5","_source.*_cat^10","_all"],

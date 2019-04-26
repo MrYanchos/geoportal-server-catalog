@@ -24,8 +24,11 @@ define(["dojo/_base/declare",
         "app/search/DropPane",
         "app/search/Paging",
         "app/search/Paging2",
-        "dojox/widget/Standby"],
-function(declare, lang, array, aspect, domConstruct, template, i18n, SearchComponent, ItemCard, DropPane, Paging, Paging2, Standby) {
+        "dojox/widget/Standby",
+
+ ],
+function(declare, lang, array, aspect, domConstruct, template, i18n, SearchComponent, ItemCard, DropPane, Paging,
+         Paging2, Standby) {
   
   var oThisClass = declare([SearchComponent], {
     

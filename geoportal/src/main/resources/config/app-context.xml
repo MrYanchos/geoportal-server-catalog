@@ -24,11 +24,11 @@
 
 	<beans:bean id="elasticContext" class="com.esri.geoportal.lib.elastic.ElasticContextHttp">
 		<beans:property name="clusterName" value="${es_cluster:elasticsearch}" />
-		<beans:property name="indexName" value="metadata" />
+		<beans:property name="indexName" value="${gpt_indexName:metadata}" />
 		<beans:property name="indexNameIsAlias" value="true" />
 		<beans:property name="autoCreateIndex" value="true" />
 		<beans:property name="allowFileId" value="false" />
-		<beans:property name="mappingsFile" value="config/elastic-mappings_hierarchy.json" />
+		<beans:property name="mappingsFile" value="${gpt_mappingsFile:config/elastic-mappings_hierarchy.json}" />
 		<beans:property name="httpPort" value="9200" />
 		<beans:property name="transportPort" value="9300" />
 		

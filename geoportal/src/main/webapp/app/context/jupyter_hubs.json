@@ -18,8 +18,9 @@
   },
   {
     "disabled": true,
+    "login": "gmail",
     "title": "Optiputer (google authentication required)",
-    "uri_template": "https://suave-jupyter.nautilus.optiputer.net/?documentId={docId}"
+    "uri_template": "https://suave-jupyter.nautilus.optiputer.net/user/{username}/lab/notebooks/CinergiDispatch.ipynb?documentId={docId}"
   }
 ]
 }

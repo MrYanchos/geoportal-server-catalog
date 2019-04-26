@@ -31,7 +31,7 @@ define({
     },
     
     nav: {
-      brand: "Geoportal",
+      brand: "Data Discovery Studio",
       home: "Home",
       search: "Search",
       map: "Map",
