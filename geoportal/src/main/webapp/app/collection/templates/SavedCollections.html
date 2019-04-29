@@ -2,32 +2,30 @@
     <div class="g-drop-pane" data-dojo-type="app/search/DropPane"
          data-dojo-attach-point="dropPane"
          data-dojo-props="title:'${label}',open:${open}">
-        <div data-dojo-type="dijit/form/Select" data-dojo-attach-point="menuNode">
-            <span value="Unnassigned Results"><b>Unnassigned Results</b></span>
+        <div data-dojo-type="dijit/form/Select"
+             data-dojo-attach-point="menuNode">
+            <span value="All"><i>Unnassigned Results</i></span>
         </div>
-        <button data-dojo-attach-point="viewBtn" data-dojo-type="dijit/form/Button" type="button">View
-            <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
-        require(["dojo/dom"], function(dom){
-            dom.byId("result2").innerHTML += "Thank you! ";
-        });
-    </script>
+        <button data-dojo-attach-point="viewBtn" data-dojo-type="dijit/form/Button"
+                data-dojo-attach-event="onClick: _selCollection"
+                type="button">View
+
         </button>
         <input type="text" name="newCollection" value="Enter a New Collection"
                data-dojo-type="dijit/form/TextBox"
-               data-dojo-props="trim:true, propercase:true" id="newCollection" />
-        <button data-dojo-attach-point="viewBtn" data-dojo-type="dijit/form/Button" type="button">Create New Collection
-            <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
-        require(["dojo/dom"], function(dom){
-            dom.byId("result2").innerHTML += "Thank you! ";
-        });
-    </script>
+               data-dojo-props="trim:true, propercase:true"
+               data-dojo-attach-point="newCollection" />
+        <button data-dojo-attach-point="newBtn"
+                data-dojo-type="dijit/form/Button"
+                data-dojo-attach-event="onClick: _addCollection"
+                type="button">Create New Collection
+
         </button>
-        <button data-dojo-attach-point="removeBtn" data-dojo-type="dijit/form/Button" type="button">Remove
-            <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
-        require(["dojo/dom"], function(dom){
-            dom.byId("result2").innerHTML += "Thank you! ";
-        });
-    </script>
+        <button data-dojo-attach-point="removeBtn"
+                data-dojo-type="dijit/form/Button"
+                data-dojo-attach-event="onClick: _removeCollection"
+                type="button">Remove
+
         </button>
 
     </div>

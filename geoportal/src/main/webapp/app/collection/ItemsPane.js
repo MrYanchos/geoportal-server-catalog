@@ -17,16 +17,18 @@ define(["dojo/_base/declare",
         "dojo/_base/array",
         "dojo/aspect",
         "dojo/dom-construct",
+      "app/common/Templated",
         "dojo/text!./templates/ItemsPane.html",
         "dojo/i18n!app/nls/resources",
-        "app/Items/ItemCard",
+        "app/collection/CollectionComponent",
+      //  "app/Items/ItemCard",
         "app/search/DropPane",
         "dojox/widget/Standby"],
-function(declare, lang, array, aspect, domConstruct, template, i18n,  ItemCard,
+function(declare, lang, array, aspect, domConstruct, Templated,template, i18n, CollectionComponent,  ItemCard,
          DropPane, Standby) {
   
   var oThisClass = declare([CollectionComponent], {
-    
+//var oThisClass = declare([Templated], {
     i18n: i18n,
     templateString: template,
     
@@ -39,8 +41,8 @@ function(declare, lang, array, aspect, domConstruct, template, i18n,  ItemCard,
     
     postCreate: function() {
       this.inherited(arguments);
-      document.body.appendChild(this.statusNode.domNode);
-      this.statusNode.target = this.dropPane.domNode;
+    //  document.body.appendChild(this.statusNode.domNode);
+     // this.statusNode.target = this.dropPane.domNode;
     },
     
     addSort: function() {

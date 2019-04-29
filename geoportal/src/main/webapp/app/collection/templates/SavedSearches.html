@@ -5,26 +5,19 @@
         <div data-dojo-type="dijit/form/Select" data-dojo-attach-point="menuNode">
             <span value="Your Saved Searches"><i>Your Saved Searches</i></span>
         </div>
-        <button data-dojo-attach-point="saveBtn" data-dojo-type="dijit/form/Button" type="button">Save Current Search
-            <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
-        require(["dojo/dom"], function(dom){
-            dom.byId("result2").innerHTML += "Thank you! ";
-        });
-    </script>
+        <button data-dojo-attach-point="saveBtn" data-dojo-type="dijit/form/Button"
+                data-dojo-attach-event="onClick: show_cinergi"
+                type="button">Save Current Search
+
         </button>
-        <button data-dojo-attach-point="showBtn" data-dojo-type="dijit/form/Button" type="button">Show Search Results
-            <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
-        require(["dojo/dom"], function(dom){
-            dom.byId("result2").innerHTML += "Thank you! ";
-        });
-    </script>
+        <button data-dojo-attach-point="showBtn" data-dojo-type="dijit/form/Button"
+                data-dojo-attach-event="onClick: _addSearch"
+                type="button">Show Search Results
+
         </button>
-        <button data-dojo-attach-point="removeBtn" data-dojo-type="dijit/form/Button" type="button">REmove
-            <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
-        require(["dojo/dom"], function(dom){
-            dom.byId("result2").innerHTML += "Thank you! ";
-        });
-    </script>
+        <button data-dojo-attach-point="removeBtn" data-dojo-type="dijit/form/Button"
+                data-dojo-attach-event="onClick: _removeSearch" type="button">Remove
+
         </button>
 
     </div>

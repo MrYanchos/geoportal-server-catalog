@@ -17,6 +17,10 @@ define(["dojo/_base/declare",
         "app/common/Templated",
         "dojo/text!./templates/CollectionImport.html",
         "dojo/i18n!../nls/resources",
+        "app/search/DropPane",
+        "dijit/form/RadioButton",
+        "dijit/form/Button",
+
     ],
     function(declare, lang, Templated, template, i18n) {
 
@@ -24,7 +28,8 @@ define(["dojo/_base/declare",
 
             i18n: i18n,
             templateString: template,
-
+            label: "Collection Import",
+            open: false,
             postCreate: function() {
                 this.inherited(arguments);
             }

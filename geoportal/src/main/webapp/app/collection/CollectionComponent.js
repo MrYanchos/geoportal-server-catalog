@@ -23,7 +23,17 @@ function(declare, lang, array, Templated, util) {
   
 
     collectionPane: null,
-    
+
+     mdArray : [],
+  curPage : 0,
+   sType : "local",
+   search: "",
+  totRecords : 0,
+    /* params - {geoportalUser:obj} */
+    ItemAdded: "app/SignedIn",
+    /* params - {geoportalUser:obj} */
+    Item: "app/SignedIn",
+
     postCreate: function() {
       this.inherited(arguments);
       if (this.conditionallyDisabled) {
@@ -37,24 +47,24 @@ function(declare, lang, array, Templated, util) {
 
 // * entry point - attach to button class
 
-  $(".btn").on('click', function (b) {
-    var bl = b;
-    if (b.title == 'Search' || b.target.title == 'Search') {
-
-      setTimeout(function () {
-
-        $(".g-item-card").each(function () {
-          var gC = $(this);
-          setSavedCard(gC);
-          assignEvent(gC);
-
-        })
-
-      }, 2000);
-    }
-
-  });
-,
+//   $(".btn").on('click', function (b) {
+//     var bl = b;
+//     if (b.title == 'Search' || b.target.title == 'Search') {
+//
+//       setTimeout(function () {
+//
+//         $(".g-item-card").each(function () {
+//           var gC = $(this);
+//           setSavedCard(gC);
+//           assignEvent(gC);
+//
+//         })
+//
+//       }, 2000);
+//     }
+//
+//   });
+// ,
 
  mdRecord : function (id, fileId, title, link, description, collections) {
     var mdRec = {
@@ -82,7 +92,15 @@ function(declare, lang, array, Templated, util) {
 
   }
       ,
-  function createUUID() {
+     collectionItem : function (id, colName, colDesc ) {
+      var cI = { "id" : id,
+        "colName" : colName,
+        "colDesc" : colDesc
+      };
+      return cI;
+
+    },
+    createUUID: function () {
     // From http://www.ietf.org/rfc/rfc4122.txt
     var s = [];
     var hexDigits = "0123456789abcdef";
@@ -97,6 +115,124 @@ function(declare, lang, array, Templated, util) {
     return uuid;
   }
 ,
+    findLocalItems: function  (query) {
+    var i, results = [];
+    for (i in localStorage) {
+      if (localStorage.hasOwnProperty(i)) {
+        if (i.match(query) || (!query && typeof i === 'string')) {
+          value = JSON.parse(localStorage.getItem(i));
+          results.push({key:i,val:value});
+        }
+      }
+    }
+    return results;
+  },
+
+    saveMdRecord : function (md) {
+
+    var key = "mdRec-" + md.id;
+    localStorage.setItem(key, JSON.stringify(md) );
+    refeshMdPanel(container);
+    return key;
+  },
+
+  saveCollectionItem:function (ColItem) {
+
+    var key = "cItem-"+ ColItem.id;
+    localStorage.setItem(key, JSON.stringify(ColItem) );
+    return key;
+  },
+    getCollections: function (qField, query) {
+    var col = this.findLocalItems("cItem");
+    // If there is a query
+    if ( typeof(qField) !== "undefined" && typeof(query) !== "undefined"  ) {
+      results = [];
+      for (var k in col){
+        var kd = col[k].val;
+        var kid = kd[qField];
+        var cleanKid = kid.replace(/[|&;$%@"<>()+,]/g, "");
+        var cleanQry = query.replace(/[|&;$%@"<>()+,]/g, "");
+        if ( cleanKid.match(cleanQry) ) {
+          results.push({key:k,val: kd });
+        }
+      }
+      col = results;
+
+    }
+
+    return col;
+  },
+    saveSearchItem: function (SeaItem) {
+
+    var key = "sItem-"+ SeaItem.id;
+    localStorage.setItem(key, JSON.stringify(SeaItem) );
+    return key;
+
+  },
+
+  getMdRecords : function (qField, query) {
+    var md = this.findLocalItems("mdRec");
+    // If there is a query
+    if ( typeof(qField) !== "undefined" && typeof(query) !== "undefined" ) {
+      results = [];
+      for (var k in md){
+        var  mkr = md[k].val;
+        var  mkey = md[k].key;
+        // var kid = md[k][qField];
+
+        if ( qField == "collections") {
+          if ( query == "default" )
+          {
+            var mCol = mkr.collections;
+            // only bring back if only in default
+            if ( mCol.length == 1 & mCol[0] == "default") {
+              results.push({key:mkey,val:mkr});
+            }
+
+          } else if ( query == "all") {
+            results.push({key:mkey,val:mkr});
+
+          } else {
+            var mCol = mkr.collections;
+
+            for ( var c in mCol ) {
+
+              if ( mCol[c].match(query) ) {
+                results.push({key:mkey,val:mkr});
+              }
+            }
+          }
+        } else if ( qField == "id" ) {
+          if (  mkr.id == query ) {
+            results.push({key:mkey,val:mkr});
+          }
+        } else {
+          var mkStr = JSON.stringify(mkr);
+          if ( mkStr.match(query) ) {
+            results.push({key:mkey,val:mkr});
+          }
+        }
+
+      }
+      md = results;
+    }
+
+    return md;
+  },
+
+
+  findLocalItems:function  (query) {
+    var i, results = [];
+    for (i in localStorage) {
+      if (localStorage.hasOwnProperty(i)) {
+        if (i.match(query) || (!query && typeof i === 'string')) {
+          value = JSON.parse(localStorage.getItem(i));
+          results.push({key:i,val:value});
+        }
+      }
+    }
+    return results;
+  },
 // duplicate version. Also in UI
 // function saveMdRecord(md) {
 //
@@ -105,7 +241,7 @@ function(declare, lang, array, Templated, util) {
 //     return key;
 // }
 
-  function setSavedCard(gC) {
+  setSavedCard :function (gC) {
     console.log('click Card:setSavedEvent');
     //var topGC = gC;
     $(gC).find('*').each(function () {
@@ -129,7 +265,7 @@ function(declare, lang, array, Templated, util) {
   }
 
 ,
-  function assignEvent(gC) {
+  assignEvent: function (gC) {
     console.log('click Card:assignEvent');
     // $(gC).click(function () {
     var tlval = '',
@@ -203,12 +339,12 @@ function(declare, lang, array, Templated, util) {
   }
 ,
 
-  function openReplacement(method, url, async, user, password) {
+  openReplacement: function (method, url, async, user, password) {
     var syncMode = async !== false ? 'async' : 'sync';
     return open.apply(this, arguments);
   }
 ,
-  function sendReplacement(data) {
+  sendReplacement: function (data) {
 
     if ( data !== null & typeof(data) !== "undefined") {
       var dt = typeof data;
@@ -229,15 +365,65 @@ function(declare, lang, array, Templated, util) {
   }
 
 ,
-  function onReadyStateChangeReplacement() {
+    onReadyStateChangeReplacement:  function () {
 
     if (this._onreadystatechange) {
       return this._onreadystatechange.apply(this, arguments);
     }
-  }
+  },
 
  // window.XMLHttpRequest.prototype.open = openReplacement;
 //  window.XMLHttpRequest.prototype.send = sendReplacement;
+
+    getMdRecords: function (qField, query) {
+    var md = findLocalItems("mdRec");
+    // If there is a query
+    if ( typeof(qField) !== "undefined" && typeof(query) !== "undefined" ) {
+      results = [];
+      for (var k in md){
+        var  mkr = md[k].val;
+        var  mkey = md[k].key;
+        // var kid = md[k][qField];
+
+        if ( qField == "collections") {
+          if ( query == "default" )
+          {
+            var mCol = mkr.collections;
+            // only bring back if only in default
+            if ( mCol.length == 1 & mCol[0] == "default") {
+              results.push({key:mkey,val:mkr});
+            }
+
+          } else if ( query == "all") {
+            results.push({key:mkey,val:mkr});
+
+          } else {
+            var mCol = mkr.collections;
+
+            for ( var c in mCol ) {
+
+              if ( mCol[c].match(query) ) {
+                results.push({key:mkey,val:mkr});
+              }
+            }
+          }
+        } else if ( qField == "id" ) {
+          if (  mkr.id == query ) {
+            results.push({key:mkey,val:mkr});
+          }
+        } else {
+          var mkStr = JSON.stringify(mkr);
+          if ( mkStr.match(query) ) {
+            results.push({key:mkey,val:mkr});
+          }
+        }
+
+      }
+      md = results;
+    }
+
+    return md;
+  }
   });
   
   return oThisClass;

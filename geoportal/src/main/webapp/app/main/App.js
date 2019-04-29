@@ -26,7 +26,8 @@ define(["dojo/_base/declare",
         "app/main/AboutPanel",
         "app/content/MetadataEditor",
         "app/content/UploadMetadata",
-        "app/main/CollectionPanel"
+        "app/main/CollectionPanel",
+      "app/main/CollectionsPanel"
     ],
 function(declare, lang, topic, appTopics, Templated, template, i18n, util, SearchPanel, MapPanel, AboutPanel,
     MetadataEditor, UploadMetadata, CollectionPane1) {
