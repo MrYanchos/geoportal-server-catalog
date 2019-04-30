@@ -19,7 +19,7 @@
 */
 
 var container= $('#collectionPanel');
-var mdRecordsId = "uniqName_9_94";
+var mdRecordsId = "uniqName_9_94"; // toolpanel node
 var collectionPanelId = "uniqName_9_22";
 var recordsDropPaneId = "dijit_TitlePane_10";
 var colDropPaneId = "dijit_TitlePane_20";

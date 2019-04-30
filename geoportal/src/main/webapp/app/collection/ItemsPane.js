@@ -43,6 +43,13 @@ function(declare, lang, array, aspect, domConstruct, Templated,template, i18n, C
       this.inherited(arguments);
     //  document.body.appendChild(this.statusNode.domNode);
      // this.statusNode.target = this.dropPane.domNode;
+     //  this.own(topic.subscribe("app/collection/assignEvent",function(item){
+     //
+     //      self.assignEvent(item);
+     //    }
+     //  ));
+
+      //setSavedCard();
     },
     
     addSort: function() {

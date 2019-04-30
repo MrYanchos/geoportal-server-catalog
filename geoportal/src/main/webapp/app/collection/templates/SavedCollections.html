@@ -4,7 +4,8 @@
          data-dojo-props="title:'${label}',open:${open}">
         <div data-dojo-type="dijit/form/Select"
              data-dojo-attach-point="menuNode">
-            <span value="All"><i>Unnassigned Results</i></span>
+            <span value="default" selected><i>Unnassigned Results</i></span>
+            <span value="All"><i>Show All</i></span>
         </div>
         <button data-dojo-attach-point="viewBtn" data-dojo-type="dijit/form/Button"
                 data-dojo-attach-event="onClick: _selCollection"

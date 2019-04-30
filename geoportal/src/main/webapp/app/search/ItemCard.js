@@ -50,16 +50,18 @@ define(["dojo/_base/declare",
   "app/content/UploadMetadata",
   "app/preview/PreviewUtil",
   "app/preview/PreviewPane",
-    "app/collection/CollectionScripts",
+
     "app/prov/Prov",
 
       "app/common/JupyterDialog",
+    "app/collection/CollectionComponent",
+      // "app/collection/CollectionScripts",
     ],
 function(declare, lang, array, string, topic, xhr, request, on, appTopics, domClass, domConstruct,
   _WidgetBase,_AttachMixin, _TemplatedMixin, _WidgetsInTemplateMixin, Tooltip, TooltipDialog, popup,
   template, i18n, AppClient, ServiceType, util, ConfirmationDialog, ChangeOwner, DeleteItems,
   MetadataEditor, gxeConfig, SetAccess, SetApprovalStatus, SetField, UploadMetadata, 
-  PreviewUtil, PreviewPane, Collection, prov,JupyterDialog) {
+  PreviewUtil, PreviewPane, prov,JupyterDialog, CollectionComponent, Collection) {
   
   var oThisClass = declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
  
@@ -109,8 +111,10 @@ function(declare, lang, array, string, topic, xhr, request, on, appTopics, domCl
       }));
         //collection
        //  on(this,"click", setSavedCard);
-      on(this,"click", assignEvent);
-        setSavedCard();
+      // use a publish/subscribe? for assignEvent, setSavedCard
+     // on(this,"click", assignEvent);
+
+       // setSavedCard();
         // assignEvent();
 
     },

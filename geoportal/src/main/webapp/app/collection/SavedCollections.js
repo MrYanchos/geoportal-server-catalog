@@ -15,17 +15,20 @@
 define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
+        "dojo/on",
+
         "app/common/Templated",
         "dojo/text!./templates/SavedCollections.html",
         "dojo/i18n!../nls/resources",
         "app/collection/CollectionComponent",
+        "app/collection/ItemsPane",
         "app/search/DropPane",
         "dijit/form/Select",
         "dijit/form/Button",
         "dijit/form/TextBox",
 
     ],
-    function(declare, lang, ArrayUtil, Templated, template, i18n, CollectionComponent) {
+    function(declare, lang, ArrayUtil, on, Templated, template, i18n, CollectionComponent, ItemsPane) {
 
         var oThisClass = declare([CollectionComponent], {
 
@@ -34,6 +37,7 @@ define(["dojo/_base/declare",
             label: "Saved Collections",
             open: true,
             postCreate: function() {
+                self = this;
                 this.inherited(arguments);
                 var col = this.getCollections();
                 for (var k in col) {
@@ -41,6 +45,17 @@ define(["dojo/_base/declare",
                     var colOpt = [{value: colk.id , label: colk.colName }];
                     this.menuNode.addOption(colOpt);
                 }
+                //viewBtn, newBtn, removeBtn
+                // on(this.viewBtn, "click", function(evt){
+                //     self._selCollection(evt);
+                // });
+                // on(this.newBtn, "click", function(evt){
+                //     self._addCollection(evt);
+                // });
+                // on(this.removeBtn, "click", function(evt){
+                //     self._removeCollection(evt);
+                // });
+
             }
 ,
 
@@ -57,11 +72,11 @@ define(["dojo/_base/declare",
                 var pageRec=10*curPage;
                 sType = "local";
 
-                var ColID = $('#gSvCollection').find(":selected").val();
-                var coltxt =  $('#gSvCollection').find(":selected").text(); //dijit_TitlePane_0_titleBarNode
+                var ColID = this.menuNode.value; // $('#gSvCollection').find(":selected").val();
+                var coltxt =   this.menuNode.focusNode.textContent; // $('#gSvCollection').find(":selected").text(); //dijit_TitlePane_0_titleBarNode
                 if ( ColID !== "default") {
 
-                    var sb = container.find('#'+recordsDropPaneId);
+                    var sb =ItemsPane.itemsNode;// container.find('#'+recordsDropPaneId);
                     var tlab = sb[0].childNodes[0];
                     tlab.nodeValue =" Saved Results for Collection   "+coltxt;
 
@@ -72,12 +87,13 @@ define(["dojo/_base/declare",
 
                 }
 
+                // use this.own (dojo.on xxx to maanage this
                 container.find('.g-item-card').each(function(d){
                     $(this).remove();
                 });
 
-                var uniq = $('#'+mdRecordsId);
-                var cp =  $('<div class="g-drop-pane dijitTitlePane" id="'+colDropPaneId+'" widgetid="'+colDropPaneId+'">');
+                var uniq = ItemsPanel.dropPane.toolsNode; // $('#'+mdRecordsId);
+                var cp = ItemsPanel.dropPane; // $('<div class="g-drop-pane dijitTitlePane" id="'+colDropPaneId+'" widgetid="'+colDropPaneId+'">');
 
 
                 if ( ColID == "default" ) {
@@ -100,7 +116,8 @@ define(["dojo/_base/declare",
                 var opc = 0;
 
                 if ( mda.length ){
-                    $("#PageTotals").html("Total Records " + mda.length);
+                 //   $("#PageTotals").html("Total Records " + mda.length);
+                    // add a paging node
 
                 }
 
