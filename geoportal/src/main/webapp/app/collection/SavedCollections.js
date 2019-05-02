@@ -21,6 +21,7 @@ define(["dojo/_base/declare",
         "dojo/text!./templates/SavedCollections.html",
         "dojo/i18n!../nls/resources",
         "app/collection/CollectionComponent",
+        "app/collection/CollectionBase",
         "app/collection/ItemsPane",
         "app/search/DropPane",
         "dijit/form/Select",
@@ -28,7 +29,7 @@ define(["dojo/_base/declare",
         "dijit/form/TextBox",
 
     ],
-    function(declare, lang, ArrayUtil, on, Templated, template, i18n, CollectionComponent, ItemsPane) {
+    function(declare, lang, ArrayUtil, on, Templated, template, i18n, CollectionComponent,CollectionBase, ItemsPane) {
 
         var oThisClass = declare([CollectionComponent], {
 
@@ -39,7 +40,7 @@ define(["dojo/_base/declare",
             postCreate: function() {
                 self = this;
                 this.inherited(arguments);
-                var col = this.getCollections();
+                var col = CollectionBase.getCollections();
                 for (var k in col) {
                     var colk = col[k].val
                     var colOpt = [{value: colk.id , label: colk.colName }];
@@ -76,68 +77,63 @@ define(["dojo/_base/declare",
                 var coltxt =   this.menuNode.focusNode.textContent; // $('#gSvCollection').find(":selected").text(); //dijit_TitlePane_0_titleBarNode
                 if ( ColID !== "default") {
 
-                    var sb =ItemsPane.itemsNode;// container.find('#'+recordsDropPaneId);
-                    var tlab = sb[0].childNodes[0];
-                    tlab.nodeValue =" Saved Results for Collection   "+coltxt;
+                    // var sb =ItemsPane.itemsNode;// container.find('#'+recordsDropPaneId);
+                    // var tlab = sb[0].childNodes[0];
+                    // tlab.nodeValue =" Saved Results for Collection   "+coltxt;
+                    //
+                    // sb.hide();
+                    // sb.show();
+                    //
+                    // console.log('Show records in the collection ..' + coltxt);
+                    //var mda = CollectionBase.getMdRecords();
 
-                    sb.hide();
-                    sb.show();
-
-                    console.log('Show records in the collection ..' + coltxt);
 
                 }
 
-                // use this.own (dojo.on xxx to maanage this
-                ItemsPane.itemsNode.find('.g-item-card').each(function(d){
-                    $(this).remove();
-                });
-
-                var uniq = ItemsPane.dropPane.toolsNode; // $('#'+mdRecordsId);
-                var cp = ItemsPane.dropPane; // $('<div class="g-drop-pane dijitTitlePane" id="'+colDropPaneId+'" widgetid="'+colDropPaneId+'">');
 
 
                 if ( ColID == "default" ) {
-                    var mda = getMdRecords("collections","default");
+                    var mda = CollectionBase.getMdRecords("collections","default");
 
                 } else if ( ColID == "All" ){
-                    var mda = getMdRecords("collections","");
+                    var mda = CollectionBase.getMdRecords("collections","");
                 } else {
-                    var mda = getMdRecords("collections",ColID);
+                    var mda = CollectionBase.getMdRecords("collections",ColID);
                 }
-
-                totRecords = mda.length;
-
-                if (mda.length > pageRec ) {
-                    startAt = pageRec;
-                } else {
-                    startAt = mda.length - 10;
-                }
-
-                var opc = 0;
-
-                if ( mda.length ){
-                 //   $("#PageTotals").html("Total Records " + mda.length);
-                    // add a paging node
-
-                }
-
-
-                for (var k in mda) {
-                    if ( k >= startAt ) {
-                        if ( opc < 10 ) {
-                            var mdRec = mda[k];
-                            var gCard = recordPanelItem(mdRec.val);
-                            cp.append(gCard);
-                        }
-                        opc++;
-                    }
-
-                }
-                uniq.append(cp);
-
-
-
-                uniq.show();
+                ItemsPane.addItem(mda);
+                // totRecords = mda.length;
+                //
+                // if (mda.length > pageRec ) {
+                //     startAt = pageRec;
+                // } else {
+                //     startAt = mda.length - 10;
+                // }
+                //
+                // var opc = 0;
+                //
+                // if ( mda.length ){
+                //  //   $("#PageTotals").html("Total Records " + mda.length);
+                //     // add a paging node
+                //
+                // }
+                //
+                //
+                // for (var k in mda) {
+                //     if ( k >= startAt ) {
+                //         if ( opc < 10 ) {
+                //             var mdRec = mda[k];
+                //             var gCard = recordPanelItem(mdRec.val);
+                //             cp.append(gCard);
+                //         }
+                //         opc++;
+                //     }
+                //
+                // }
+                // uniq.append(cp);
+                //
+                //
+                //
+                // uniq.show();
 
             }
 ,
@@ -167,7 +163,7 @@ define(["dojo/_base/declare",
 
                 if ( ColID !== "default" && ColID !== "All" ) {
 
-                    var mdRem  = this.getMdRecords("collections", ColID );
+                    var mdRem  = CollectionBase.getMdRecords("collections", ColID );
 
                     for ( var k in mdRem ) {
                         var mCol = mdRem[k].val.collections;
@@ -189,10 +185,15 @@ define(["dojo/_base/declare",
                     }
 
                     localStorage.removeItem("cItem-"+ColID);
-                    this.menuNode.options = ArrayUtil.filter(this.menuNode.options, function(item, index){
-                        return item.value!==ColID  });
-                    //this.menuNode.options= this.menuNode.options.slice(i,1);
+                    // this.menuNode.options = ArrayUtil.filter(this.menuNode.options, function(item, index){
+                    //     return item.value!==ColID  });
                     this.menuNode.set("value", "All");
+
+                    this.menuNode.removeOption(ColID);
+
+                    //this.menuNode.options= this.menuNode.options.slice(i,1);
+
+
                   //  $('#gSvCollection').find(":selected").remove();
                   //  $('#gSvCollection').val('default');
                     // code remove

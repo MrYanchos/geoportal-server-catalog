@@ -72,6 +72,8 @@ function(declare, lang, array, string, topic, xhr, request, on, appTopics, domCl
     item: null,
     itemsNode: null,
     searchPane: null,
+    itemIsSaved: false,
+
   //    script: 'custom/localCollectionSaveEvents.js',
   //    script2: 'custom/localCollectionSaveUI.js',
 
@@ -109,7 +111,14 @@ function(declare, lang, array, string, topic, xhr, request, on, appTopics, domCl
           self._renderOwnerAndDate(self.item);
         }
       }));
-        //collection
+
+
+      this.own(topic.subscribe(appTopics.itemStatusChanged,function(params){
+        if (self.item && self.item._id === params.item._id && params.status) {
+          self._renderItemsSaveStatus(self.item, params.status);
+        }
+      }));
+      //collection
        //  on(this,"click", setSavedCard);
       // use a publish/subscribe? for assignEvent, setSavedCard
      // on(this,"click", assignEvent);
@@ -150,7 +159,7 @@ function(declare, lang, array, string, topic, xhr, request, on, appTopics, domCl
         this._renderCinergiLinks(hit._id,item);
         this._renderSchemaOrg(item);
       this._renderId(item);
-
+      this._renderItemsSaveStatus(item, this.itemIsSaved);
     },
     
     _canEditMetadata: function(item,isOwner,isAdmin,isPublisher) {
@@ -1165,6 +1174,36 @@ function(declare, lang, array, string, topic, xhr, request, on, appTopics, domCl
           dialog.show(item);
         }
       }, actionsNode);
+
+    },
+    _renderItemsSaveStatus: function(item, status) {
+      var collectionsNode = this.collectionsNode;
+      domConstruct.empty(collectionsNode);
+      var btnText = "Save Item";
+      var self = this;
+
+      switch (status) {
+        case 'saved':
+          this.itemIsSaved = true;
+          btnText = "Saved";
+          break;
+        default:
+          this.itemIsSaved = false;
+          btnText = "Save";
+      }
+      var link = domConstruct.create("a",{
+        // href: href,
+        //  target: "_blank",
+        "class": "g-item-status",
+        innerHTML: btnText,
+        onclick: function(e) {
+          if (self.isItemSaved){
+            topic.publish(appTopics.itemRemove, {item:item, collection:'default'})
+          } else {
+            topic.publish(appTopics.itemSave, {item:item, collection:'default'})
+          }
+        },
+      }, collectionsNode);
 
     },
 

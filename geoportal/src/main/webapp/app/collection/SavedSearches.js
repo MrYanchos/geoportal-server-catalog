@@ -14,17 +14,19 @@
  */
 define(["dojo/_base/declare",
         "dojo/_base/lang",
+        "dojo/_base/array",
         "app/common/Templated",
         "dojo/topic",
         "app/context/app-topics",
         "dojo/text!./templates/SavedSearches.html",
         "dojo/i18n!../nls/resources",
         "app/collection/CollectionComponent",
+        "app/collection/CollectionBase",
         "app/search/DropPane",
         "dijit/form/Select",
         "dijit/form/Button"
     ],
-    function(declare, lang, Templated, topic, appTopics, template, i18n, CollectionComponent) {
+    function(declare, lang, ArrayUtil, Templated, topic, appTopics, template, i18n, CollectionComponent, CollectionBase) {
 
         var oThisClass = declare([CollectionComponent], {
 
@@ -41,7 +43,7 @@ define(["dojo/_base/declare",
 
                 for (var k in sea) {
                     var seak = sea[k].val;
-                    var colOpt = [{value: seak.id, title: seak.searchUrl, value: seak.searchText}];
+                    var colOpt = [{value: seak.id, title: seak.searchUrl, label: seak.searchText}];
                     this.menuNode.addOption(colOpt);
                 }
                 topic.subscribe(appTopics.LastQuery,function(params){
@@ -50,7 +52,7 @@ define(["dojo/_base/declare",
                 });
             },
             getSavedSearches: function (qField, query) {
-                var sea = this.findLocalItems("sItem");
+                var sea = CollectionBase.findLocalItems("sItem");
                 if (typeof (qField) !== "undefined" && typeof (query)) {
                     results = [];
 
@@ -69,7 +71,9 @@ define(["dojo/_base/declare",
             },
             _addSearch: function (cObj) {
                 // Puts a record into saved search
-
+                if (!this.lastQuery){
+                    return;
+                }
                 //var sUrl='http://cinergi.sdsc.edu/geoportal/?q=';
                 var port = location.port === 80 ? "" : ':' + location.port;
                 var sUrl = location.protocol + "//" + location.hostname + port + location.pathname + '?q=';
@@ -89,13 +93,12 @@ define(["dojo/_base/declare",
                 //var seaID = cObj.id.substr(6);
                 var newSearchText = sQry;
 
-                var nid = this.createUUID();
-                var si = this.searchItem(nid, newSearchText, sUrl, ss);
+                var nid = CollectionBase.createUUID();
+                var si = CollectionBase.searchItem(nid, newSearchText, sUrl, ss);
                 this.saveSearchItem(si);
 
-                var newSearch = $('<option value="' + si.id + '" >' + newSearchText + '</option>');
-                var sb = $('#gSvSearch');
-                sb.append(newSearch);
+                var newSearch = { value: si.id, label: newSearchText };
+                this.menuNode.addOption(newSearch);
                 console.log(' Add search' + newSearchText);
 
             },
@@ -103,14 +106,17 @@ define(["dojo/_base/declare",
             _removeSearch: function (cObj) {
                 // Remove Saved Search
 
-                var seaID = cObj.id;
-                localStorage.removeItem(seaID);
+              //  var seaID = cObj.id;
+                var seaID = this.menuNode.value;
+                localStorage.removeItem("sItem-"+ seaID);
                 console.log('cleared  ' + seaID);
 
                 // Remove from list ...
                // var ColStr = $('#gSvSearch').find(":selected").remove();
-                this.menuNode.options = ArrayUtil.filter(this.menuNode.options, function(item, index){
-                    return item.value!==seaID  });
+               //  this.menuNode.options = ArrayUtil.filter(this.menuNode.options, function(item, index){
+               //      return item.value!==seaID  });
+                this.menuNode.removeOption(seaID);
+
             },
             show_cinergi: function (sp, savedSearch) {
                 // Show DDH records on search page

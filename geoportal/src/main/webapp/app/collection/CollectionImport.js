@@ -17,12 +17,13 @@ define(["dojo/_base/declare",
         "app/common/Templated",
         "dojo/text!./templates/CollectionImport.html",
         "dojo/i18n!../nls/resources",
+        "app/collection/CollectionBase",
         "app/search/DropPane",
         "dijit/form/RadioButton",
         "dijit/form/Button",
 
     ],
-    function(declare, lang, Templated, template, i18n) {
+    function(declare, lang, Templated, template, i18n, CollectionBase) {
 
         var oThisClass = declare([Templated], {
 

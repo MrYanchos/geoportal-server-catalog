@@ -21,10 +21,11 @@ define(["dojo/_base/declare",
         "dojo/text!./templates/ItemsPane.html",
         "dojo/i18n!app/nls/resources",
         "app/collection/CollectionComponent",
+      "app/collection/CollectionBase",
       //  "app/Items/ItemCard",
         "app/search/DropPane",
         "dojox/widget/Standby"],
-function(declare, lang, array, aspect, domConstruct, Templated,template, i18n, CollectionComponent,  ItemCard,
+function(declare, lang, array, aspect, domConstruct, Templated,template, i18n, CollectionComponent, CollectionBase, ItemCard,
          DropPane, Standby) {
   
   var oThisClass = declare([CollectionComponent], {
@@ -51,7 +52,29 @@ function(declare, lang, array, aspect, domConstruct, Templated,template, i18n, C
 
       //setSavedCard();
     },
-    
+
+    processSavedResults: function(item){
+     if (isArray(item))  {
+       array.forEach( item, function(md ){
+         var itemCard = new SavedItemCard({
+           itemsNode: this.itemsNode,
+           searchPane: this.searchPane
+         });
+         itemCard.render(md);
+         itemCard.placeAt(itemsNode);
+
+       })
+     } else {
+       var itemCard = new SavedItemCard({
+         itemsNode: this.itemsNode,
+         searchPane: this.searchPane
+       });
+       itemCard.render(item);
+       itemCard.placeAt(itemsNode);
+
+     }
+    },
+
     addSort: function() {
       var self = this, dd = null;
       var addOption = function(parent,ddbtn,label,field,sortDir) {
@@ -109,62 +132,7 @@ function(declare, lang, array, aspect, domConstruct, Templated,template, i18n, C
       addOption(ddul,ddbtn,i18n.search.sort.byDate,"sys_modified_dt","desc");
     },
     
-    destroyItems: function(searchContext,searchResponse) {
-      this.noMatchNode.style.display = "none";
-      this.noMatchNode.innerHTML = "";
-      var rm = [];
-      array.forEach(this.dropPane.getChildren(),function(child){
-        if (child.isItemCard) rm.push(child);
-      });
-      array.forEach(rm,function(child){
-        this.dropPane.removeChild(child);
-      },this);
-    },
-    
-    showNoMatch: function() {
-      this.setNodeText(this.noMatchNode,i18n.search.results.noMatch);
-      this.noMatchNode.style.display = "block";
-    },
-    
-    /* SearchComponent API ============================================= */
-    
-    appendQueryParams: function(params) {
-      this.paging.appendQueryParams(params);
-      if (this.sortField !== null && this.sortDir !== null) {
-        params.urlParams.sort = this.sortField+":"+this.sortDir;
-      }
-        this.statusNode.show();
-    },
-    
-    processError: function(searchError) {
-      this.destroyItems();
-      this.setNodeText(this.noMatchNode,i18n.search.results.error);
-      this.noMatchNode.style.display = "block";
-        this.statusNode.hide();
-    },
-    
-    processResults: function(searchResponse) {
-        this.statusNode.hide();
-        this.paging.searchPane = this.searchPane;
-      this.paging.processResults(searchResponse);
-      this.destroyItems();
-      if (searchResponse.hits) {
-        var searchHits = searchResponse.hits;
-        var hits = searchHits.hits;
-        var total = searchHits.total;
-        var num = hits.length;
-        var itemsNode = this.itemsNode;
-        array.forEach(hits,function(hit){
-          var itemCard = new ItemCard({
-            itemsNode: this.itemsNode,
-            searchPane: this.searchPane
-          });
-          itemCard.render(hit);
-          itemCard.placeAt(itemsNode);
-        },this);
-      }
-    }
-    
+
   });
   
   return oThisClass;
