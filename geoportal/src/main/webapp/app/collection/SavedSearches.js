@@ -15,6 +15,8 @@
 define(["dojo/_base/declare",
         "dojo/_base/lang",
         "app/common/Templated",
+        "dojo/topic",
+        "app/context/app-topics",
         "dojo/text!./templates/SavedSearches.html",
         "dojo/i18n!../nls/resources",
         "app/collection/CollectionComponent",
@@ -22,7 +24,7 @@ define(["dojo/_base/declare",
         "dijit/form/Select",
         "dijit/form/Button"
     ],
-    function(declare, lang, Templated, template, i18n, CollectionComponent) {
+    function(declare, lang, Templated, topic, appTopics, template, i18n, CollectionComponent) {
 
         var oThisClass = declare([CollectionComponent], {
 
@@ -30,9 +32,11 @@ define(["dojo/_base/declare",
             templateString: template,
             label: "Saved Search",
             open: true,
+            lastQuery:null,
+
             postCreate: function () {
                 this.inherited(arguments);
-
+                var self = this;
                 var sea = this.getSavedSearches();
 
                 for (var k in sea) {
@@ -40,6 +44,10 @@ define(["dojo/_base/declare",
                     var colOpt = [{value: seak.id, title: seak.searchUrl, value: seak.searchText}];
                     this.menuNode.addOption(colOpt);
                 }
+                topic.subscribe(appTopics.LastQuery,function(params){
+                    if (params !== null && params.query !== null)
+                        self.lastQuery = params;
+                });
             },
             getSavedSearches: function (qField, query) {
                 var sea = this.findLocalItems("sItem");
@@ -65,7 +73,8 @@ define(["dojo/_base/declare",
                 //var sUrl='http://cinergi.sdsc.edu/geoportal/?q=';
                 var port = location.port === 80 ? "" : ':' + location.port;
                 var sUrl = location.protocol + "//" + location.hostname + port + location.pathname + '?q=';
-                var ss = JSON.parse(localStorage.getItem("saveSearch"));
+               // var ss = JSON.parse(localStorage.getItem("saveSearch"));
+                var ss = this.lastQuery;
                 var sa = ss.query.bool.must;
                 var sQry = '';
                 for (var i in sa) {
@@ -128,7 +137,7 @@ define(["dojo/_base/declare",
                     aggUrl = bref + inJ + eref;
                 }
 
-                container.find('.g-item-card').each(function (d) {
+                ItemPane.itemNode.find('.g-item-card').each(function (d) {
                     $(this).remove();
                 });
 

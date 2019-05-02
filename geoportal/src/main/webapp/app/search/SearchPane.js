@@ -137,6 +137,7 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
           if (params.queries && params.queries.length > 0) {
               if (postData === null) postData = {};
               postData.query = {"bool": {"must": params.queries}};
+              topic.publish(appTopics.LastQuery,{query:postData.query, queries:params.queries});
               if (this.highlightQuery) {
                   postData.highlight = {
                       "require_field_match": false,

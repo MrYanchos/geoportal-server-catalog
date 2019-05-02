@@ -32,7 +32,10 @@ define([],function(){var obj={
   RefreshSearchResultPage: "app/RefreshSearchResultPage",
   
   /* params - {geoportalUser:obj} */
+
   SignedIn: "app/SignedIn",
 
+  /* params - {queryj} */
+  LastQuery: "app/LastQuery",
 // .......................................................................................
 };return obj;});

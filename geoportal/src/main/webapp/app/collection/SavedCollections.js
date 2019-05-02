@@ -88,12 +88,12 @@ define(["dojo/_base/declare",
                 }
 
                 // use this.own (dojo.on xxx to maanage this
-                container.find('.g-item-card').each(function(d){
+                ItemsPane.itemsNode.find('.g-item-card').each(function(d){
                     $(this).remove();
                 });
 
-                var uniq = ItemsPanel.dropPane.toolsNode; // $('#'+mdRecordsId);
-                var cp = ItemsPanel.dropPane; // $('<div class="g-drop-pane dijitTitlePane" id="'+colDropPaneId+'" widgetid="'+colDropPaneId+'">');
+                var uniq = ItemsPane.dropPane.toolsNode; // $('#'+mdRecordsId);
+                var cp = ItemsPane.dropPane; // $('<div class="g-drop-pane dijitTitlePane" id="'+colDropPaneId+'" widgetid="'+colDropPaneId+'">');
 
 
                 if ( ColID == "default" ) {
