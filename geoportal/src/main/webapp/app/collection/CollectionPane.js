@@ -126,7 +126,7 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
             var self = this;
             if (this.showItemsOnStart) {
                 // wait a bit for the map
-                setTimeout(function(){self.savedItems({});},100);
+                setTimeout(function(){self.savedResults({});},100);
             }
             array.forEach(this.getCollectionComponents(),function(component){
                 component.collectionPane = self;
@@ -144,15 +144,16 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
             return components;
         },
 
-        savedItems: function() {
-
+        savedResults: function (Field, query){
             var components = this.getCollectionComponents();
-            var self = this, params = {urlParams: {}};
-            var uri = window.location.search;
-            var query = uri.substring(uri.indexOf("?") + 1, uri.length);
-            if (query != null && query.length > 0) {
-            }
-        }
+            var self = this;
+
+            var mda = CollectionBase.getMdRecords(Field,query);
+            array.forEach(components, function (component) {
+                component.processSavedResults(mda);
+            });
+
+        },
 
     });
 

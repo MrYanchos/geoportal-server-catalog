@@ -45,6 +45,7 @@ function(declare, lang, array, Templated, util, CollectionBase) {
 
     processSavedResults: function(items) {},
 
+
   //  var open = window.XMLHttpRequest.prototype.open,
   //  send = window.XMLHttpRequest.prototype.send,
    // onReadyStateChange;
