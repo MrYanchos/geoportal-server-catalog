@@ -1,8 +1,10 @@
 <div>
     <div class="g-drop-pane" data-dojo-type="app/search/DropPane"
          data-dojo-attach-point="dropPane"
-         data-dojo-props="title:'${label}',open:${open}">
-        <form id="myform">
+         data-dojo-props="title:'${label}',open:${open}" >
+        <form id="myform" >
+            <fieldset disabled="disabled">
+                <div>Disabled. To be Implemented</div>
             <input type="radio" data-dojo-type="dijit/form/RadioButton"
                    name="importFormat" id="radioOne" checked value="Merge"/>
             <label for="radioOne">Merge</label> <br />
@@ -20,6 +22,7 @@
             });
         </script>
             </button>
+            </fieldset>
         </form>
     </div>
 </div>
