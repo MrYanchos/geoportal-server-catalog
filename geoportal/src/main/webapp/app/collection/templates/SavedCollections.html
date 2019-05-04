@@ -2,6 +2,7 @@
     <div class="g-drop-pane" data-dojo-type="app/search/DropPane"
          data-dojo-attach-point="dropPane"
          data-dojo-props="title:'${label}',open:${open}">
+        <div class="form-group">
         <div data-dojo-type="dijit/form/Select"
              data-dojo-attach-point="menuNode">
             <span value="default" selected><i>Unnassigned Results</i></span>
@@ -9,9 +10,11 @@
         </div>
         <button data-dojo-attach-point="viewBtn" data-dojo-type="dijit/form/Button"
                 data-dojo-attach-event="onClick:_selCollection"
-                type="button">View
+                type="button" class="btn btn-primary">View
 
         </button>
+        </div>
+        <div class="form-group">
         <input type="text" name="newCollection" value="Enter a New Collection"
                data-dojo-type="dijit/form/TextBox"
                data-dojo-props="trim:true, propercase:true"
@@ -19,22 +22,28 @@
         <button data-dojo-attach-point="newBtn"
                 data-dojo-type="dijit/form/Button"
                 data-dojo-attach-event="onClick:_addCollection"
-                type="button">Create New Collection
+                type="button" class="btn btn-primary">Create New Collection
 
         </button>
+        </div>
+        <div class="form-group">
         <button data-dojo-attach-point="removeBtn"
                 data-dojo-type="dijit/form/Button"
                 data-dojo-attach-event="onClick:_removeCollection"
-                type="button">Remove
+                type="button"
+        class="btn btn-danger">Remove Collection
 
         </button>
+        </div>
+        <div class="form-group">
 
-    </div>
-    <button data-dojo-attach-point="exportBtn" data-dojo-type="dijit/form/Button" type="button">Export Collection
+    <button data-dojo-attach-point="exportBtn" data-dojo-type="dijit/form/Button" type="button" class="btn btn-primary">Export Collection
         <script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
         require(["dojo/dom"], function(dom){
             dom.byId("result2").innerHTML += "Thank you! ";
         });
     </script>
     </button>
+        </div>
+    </div>
 </div>

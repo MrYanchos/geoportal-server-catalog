@@ -22,11 +22,12 @@ define(["dojo/_base/declare",
         "dojo/text!./templates/SavedItemCard.html",
         "dojo/i18n!app/nls/resources",
         "app/collection/CollectionBase",
+        "app/etc/util",
 
     ],
     function(declare, lang, array, string, topic, xhr, request, on, appTopics, domClass, domConstruct,
              _WidgetBase,_AttachMixin, _TemplatedMixin, _WidgetsInTemplateMixin, Tooltip, TooltipDialog, popup,
-             template, i18n,  CollectionBase) {
+             template, i18n,  CollectionBase, util) {
 
         var oThisClass = declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
 
@@ -41,7 +42,6 @@ define(["dojo/_base/declare",
 
 
             postCreate: function() {
-                this.intializeToolTip();
                 this.inherited(arguments);
                 var self = this;
                 // this.own(topic.subscribe(appTopics.ItemOwnerChanged,function(params){
@@ -86,15 +86,36 @@ define(["dojo/_base/declare",
                 this._renderTitle(item);
 
                 this._renderDescription(item);
+                this._renderCollections(item);
 
             },
-            // _mouseenter: function(e) {
-            //     topic.publish(appTopics.OnMouseEnterSavedItem,{item:this.item});
-            // },
-            //
-            // _mouseleave: function(e) {
-            //     topic.publish(appTopics.OnMouseLeaveSavedItem,{item:this.item});
-            // },
+
+            _mouseenter: function(e) {
+                topic.publish("app/collection/OnMouseEnterSavedItem",{item:this.item});
+            },
+
+            _mouseleave: function(e) {
+                topic.publish("app/collection/OnMouseLeaveSavedItem",{item:this.item});
+            },
+            onAddCollectionClicked: function(evt){
+                this.myTempDialog.show();
+            },
+            onRemoveCollectionClicked: function(evt){
+                this.myTempDialog.show();
+            },
+            onRemoveMDRecordClicked: function(evt){
+                this.myTempDialog.show();
+            },
+
+            _renderCollections: function (item) {
+                var collections = item.collections;
+                var collString = "collections:"
+                array.forEach(collections, function(coll){
+                    collString = collString + ", " + coll;
+                })
+                util.setNodeText(this.collectionsNode,collString);
+
+            },
             /*
 
         DVW 2018-80-23 Restore Logic to allow for highlighting of HTML.
@@ -119,19 +140,26 @@ define(["dojo/_base/declare",
             _renderTitle: function (item, highlight) {
                 var title = item.title;
                 if (!title || 0 === title.length){
-                    title = "Title Not Provided. Identifier: " + item._id;
+                    title = "Title Not Provided. Identifier: " + item.id;
                 }
+
                 if (typeof highlight != "undefined") {
-
                     if (typeof highlight.title != "undefined") {
-
                         title = highlight.title;
-                        util.setNodeHtml(this.titleNode, title);
-                    } else {
-                        util.setNodeText(this.titleNode,title);
                     }
-                } else
-                { util.setNodeText(this.titleNode,title);}
+                }
+
+                var titleElement = domConstruct.create("a",{
+                   // href: item.mdlink +"/html",
+                    href: item.mdlink ,
+                    target: "_blank",
+                    title: title ,
+                    "aria-label": title,
+                    innerHTML: title
+                },this.titleNode);
+
+
+
 
 
             },

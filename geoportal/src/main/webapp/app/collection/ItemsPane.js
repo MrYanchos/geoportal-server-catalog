@@ -22,10 +22,10 @@ define(["dojo/_base/declare",
         "dojo/i18n!app/nls/resources",
         "app/collection/CollectionComponent",
       "app/collection/CollectionBase",
-      //  "app/Items/ItemCard",
+      "app/collection/SavedItemCard",
         "app/search/DropPane",
         "dojox/widget/Standby"],
-function(declare, lang, array, aspect, domConstruct, Templated,template, i18n, CollectionComponent, CollectionBase, ItemCard,
+function(declare, lang, array, aspect, domConstruct, Templated,template, i18n, CollectionComponent, CollectionBase, SavedItemCard,
          DropPane, Standby) {
   
   var oThisClass = declare([CollectionComponent], {
@@ -54,23 +54,25 @@ function(declare, lang, array, aspect, domConstruct, Templated,template, i18n, C
     },
 
     processSavedResults: function(item){
-     if (isArray(item))  {
+      var self = this;
+      domConstruct.empty(this.itemsNode);
+     if (Array.isArray(item))  {
        array.forEach( item, function(md ){
          var itemCard = new SavedItemCard({
-           itemsNode: this.itemsNode,
-           searchPane: this.searchPane
+           itemsNode: self.itemsNode,
+           itemsPane: self.itemsPane
          });
-         itemCard.render(md);
-         itemCard.placeAt(itemsNode);
+         itemCard.render(md.val);
+         itemCard.placeAt(self.itemsNode);
 
        })
      } else {
        var itemCard = new SavedItemCard({
-         itemsNode: this.itemsNode,
-         searchPane: this.searchPane
+         itemsNode: self.itemsNode,
+         itemsPane: self.itemsPane
        });
-       itemCard.render(item);
-       itemCard.placeAt(itemsNode);
+       itemCard.render(item.val);
+       itemCard.placeAt(self.itemsNode);
 
      }
     },

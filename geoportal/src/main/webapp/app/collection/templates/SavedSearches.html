@@ -2,23 +2,29 @@
     <div class="g-drop-pane" data-dojo-type="app/search/DropPane"
          data-dojo-attach-point="dropPane"
          data-dojo-props="title:'${label}',open:${open}">
-        <div data-dojo-type="dijit/form/Select" data-dojo-attach-point="menuNode">
+        <div class="form-group">
+            <div data-dojo-type="dijit/form/Select" data-dojo-attach-point="menuNode">
             <span value="Your Saved Searches"><i>Your Saved Searches</i></span>
         </div>
         <button data-dojo-attach-point="saveBtn" data-dojo-type="dijit/form/Button"
                 data-dojo-attach-event="onClick: _addSearch"
-                type="button">Save Current Search
+                type="button" class="btn btn-primary">Save Current Search
 
         </button>
+        </div>
+        <div class="form-group">
         <button data-dojo-attach-point="showBtn" data-dojo-type="dijit/form/Button"
                 data-dojo-attach-event="onClick: show_cinergi"
-                type="button">Show Search Results
+                type="button"
+        class="btn btn-primary">Show Search Results
 
         </button>
+
         <button data-dojo-attach-point="removeBtn" data-dojo-type="dijit/form/Button"
-                data-dojo-attach-event="onClick: _removeSearch" type="button">Remove
+                data-dojo-attach-event="onClick: _removeSearch" type="button"
+        class="btn btn-danger">Remove Search
 
         </button>
-
+        </div>
     </div>
 </div>

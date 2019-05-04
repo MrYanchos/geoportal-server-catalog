@@ -21,8 +21,9 @@ define(["dojo/_base/declare",
 function(declare, lang, array, Templated, util, CollectionBase) {
   
   var oThisClass = declare([Templated], {
-  
 
+    conditionallyDisabled: false,
+    isCollectionComponent: true,
     collectionPane: null,
 
      mdArray : [],

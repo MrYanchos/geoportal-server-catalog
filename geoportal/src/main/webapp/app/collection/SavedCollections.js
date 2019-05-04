@@ -143,11 +143,11 @@ define(["dojo/_base/declare",
             _addCollection: function (C){
 
                 var newCollection = this.newCollection.value;
-                var ncID = this.createUUID();
+                var ncID = CollectionBase.createUUID();
 
 
                 if (newCollection.length ) {
-                    var nco = this.collectionItem(ncID, newCollection,"")
+                    var nco = CollectionBase.collectionItem(ncID, newCollection,"")
                     localStorage.setItem("cItem-"+ncID, JSON.stringify(nco));
 
                     var newColOpt = [{value: ncID ,  label:newCollection }];

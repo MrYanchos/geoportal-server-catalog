@@ -7,12 +7,31 @@
    -->
     <div>
 
-        <div class="pull-left" >
-            <span class="g-item-actions " data-dojo-attach-point="collectionsNode"></span>
+        <div class="pull-right" >
+            <span class="g-item-description  clearfix" data-dojo-attach-point="collectionsNode"></span>
         </div>
         <div class="g-item-description pull-left clearfix" data-dojo-attach-point="descriptionNode"></div>
     </div>
-    <div class="g-item-actions clearfix" data-dojo-attach-point="actionsNode"></div>
+    <div >
+        <button type="button"
+                data-dojo-attach-point="addButton"
+                data-dojo-attach-event="onClick: onAddCollectionClicked"
+                class="btn btn-link btn-sm"
+        >Add to Collection</button>
+        <button type="button"
+                data-dojo-attach-point="rmButton"
+                data-dojo-attach-event="onClick: onRemoveCollectionClicked"
+                class="btn btn-link btn-sm"
+        >Remove from Collection</button>
+        <button type="button"
+                data-dojo-attach-point="rmButton"
+                data-dojo-attach-event="onClick: onRemoveMDRecordClicked"
+                class="btn btn-link btn-sm"
+        >Remove Saved record</button>
+    </div>
 
     <div class="g-item-identification" data-dojo-attach-point="idNode"></div>
+    <div data-dojo-attach-point="myTempDialog" data-dojo-type="dijit/Dialog" title="clicked"
+         > Clicked
+    </div>
 </div>
