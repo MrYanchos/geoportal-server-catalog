@@ -54,14 +54,14 @@ define(["dojo/_base/declare",
     "app/prov/Prov",
 
       "app/common/JupyterDialog",
-    "app/collection/CollectionComponent",
+    "app/collection/CollectionBase",
       // "app/collection/CollectionScripts",
     ],
 function(declare, lang, array, string, topic, xhr, request, on, appTopics, domClass, domConstruct,
   _WidgetBase,_AttachMixin, _TemplatedMixin, _WidgetsInTemplateMixin, Tooltip, TooltipDialog, popup,
   template, i18n, AppClient, ServiceType, util, ConfirmationDialog, ChangeOwner, DeleteItems,
   MetadataEditor, gxeConfig, SetAccess, SetApprovalStatus, SetField, UploadMetadata, 
-  PreviewUtil, PreviewPane, prov,JupyterDialog, CollectionComponent, Collection) {
+  PreviewUtil, PreviewPane, prov,JupyterDialog, CollectionBase, Collection) {
   
   var oThisClass = declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
  
@@ -136,8 +136,8 @@ function(declare, lang, array, string, topic, xhr, request, on, appTopics, domCl
 
         var item = this.item = hit._source;
       var highlight = hit.highlight;
-
       item._id = hit._id;
+      this.itemIsSaved = CollectionBase.isSavedItem(item._id).isSaved;
       var links = this._uniqueLinks(item);
      // util.setNodeText(this.titleNode,item.title);
         this._renderTitle(item, highlight);
@@ -1176,25 +1176,26 @@ function(declare, lang, array, string, topic, xhr, request, on, appTopics, domCl
       }, actionsNode);
 
     },
-    _renderItemsSaveStatus: function(item, status) {
+    _renderItemsSaveStatus: function(item, isItemSaved) {
       var collectionsNode = this.collectionsNode;
       domConstruct.empty(collectionsNode);
       var btnText = "Save Item";
+      var btnClass ="btn btn-primary  btn-xs"
       var self = this;
 
-      switch (status) {
-        case 'saved':
-          this.itemIsSaved = true;
+      switch (isItemSaved) {
+        case true:
           btnText = "Saved";
+          var btnClass ="btn btn-success  btn-xs"
           break;
         default:
-          this.itemIsSaved = false;
           btnText = "Save";
+          var btnClass ="btn btn-primary  btn-xs"
       }
       var link = domConstruct.create("a",{
         // href: href,
         //  target: "_blank",
-        "class": "g-item-status",
+        "class": btnClass,
         innerHTML: btnText,
         onclick: function(e) {
           if (self.isItemSaved){

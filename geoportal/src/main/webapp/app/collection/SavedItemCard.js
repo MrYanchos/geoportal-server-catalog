@@ -36,7 +36,7 @@ define(["dojo/_base/declare",
             templateString: template,
 
             isItemCard: true,
-            item: null,
+            mdRecord: null,
             itemsNode: null,
             itemsPane: null,
             itemIsSaved: true,
@@ -45,6 +45,9 @@ define(["dojo/_base/declare",
             postCreate: function() {
                 this.inherited(arguments);
                 var self = this;
+                this.own(topic.subscribe("app/collection/selectCollection",function(params){
+                     self._renderActionStatus(self.mdRecord);
+                }));
                 // this.own(topic.subscribe(appTopics.ItemOwnerChanged,function(params){
                 //     if (self.item && self.item === params.item) {
                 //         self._renderOwnerAndDate(self.item);
@@ -81,37 +84,49 @@ define(["dojo/_base/declare",
 
             //   },
 
-            render: function(item) {
+            render: function(mdRecord) {
+                this.mdRecord = mdRecord;
 
+                this._renderTitle(mdRecord);
 
-                this._renderTitle(item);
-
-                this._renderDescription(item);
-                this._renderCollections(item);
+                this._renderDescription(mdRecord);
+                this._renderCollections(mdRecord);
+                this._renderActionStatus(mdRecord); // enable/disable buttons
 
             },
 
             _mouseenter: function(e) {
-                topic.publish("app/collection/OnMouseEnterSavedItem",{item:this.item});
+                topic.publish("app/collection/OnMouseEnterSavedItem",{item:this.mdRecord});
             },
 
             _mouseleave: function(e) {
-                topic.publish("app/collection/OnMouseLeaveSavedItem",{item:this.item});
+                topic.publish("app/collection/OnMouseLeaveSavedItem",{item:this.mdRecord});
             },
-            onAddCollectionClicked: function(evt, item){
+            onAddCollectionClicked: function(evt){
                 var collTxtBox = registry.byId("collectionMenuNode");
                 var coll= collTxtBox.value;
-                this.myTempDialog.show();
+                CollectionBase._addCollectionMdRecord(this.mdRecord,coll);
+                this._renderCollections(this.mdRecord)
+                this._renderActionStatus(mdRecord);
+                // this.myTempDialog.show();
             },
             onRemoveCollectionClicked: function(evt){
-                this.myTempDialog.show();
+                var collTxtBox = registry.byId("collectionMenuNode");
+                var coll= collTxtBox.value;
+                CollectionBase._removeCollectionMdRecord(this.mdRecord,coll);
+                this._renderCollections(this.mdRecord)
+                this._renderActionStatus(mdRecord);
+                // this.myTempDialog.show();
             },
             onRemoveMDRecordClicked: function(evt){
-                this.myTempDialog.show();
+
+                CollectionBase.removeMdRecord(this.mdRecord);
+                this.mdRecord.title ='deleted';
+                this._renderTitle(this.mdRecord)
             },
 
-            _renderCollections: function (item) {
-                var collections = item.collections;
+            _renderCollections: function (mdRecord) {
+                var collections = mdRecord.collections;
                 var collString = "collections:"
                 array.forEach(collections, function(coll){
                     collString = collString + ", " + coll;
@@ -123,8 +138,8 @@ define(["dojo/_base/declare",
 
         DVW 2018-80-23 Restore Logic to allow for highlighting of HTML.
         */
-            _renderDescription: function (item, highlight) {
-                var desc = item.description;
+            _renderDescription: function (mdRecord, highlight) {
+                var desc = mdRecord.description;
                 if (desc && desc.indexOf("REQUIRED FIELD") > -1 ) {
                     desc = "";
                 }
@@ -140,10 +155,10 @@ define(["dojo/_base/declare",
                 } else {util.setNodeText(this.descriptionNode,desc);}
 
             },
-            _renderTitle: function (item, highlight) {
-                var title = item.title;
+            _renderTitle: function (mdRecord, highlight) {
+                var title = mdRecord.title;
                 if (!title || 0 === title.length){
-                    title = "Title Not Provided. Identifier: " + item.id;
+                    title = "Title Not Provided. Identifier: " + mdRecord.id;
                 }
 
                 if (typeof highlight != "undefined") {
@@ -153,18 +168,43 @@ define(["dojo/_base/declare",
                 }
 
                 var titleElement = domConstruct.create("a",{
-                   // href: item.mdlink +"/html",
-                    href: item.mdlink ,
+                   // href: mdRecord.mdlink +"/html",
+                    href: mdRecord.mdlink ,
                     target: "_blank",
                     title: title ,
                     "aria-label": title,
                     innerHTML: title
                 },this.titleNode);
 
+            },
+            _renderActionStatus: function(mdRecord){
+              var add = this.addButton ;
+              var rmColl = this.rmCollectionButton;
+              var rmMd = this.rmMdRecordButton;
 
+                var collTxtBox = registry.byId("collectionMenuNode");
+                var coll= collTxtBox.value;
+                switch (CollectionBase._inCollectionMdRecord(mdRecord, coll)){
+                    case true:
+                          add.disabled = true;
+                        add.title = "item in "+ coll;
+                          rmColl.disabled =false;
+                        rmColl.title = "remove item from " + coll;
 
-
-
+                          break;
+                    case false:
+                          add.disabled = false;
+                        add.title = "add item to " + coll;
+                        rmColl.disabled =true;
+                        rmColl.title = " not in " + coll;
+                        break;
+                    default:
+                        add.disabled = true;
+                        add.title = "Select a collection";
+                        rmColl.disabled =true;
+                        rmColl.title = "Select a collection";
+                        break;
+              }
             },
         });
 

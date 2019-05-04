@@ -16,7 +16,7 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/on",
-
+        "dojo/topic",
         "app/common/Templated",
         "dojo/text!./templates/SavedCollections.html",
         "dojo/i18n!../nls/resources",
@@ -29,7 +29,7 @@ define(["dojo/_base/declare",
         "dijit/form/TextBox",
 
     ],
-    function(declare, lang, ArrayUtil, on, Templated, template, i18n, CollectionComponent,CollectionBase, ItemsPane) {
+    function(declare, lang, ArrayUtil, on, topic, Templated, template, i18n, CollectionComponent,CollectionBase, ItemsPane) {
 
         var oThisClass = declare([CollectionComponent], {
 
@@ -38,7 +38,7 @@ define(["dojo/_base/declare",
             label: "Saved Collections",
             open: true,
             postCreate: function() {
-                self = this;
+                var self = this;
                 this.inherited(arguments);
                 var col = CollectionBase.getCollections();
                 for (var k in col) {
@@ -46,6 +46,9 @@ define(["dojo/_base/declare",
                     var colOpt = [{value: colk.id , label: colk.colName }];
                     this.menuNode.addOption(colOpt);
                 }
+                this.menuNode.on( "change", function(evt){
+                    topic.publish("app/collection/selectCollection", self.menuNode.value);
+                });
                 //viewBtn, newBtn, removeBtn
                 // on(this.viewBtn, "click", function(evt){
                 //     self._selCollection(evt);

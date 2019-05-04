@@ -1,21 +1,62 @@
-define(["dojo/_base/lang"],
-    function (lang) {
+define(["dojo/_base/lang",
+        "dojo/_base/array"],
+    function (lang,array) {
 
         var oThisObject = {
 
             mdRecord: function (id, fileId, title, link, description, collections) {
+                var self = this;
                 var mdRec = {
                     "id": id,
                     "fileId": fileId,
                     "title": title,
                     "mdlink": link,
                     "description": description,
-                    "collections": collections
+                    "collections": collections,
+
                 };
                 return mdRec;
             }
             ,
+            "_addCollectionMdRecord":function(mdRecord, coll){
+                if (coll==="All" | coll==="default" ) return;
+                if (mdRecord) {
+                    if (array.indexOf(mdRecord.collections, coll) < 0) {
+                        mdRecord.collections.push(coll);
+                        mdRecord.collections = array.filter(mdRecord.collections, function(collection){
+                            return collection !== "default";
+                        }
+                        )
+                    };
+                    this.saveMdRecord(mdRecord);
+                }
 
+            },
+            "_removeCollectionMdRecord":function(mdRecord, coll){
+                if (coll==="All" | coll==="default" ) return;
+                if (mdRecord) {
+                    if (array.indexOf(mdRecord.collections, coll) >= 0) {
+                        mdRecord.collections.pop(coll);
+                        mdRecord.collections = array.filter(mdRecord.collections, function(collection){
+                                return collection === "default";
+                            }
+                        )
+                        if (mdRecord.collections.length ===0){
+                            mdRecord.collections.push("default");
+                        }
+                    };
+                    this.saveMdRecord(mdRecord);
+                }
+
+            },
+            "_inCollectionMdRecord":function(mdRecord, coll){
+                if (coll==="All" | coll==="default") return null;
+                if (mdRecord) {
+                    if ( array.indexOf(mdRecord.collections, coll) >= 0) return true;
+                }
+                return false;
+
+            },
             searchItem: function (id, searchText, sUrl, params, query) {
                 var mdSS = {
                     "id": id,
@@ -67,13 +108,21 @@ define(["dojo/_base/lang"],
             },
 
             saveMdRecord: function (md) {
-
+                if (md.id){
                 var key = "mdRec-" + md.id;
                 localStorage.setItem(key, JSON.stringify(md));
               //  refeshMdPanel(container);
                 return key;
+                    }
+                return null;
             },
-
+            removeMdRecord: function (md) {
+                if (md.id){
+                var key = "mdRec-" + md.id;
+                localStorage.removeItem(key);
+                //  refeshMdPanel(container);
+                }
+            },
             saveCollectionItem: function (ColItem) {
 
                 var key = "cItem-" + ColItem.id;
@@ -106,6 +155,22 @@ define(["dojo/_base/lang"],
                 localStorage.setItem(key, JSON.stringify(SeaItem));
                 return key;
 
+            },
+            isSavedItem: function(itemId){
+                var isSaved = false;
+                var collections = [];
+                // case for item from ES vs MdRecord
+                if (itemId){
+
+                    var rec = this.getMdRecords("id", itemId);
+                    if (rec.length > 0){
+                        if (rec[0].val.id = itemId){
+                            isSaved = true;
+                            collections = rec[0].val.collections;
+                        }
+                    }
+                }
+                return {isSaved:isSaved, collections:collections};
             },
 
             getMdRecords: function (qField, query) {
