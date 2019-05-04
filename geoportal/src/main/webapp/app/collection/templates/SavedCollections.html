@@ -4,7 +4,8 @@
          data-dojo-props="title:'${label}',open:${open}">
         <div class="form-group">
         <div data-dojo-type="dijit/form/Select"
-             data-dojo-attach-point="menuNode">
+             data-dojo-attach-point="menuNode"
+        id="collectionMenuNode">
             <span value="default" selected><i>Unnassigned Results</i></span>
             <span value="All"><i>Show All</i></span>
         </div>
@@ -15,7 +16,7 @@
         </button>
         </div>
         <div class="form-group">
-        <input type="text" name="newCollection" value="Enter a New Collection"
+        <input type="text" id="newCollection" value="Enter a New Collection"
                data-dojo-type="dijit/form/TextBox"
                data-dojo-props="trim:true, propercase:true"
                data-dojo-attach-point="newCollection" />

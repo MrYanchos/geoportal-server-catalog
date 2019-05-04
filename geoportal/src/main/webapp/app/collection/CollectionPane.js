@@ -49,25 +49,28 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
                  exists, add to collection
                  does not exist. add to collection or default
                   */
+
                 if (params.item ){
-                    var mds = CollectionBase.getMdRecords('id', params.item.id);
+                    var item = params.item;
+                    var mds = CollectionBase.getMdRecords('id', item._id);
                     var collections = [];
                      if (mds.length ==0 ){
                          //id, fileId, title, link, description, collections
                          if (params.collection){
                             collections.push(params.collection);
                          }
-                         var md = CollectionBase.mdRecord(item.id, item.fileId, item.title, link, item.description, collections)
+                         var idlink = 'http://datadiscoverystudio.org/geoportal/rest/metadata/item/'+item._id+'/html';
+                         var md = CollectionBase.mdRecord(item._id, item.fileid, item.title, idlink, item.description, collections)
 
                      }
                      else {
-                         var md = mds[0];
+                         var md = mds[0].val;
                          if (md.collections){
                              var found = md.collections.find(function(coll) {
                                  return coll === params.collection;
                              });
                              if (found){
-                                print (' addItem, already in assigned collection');
+                                console.log (' addItem, already in assigned collection');
                                 return; // item has not changed. Does not need to be saved.
                              } else {
                                  md.collections.push(params.collection);

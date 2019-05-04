@@ -12,6 +12,7 @@ define(["dojo/_base/declare",
         "app/context/app-topics",
         "dojo/dom-class",
         "dojo/dom-construct",
+        "dijit/registry",
         "dijit/_WidgetBase",
         "dijit/_AttachMixin",
         "dijit/_TemplatedMixin",
@@ -25,7 +26,7 @@ define(["dojo/_base/declare",
         "app/etc/util",
 
     ],
-    function(declare, lang, array, string, topic, xhr, request, on, appTopics, domClass, domConstruct,
+    function(declare, lang, array, string, topic, xhr, request, on, appTopics, domClass, domConstruct,registry,
              _WidgetBase,_AttachMixin, _TemplatedMixin, _WidgetsInTemplateMixin, Tooltip, TooltipDialog, popup,
              template, i18n,  CollectionBase, util) {
 
@@ -97,7 +98,9 @@ define(["dojo/_base/declare",
             _mouseleave: function(e) {
                 topic.publish("app/collection/OnMouseLeaveSavedItem",{item:this.item});
             },
-            onAddCollectionClicked: function(evt){
+            onAddCollectionClicked: function(evt, item){
+                var collTxtBox = registry.byId("collectionMenuNode");
+                var coll= collTxtBox.value;
                 this.myTempDialog.show();
             },
             onRemoveCollectionClicked: function(evt){
