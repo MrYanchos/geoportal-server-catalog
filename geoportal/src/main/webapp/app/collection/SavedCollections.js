@@ -29,7 +29,7 @@ define(["dojo/_base/declare",
         "dijit/form/TextBox",
 
     ],
-    function(declare, lang, ArrayUtil, on, topic, Templated, template, i18n, CollectionComponent,CollectionBase, ItemsPane) {
+    function(declare, lang, ArrayUtil, on, topic, Templated, template, i18n, CollectionComponent,CollectionBase,  ItemsPane) {
 
         var oThisClass = declare([CollectionComponent], {
 
@@ -214,12 +214,12 @@ define(["dojo/_base/declare",
 
             var fn = "exportCollection" + $.now() + ".csv";
 
-            var x = $(e).attr("download", fn);
+            var x = this.exportBtn.download =fn;
 
             var ez = this.getExpAll();
 
             var exFile = "data:application/octet-stream," + encodeURIComponent(ez);
-            $(e).attr("href", exFile);
+                this.exportBtn.href = exFile;
 
         },
 
@@ -345,6 +345,21 @@ define(["dojo/_base/declare",
                         colText = colText + coLabel + cName +  ',' + cIndex + ',' + cDesc + '\n';
                     }
                 }
+                // var fields = [ {id : "id"},
+                //     {id :"colName"},
+                //     {id :"colDesc" }]
+                // var collConfig = {
+                //     quotes: false, //or array of booleans
+                //     quoteChar: '"',
+                //     escapeChar: '"',
+                //     delimiter: ",",
+                //     header: true,
+                //     newline: "\r\n",
+                //     skipEmptyLines: false, //or 'greedy',
+                //     columns: ["id","colName","colDesc"] //or array of strings
+                // }
+                //
+                // colText = colText+ CSV.serialize({fields:fields, records:sc});
             }
 
 
@@ -355,20 +370,39 @@ define(["dojo/_base/declare",
             } else {
                 var md = CollectionBase.getMdRecords('collections', ColID);
             }
-
+// var mdarray= [];
+//              ArrayUtil.forEach(md, function(m ){
+//     mdarray.push(m.val) ;
+// })
+//             var recfields = [ {id : "id"},
+//                 {id :"title"},
+//                 {id :"mdlink" },
+//                 {id :"fileId" },
+//                 {id :"description" },
+//             ]
+//             var recfields = [ {id : "key"},
+//                 {id :"val"},
+//                 {id :"mdlink" },
+//                 {id :"fileId" },
+//                 {id :"description" },
+//             ]
+//             mdRecsText = mdText+ CSV.serialize({fields:recfields, records: mdarray});
 
             if ( Array.isArray(md) ) {
                 for ( var c in md ) {
                     try {
                         var mName = md[c].val.title.toString();
-                        mName = mName.replace(/,/g, '|');
+                        mName = mName.replace(/,/g, '--');
+                        mName = mName.replace(/\r?\n/g,' ');
                         var mLink = md[c].val.mdlink;
                         var mId = md[c].val.id;
                         var fId = md[c].val.fileId;
                         var mDesc = "";
                         if (md[c].val.hasOwnProperty("description")) {
                             var mDesc = md[c].val.description;
+
                             (typeof mDesc !== "undefined") ? mDesc = mDesc.replace(/,/g, '|') : mDesc = "";
+                            mDesc = mDesc.replace(/\r?\n/g,' ');
                         }
 
                         var xol = md[c].val.collections;
