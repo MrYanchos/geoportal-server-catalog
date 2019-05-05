@@ -79,7 +79,7 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
                          }
                      }
                     CollectionBase.saveMdRecord(md);
-                    topic.publish(appTopics.itemStatusChanged, {item:params.item, status:'saved' } )
+                    topic.publish(appTopics.itemStatusChanged, {item:params.item, status:true } )
 
 
                 }
@@ -112,7 +112,7 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
                         }
                         self.saveMdRecord(md);
                         if (params.collection === 'default') {
-                            topic.publish(appTopics.itemStatusChanged, {item: params.item, collection:params.collection, status: 'removed'})
+                            topic.publish(appTopics.itemStatusChanged, {item: params.item, collection:params.collection, status: false})
                         }
                     }
                 }
