@@ -79,7 +79,7 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
                          }
                      }
                     CollectionBase.saveMdRecord(md);
-                    topic.publish(appTopics.itemStatusChanged, {item:params.item, status:true } )
+                    topic.publish(appTopics.itemStatusChanged, {item:params.item, status:"saved" } )
 
 
                 }
@@ -89,7 +89,7 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
                 if (params.item ) {
                     var mds = CollectionBase.getMdRecords('id', params.item.id);
                     if (mds.length ==0 ){
-                        print (' addRemove, item not found');
+                        console.log (' addRemove, item not found');
                         return;
                     }
                     else {
@@ -97,7 +97,7 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
                             localStorage.removeItem("mdRec-" + params.item.id);
                             topics.publish(appTopics.itemStatusChanged, {item: params.item, collection:'All', status: 'removed'});
                         }
-                        var md = mds[0];
+                        var md = mds[0].val;
                         if (md.collections){
                             var found = md.collections.find(function(coll) {
                                 return coll === params.collection;
@@ -105,15 +105,23 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
                             if (found){
                                 md.collections.pop(params.collection);;
                             } else {
-                                print (' itemRemove not found in collection');
-                                return; // remove not needed.
+                                console.log (' itemRemove not found in collection');
+                               // return; // remove not needed.
                             }
 
                         }
-                        self.saveMdRecord(md);
-                        if (params.collection === 'default') {
-                            topic.publish(appTopics.itemStatusChanged, {item: params.item, collection:params.collection, status: false})
+                        if (md.collections.length > 0 ){
+                            CollectionBase.saveMdRecord(md);
+                            topic.publish(appTopics.itemStatusChanged, {item: params.item, collection:params.collection, status: "saved"});
+                        } else {
+                            CollectionBase.removeMdRecord(md);
+                            topic.publish(appTopics.itemStatusChanged, {item: params.item, collection:params.collection, status: "removed"});
+
                         }
+
+                        // if (params.collection === 'default') {
+                        //     topic.publish(appTopics.itemStatusChanged, {item: params.item, collection:params.collection, status: false})
+                        // }
                     }
                 }
             })

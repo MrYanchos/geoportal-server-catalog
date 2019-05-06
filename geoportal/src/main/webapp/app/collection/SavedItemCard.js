@@ -129,7 +129,8 @@ define(["dojo/_base/declare",
                 var collections = mdRecord.collections;
                 var collString = "collections:"
                 array.forEach(collections, function(coll){
-                    collString = collString + ", " + coll;
+                    var collName = CollectionBase.getCollectionNameById(coll);
+                    collString = collString + ", " +collName ;
                 })
                 util.setNodeText(this.collectionsNode,collString);
 

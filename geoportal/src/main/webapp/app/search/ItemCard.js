@@ -159,7 +159,13 @@ function(declare, lang, array, string, topic, xhr, request, on, appTopics, domCl
         this._renderCinergiLinks(hit._id,item);
         this._renderSchemaOrg(item);
       this._renderId(item);
-      this._renderItemsSaveStatus(item, this.itemIsSaved);
+      var status = "save";
+      if (this.itemIsSaved){
+        status="saved"
+      } else {
+        status = "not saved";
+      }
+      this._renderItemsSaveStatus(item, status);
     },
     
     _canEditMetadata: function(item,isOwner,isAdmin,isPublisher) {
@@ -1176,15 +1182,16 @@ function(declare, lang, array, string, topic, xhr, request, on, appTopics, domCl
       }, actionsNode);
 
     },
-    _renderItemsSaveStatus: function(item, isItemSaved) {
+    _renderItemsSaveStatus: function(item, status) {
       var collectionsNode = this.collectionsNode;
       domConstruct.empty(collectionsNode);
       var btnText = "Save Item";
       var btnClass ="btn btn-primary  btn-xs"
       var self = this;
 
-      switch (isItemSaved) {
-        case true:
+
+      switch (status) {
+        case "saved":
           btnText = "Saved";
           var btnClass ="btn btn-success  btn-xs"
           break;
@@ -1198,7 +1205,7 @@ function(declare, lang, array, string, topic, xhr, request, on, appTopics, domCl
         "class": btnClass,
         innerHTML: btnText,
         onclick: function(e) {
-          if (self.isItemSaved){
+          if (self.itemIsSaved){
             topic.publish(appTopics.itemRemove, {item:item, collection:'default'})
           } else {
             topic.publish(appTopics.itemSave, {item:item, collection:'default'})

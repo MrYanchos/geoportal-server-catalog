@@ -129,6 +129,15 @@ define(["dojo/_base/lang",
                 localStorage.setItem(key, JSON.stringify(ColItem));
                 return key;
             },
+            getCollectionNameById: function(id ){
+                if (id === "default") return "unassigned";
+               var coll = this.getCollections ("id", id);
+               if (coll.length > 0){
+                   return coll[0].val.colName;
+               }
+               return "default";
+
+            },
             getCollections: function (qField, query) {
                 var col = this.findLocalItems("cItem");
                 // If there is a query
