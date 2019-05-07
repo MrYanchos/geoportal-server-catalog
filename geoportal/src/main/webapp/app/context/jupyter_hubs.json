@@ -1,10 +1,7 @@
 { "documentation":"docId will be filled in by geoportal.  ",
 
   "hubs":[
-  {
-    "title": "suave-jupyterhub.com (local authentication required)",
-    "uri_template": "http://suave-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb?documentId={docId}"
-  },
+
   {
     "title": "MyBinder-{branch}",
     "uri_template": "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/{branch}?urlpath=%2Fnotebooks%2FCinergiDispatch.ipynb?documentId={docId}",
@@ -15,7 +12,14 @@
       "title":"Development"}
 
   ]
-  },
+  }, {
+      "title": "UCSD Data Science Hub (UCSD)",
+      "uri_template": "https://datahub.ucsd.edu/hub/user-redirect/notebooks/jupyter-cinergi/CinergiDispatch.ipynb?documentId={docId}"
+    },
+    {
+      "title": "suave-jupyterhub.com (local authentication required)",
+      "uri_template": "http://suave-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb?documentId={docId}"
+    },
   {
     "disabled": false,
     "login": "Gmail",

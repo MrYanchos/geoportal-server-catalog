@@ -43,8 +43,10 @@ function(declare, lang, array, Templated, util, CollectionBase) {
       }
     },
     processError: function(searchError) {},
-
-    processSavedResults: function(items) {},
+    savedResults: function() {
+      if (this.collectionPane) this.collectionPane.savedResults();
+    },
+    processSavedResults: function(items, totalRecords, nextPage) {},
 
 
   //  var open = window.XMLHttpRequest.prototype.open,

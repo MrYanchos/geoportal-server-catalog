@@ -23,10 +23,11 @@ define(["dojo/_base/declare",
         "app/collection/CollectionComponent",
       "app/collection/CollectionBase",
       "app/collection/SavedItemCard",
+        "app/collection/PagingCollections",
         "app/search/DropPane",
         "dojox/widget/Standby"],
 function(declare, lang, array, aspect, domConstruct, Templated,template, i18n, CollectionComponent, CollectionBase, SavedItemCard,
-         DropPane, Standby) {
+    PagingCollections,DropPane, Standby) {
   
   var oThisClass = declare([CollectionComponent], {
 //var oThisClass = declare([Templated], {
@@ -42,6 +43,10 @@ function(declare, lang, array, aspect, domConstruct, Templated,template, i18n, C
     
     postCreate: function() {
       this.inherited(arguments);
+      this.inherited(arguments);
+     // this.addSort();
+      this.paging = new PagingCollections({});
+      this.paging.placeAt(this.dropPane.toolsNode);
     //  document.body.appendChild(this.statusNode.domNode);
      // this.statusNode.target = this.dropPane.domNode;
      //  this.own(topic.subscribe("app/collection/assignEvent",function(item){
@@ -53,11 +58,11 @@ function(declare, lang, array, aspect, domConstruct, Templated,template, i18n, C
       //setSavedCard();
     },
 
-    processSavedResults: function(item){
+    processSavedResults: function(records, totalRecords, nextPage){
       var self = this;
       domConstruct.empty(this.itemsNode);
-     if (Array.isArray(item))  {
-       array.forEach( item, function(md ){
+     if (Array.isArray(records))  {
+       array.forEach( records, function(md ){
          var itemCard = new SavedItemCard({
            itemsNode: self.itemsNode,
            itemsPane: self.itemsPane

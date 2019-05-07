@@ -1,6 +1,7 @@
 define(["dojo/_base/lang",
-        "dojo/_base/array"],
-    function (lang,array) {
+        "dojo/_base/array",
+        "dojo/topic",],
+    function (lang,array, topic) {
 
         var oThisObject = {
 
@@ -37,10 +38,7 @@ define(["dojo/_base/lang",
                 if (mdRecord) {
                     if (array.indexOf(mdRecord.collections, coll) >= 0) {
                         mdRecord.collections.pop(coll);
-                        mdRecord.collections = array.filter(mdRecord.collections, function(collection){
-                                return collection === "default";
-                            }
-                        )
+
                         if (mdRecord.collections.length ===0){
                             mdRecord.collections.push("default");
                         }
@@ -112,6 +110,7 @@ define(["dojo/_base/lang",
                 var key = "mdRec-" + md.id;
                 localStorage.setItem(key, JSON.stringify(md));
               //  refeshMdPanel(container);
+                    topic.publish("app/collection/refresh", true);
                 return key;
                     }
                 return null;
@@ -121,6 +120,7 @@ define(["dojo/_base/lang",
                 var key = "mdRec-" + md.id;
                 localStorage.removeItem(key);
                 //  refeshMdPanel(container);
+                    topic.publish("app/collection/refresh", true);
                 }
             },
             saveCollectionItem: function (ColItem) {
@@ -182,56 +182,6 @@ define(["dojo/_base/lang",
                 return {isSaved:isSaved, collections:collections};
             },
 
-            getMdRecords: function (qField, query) {
-                var md = this.findLocalItems("mdRec");
-                // If there is a query
-                if (typeof (qField) !== "undefined" && typeof (query) !== "undefined") {
-                    results = [];
-                    for (var k in md) {
-                        var mkr = md[k].val;
-                        var mkey = md[k].key;
-                        // var kid = md[k][qField];
-
-                        if (qField == "collections") {
-                            if (query == "default") {
-                                var mCol = mkr.collections;
-                                // only bring back if only in default
-                                if (mCol.length == 1 & mCol[0] == "default") {
-                                    results.push({key: mkey, val: mkr});
-                                }
-
-                            } else if (query == "all") {
-                                results.push({key: mkey, val: mkr});
-
-                            } else {
-                                var mCol = mkr.collections;
-
-                                for (var c in mCol) {
-
-                                    if (mCol[c].match(query)) {
-                                        results.push({key: mkey, val: mkr});
-                                    }
-                                }
-                            }
-                        } else if (qField == "id") {
-                            if (mkr.id == query) {
-                                results.push({key: mkey, val: mkr});
-                            }
-                        } else {
-                            var mkStr = JSON.stringify(mkr);
-                            if (mkStr.match(query)) {
-                                results.push({key: mkey, val: mkr});
-                            }
-                        }
-
-                    }
-                    md = results;
-                }
-
-                return md;
-            },
-
-
             findLocalItems: function (query) {
                 var i, results = [];
                 for (i in localStorage) {
@@ -291,7 +241,133 @@ define(["dojo/_base/lang",
                 }
 
                 return md;
-            }
+            },
+getMdRecordsPaged: function(qField, query, curPage=0, pageSize=10)
+    {
+        var startAt = 0;
+        var hasNext = true;
+      var mda = this.getMdRecords(qField, query);
+      var  totRecords = mda.length;
+
+        if (curPage > 0 ) {
+            startAt = curPage * pageSize ;
+        }
+
+
+        var endAt = curPage * pageSize  + pageSize;
+
+        var nextPage = curPage + 1;
+        if (endAt > mda.length ) {
+            endAt = mda.length;
+            hasNext = false;
+            nextPage =curPage;
+        }
+
+        var records = [];
+        for (var i =startAt; i < endAt; i++) {
+
+            records.push( mda[i]);
+
+                }
+
+
+        return {totalRecords: mda.length, startRec:startAt, nextPage: nextPage, hasNext: hasNext, records: records }
+
+    },
+            getSavedSearchRecords: function (sp, savedSearch, curPage = 0, pageSize = 10 ) {
+                // Show DDH records on search page
+                sType = "csw";
+                var aggUrl;
+                var startP = curPage * 10;
+                if (typeof sp !== "undefined") {
+                    startP = sp * 10;
+                    this.curPage = sp;
+                    $("#PageCnt").html("Page " + curPage);
+                }
+
+                var bref = 'http://132.249.238.169:8080/geoportal/opensearch?f=json&from=' + startP + '&size=10&sort=sys_modified_dt:desc&esdsl={"query":{"bool":{"must":[{"query_string":{"analyze_wildcard":true,"query":"';
+                var eref = '","fields":["_source.title^5","_source.*_cat^10","_all"],"default_operator":"and"}}]}}}';
+
+                if (savedSearch) {
+                    aggUrl = savedSearch;
+                } else {
+                    var inp = $("#gSvSearch option:selected").text();
+
+                    var inJ = inp.split(" ").join('+');
+                    var inParams = '&from=' + startP + '&q=' + inJ;
+
+                    aggUrl = bref + inJ + eref;
+                }
+
+                ItemPane.itemNode.find('.g-item-card').each(function (d) {
+                    $(this).remove();
+                });
+
+                mdArray = [];
+
+                var uniq = $('#' + mdRecordsId);
+                var cp = $('<div class="g-drop-pane dijitTitlePane" id="' + recordsDropPaneId + '" widgetid="' + recordsDropPaneId + '">');
+
+                $.ajax({
+                    type: "GET",
+                    url: aggUrl,
+                    dataType: 'json',
+                    data: {"datatype": "query"},
+                    contentType: 'application/json',
+                    success: function (data) {
+                        //console.log(data);
+                        var ha = [];
+
+                        if (data.hits) {
+                            ha = data.hits.hits;
+                            var hal = data.hits.total;
+
+                        } else {
+                            ha = data.results;
+                            var hal = data.total;
+                        }
+
+                        totRecords = hal;
+
+                        $("#PageTotals").html("Total Records " + hal);
+                        for (i = 0; i < ha.length; i++) {
+                            if (ha[i]._id) {
+                                var hid = ha[i]._id;
+                            } else {
+                                var hid = ha[i].id;
+                            }
+                            var src_title = ha[i]._source.title;
+                            var src_desc = ha[i]._source.description;
+                            var src_fileid = ha[i]._source.fileid;
+
+                            var idlink = 'http://datadiscoverystudio.org/geoportal/rest/metadata/item/' + hid + '/html';
+                            var col = [];
+                            var mdRec = mdRecord(hid, src_fileid, src_title, idlink, src_desc, col);
+
+                            mdArray.push(mdRec);
+
+                            var gCard = recordPanelItem(mdRec);
+                            cp.append(gCard);
+                        }
+
+
+                        uniq.append(cp);
+                        uniq.show();
+
+                        var sb = $('#' + recordsDropPaneId + '_titleBarNode');
+                        var tlab = sb[0].childNodes[0];
+                        tlab.nodeValue = "Results - DDS Records for Saved Search  " + inp;
+
+                        sb.hide();
+
+                        sb.show();
+
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr);
+                    }
+                });
+            },
         }
         return oThisObject;
     });

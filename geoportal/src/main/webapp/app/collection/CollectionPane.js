@@ -28,11 +28,14 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
 
         defaultSort: null,
         showItemsOnStart: true,
-
+        curPage: 0,
+        pageSize: 10,
         lastQuery: null,
         lastQueryCount: 0,
         lastQueryWasMyContent: false,
         highlightQuery: null,
+        lastSavedField: null,
+        lastSavedQuery: null,
 
         _dfd: null,
 
@@ -81,20 +84,22 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
                     CollectionBase.saveMdRecord(md);
                     topic.publish(appTopics.itemStatusChanged, {item:params.item, status:"saved" } )
 
-
+                    self.refreshResults();
                 }
             })
             );
             this.own(topic.subscribe(appTopics.itemRemove,function(params){
-                if (params.item ) {
-                    var mds = CollectionBase.getMdRecords('id', params.item.id);
+
+                    if (params.item ) {
+                        var item = params.item;
+                    var mds = CollectionBase.getMdRecords('id', item._id);
                     if (mds.length ==0 ){
                         console.log (' addRemove, item not found');
                         return;
                     }
                     else {
                         if (params.removeAll) {
-                            localStorage.removeItem("mdRec-" + params.item.id);
+                            localStorage.removeItem("mdRec-" + item._id);
                             topics.publish(appTopics.itemStatusChanged, {item: params.item, collection:'All', status: 'removed'});
                         }
                         var md = mds[0].val;
@@ -112,23 +117,24 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
                         }
                         if (md.collections.length > 0 ){
                             CollectionBase.saveMdRecord(md);
-                            topic.publish(appTopics.itemStatusChanged, {item: params.item, collection:params.collection, status: "saved"});
+                            topic.publish(appTopics.itemStatusChanged, {item: item, collection:params.collection, status: "saved"});
                         } else {
                             CollectionBase.removeMdRecord(md);
-                            topic.publish(appTopics.itemStatusChanged, {item: params.item, collection:params.collection, status: "removed"});
+                            topic.publish(appTopics.itemStatusChanged, {item: item, collection:params.collection, status: "removed"});
 
                         }
-
+                        self.refreshResults();
                         // if (params.collection === 'default') {
-                        //     topic.publish(appTopics.itemStatusChanged, {item: params.item, collection:params.collection, status: false})
+                        //     topic.publish(appTopics.itemStatusChanged, {item: item, collection:params.collection, status: false})
                         // }
                     }
                 }
             })
             );
-            // topic.subscribe(appTopics.SignedIn,function(params){
-            //     if (self._started) self.search();
-            // });
+            this.own(topic.subscribe("app/collection/refresh", function(){
+                self.refreshResults();
+            }));
+
         },
 
         startup: function() {
@@ -159,13 +165,37 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
             var components = this.getCollectionComponents();
             var self = this;
 
-            var mda = CollectionBase.getMdRecords(Field,query);
+           // var mda = CollectionBase.getMdRecords(Field,query);
+            var paged = CollectionBase.getMdRecordsPaged(Field,query, this.curPage, this.pageSize);
+            var mda = paged.records;
+            var totalRecords = paged.totalRecords;
+            if (paged.nextPage !== null){
+                this.curPage = paged.nextPage;
+            }
+            array.forEach(components, function (component) {
+                component.processSavedResults(mda, totalRecords, paged.nextPage);
+            });
+            this.lastSavedQuery = query;
+            this.lastSavedField = Field;
+
+        },
+        refreshResults: function (){
+            this.savedResults(this.lastSavedField, this.lastSavedQuery);
+
+        },
+        savedSearch: function (esdsl){
+            var components = this.getCollectionComponents();
+            var self = this;
+
+            //var mda = CollectionBase.getMdRecords(Field,query);
+
             array.forEach(components, function (component) {
                 component.processSavedResults(mda);
             });
+            this.lastQuery = esdsl;
+
 
         },
-
     });
 
     return oThisClass;

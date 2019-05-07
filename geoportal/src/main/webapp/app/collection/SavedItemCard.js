@@ -107,7 +107,7 @@ define(["dojo/_base/declare",
                 var coll= collTxtBox.value;
                 CollectionBase._addCollectionMdRecord(this.mdRecord,coll);
                 this._renderCollections(this.mdRecord)
-                this._renderActionStatus(mdRecord);
+                this._renderActionStatus(this.mdRecord);
                 // this.myTempDialog.show();
             },
             onRemoveCollectionClicked: function(evt){
@@ -115,7 +115,7 @@ define(["dojo/_base/declare",
                 var coll= collTxtBox.value;
                 CollectionBase._removeCollectionMdRecord(this.mdRecord,coll);
                 this._renderCollections(this.mdRecord)
-                this._renderActionStatus(mdRecord);
+                this._renderActionStatus(this.mdRecord);
                 // this.myTempDialog.show();
             },
             onRemoveMDRecordClicked: function(evt){

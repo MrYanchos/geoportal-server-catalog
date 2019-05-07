@@ -159,6 +159,7 @@ define(["dojo/_base/declare",
                   // this.menuNode.options.push(newColOpt);
                     this.menuNode.addOption(newColOpt);
                     this.menuNode.set("value", ncID);
+                    this.newCollection.set('displayedValue', '');
                 }
 
             },
