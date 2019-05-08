@@ -65,14 +65,15 @@ function(declare, lang, array, topic, aspect, domConstruct,registry, Templated,t
       if (typeof this.maxShowPageCount === "undefined" || this.maxShowPageCount === null) {
         this.maxShowPageCount = 9999;
       }
-      this.own(topic.subscribe("app/collection/selectCollection",function(params){
-        var menu = registry.byId("collectionMenuNode");
-        var coll = menu.get("displayedValue");
-        self.dropPane.set("label" ,  "Collection Items from " + coll);
-
-        self.dropPane.set("title" ,  "Collection Items from " + coll);
-
-      }));
+      // We refresh on clicking view, not select.
+      // this.own(topic.subscribe("app/collection/selectCollection",function(params){
+      //   var menu = registry.byId("collectionMenuNode");
+      //   var coll = menu.get("displayedValue");
+      //   self.dropPane.set("label" ,  "Collection Items from " + coll);
+      //
+      //   self.dropPane.set("title" ,  "Collection Items from " + coll);
+      //
+      // }));
     //  document.body.appendChild(this.statusNode.domNode);
      // this.statusNode.target = this.dropPane.domNode;
      //  this.own(topic.subscribe("app/collection/assignEvent",function(item){
@@ -86,7 +87,7 @@ function(declare, lang, array, topic, aspect, domConstruct,registry, Templated,t
 
     processSavedResults: function(records, totalRecords, nextPage, startRec, endRec){
       var self = this;
-      domConstruct.empty(this.itemsNode);
+      this.destroyItems();
       this.paging.collectionPane = this.collectionPane;
       this.paging.processSavedResults(records, totalRecords, nextPage, startRec, endRec);
 

@@ -16,7 +16,7 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/on",
-        "dojo/topic",
+        "dojo/topic",     "dijit/registry",
         "app/common/Templated",
         "dojo/text!./templates/SavedCollections.html",
         "dojo/i18n!../nls/resources",
@@ -29,7 +29,7 @@ define(["dojo/_base/declare",
         "dijit/form/TextBox",
 
     ],
-    function(declare, lang, ArrayUtil, on, topic, Templated, template, i18n, CollectionComponent,CollectionBase,  ItemsPane) {
+    function(declare, lang, ArrayUtil, on, topic, registry, Templated, template, i18n, CollectionComponent,CollectionBase,  ItemsPane) {
 
         var oThisClass = declare([CollectionComponent], {
 
@@ -77,7 +77,7 @@ define(["dojo/_base/declare",
                 sType = "local";
 
                 var ColID = this.menuNode.value; // $('#gSvCollection').find(":selected").val();
-                var coltxt =   this.menuNode.focusNode.textContent; // $('#gSvCollection').find(":selected").text(); //dijit_TitlePane_0_titleBarNode
+                var coltxt =   this.menuNode.get("displayedValue"); // $('#gSvCollection').find(":selected").text(); //dijit_TitlePane_0_titleBarNode
                 if ( ColID !== "default") {
 
                     // var sb =ItemsPane.itemsNode;// container.find('#'+recordsDropPaneId);
@@ -93,7 +93,9 @@ define(["dojo/_base/declare",
 
                 }
 
-
+                  var dp = registry.byId("itemDropPane");
+                dp.set("label" ,  "Collection Items from " + coltxt);
+                dp.set("title" ,  "Collection Items from " + coltxt);
 
                 if ( ColID == "default" ) {
                    // var mda = CollectionBase.getMdRecords("collections","default");

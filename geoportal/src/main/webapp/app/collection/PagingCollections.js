@@ -103,7 +103,7 @@ define(["dojo/_base/declare",
                 if (this.hasLess) {
                     this.start = 1;
                     this.collectionPane.start = 1;
-                    this.savedResults();
+                    this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery);
                 }
             },
 
@@ -111,7 +111,7 @@ define(["dojo/_base/declare",
                 if (this.hasLess) {
                     this.start = this.previousStart;
                     this.collectionPane.start = this.previousStart;
-                    this.savedResults();
+                    this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery);
                 }
             },
 
@@ -119,7 +119,7 @@ define(["dojo/_base/declare",
                 if (this.hasMore) {
                     this.start = this.nextStart;
                     this.collectionPane.start = this.nextStart;
-                    this.savedResults();
+                    this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery);
                 }
             },
 
@@ -149,7 +149,7 @@ define(["dojo/_base/declare",
                 this._hasMore();
                 if (this.hasMore) {
 
-                    this.savedResults();
+                    this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery);
                 }
             },
 

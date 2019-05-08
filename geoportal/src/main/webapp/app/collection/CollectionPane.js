@@ -169,6 +169,7 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
         },
 
         savedResults: function (Field, query){
+
             var components = this.getCollectionComponents();
             var self = this;
 

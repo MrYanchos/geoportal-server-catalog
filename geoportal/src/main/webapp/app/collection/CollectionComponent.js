@@ -43,11 +43,14 @@ function(declare, lang, array, Templated, util, CollectionBase) {
       }
     },
     processError: function(searchError) {},
-    savedResults: function() {
-      if (this.collectionPane) this.collectionPane.savedResults();
+    savedResults: function(Field, query) {
+      if (this.collectionPane) this.collectionPane.savedResults(Field, query);
     },
     processSavedResults: function(items, totalRecords, nextPage, startRec, endRec) {},
-
+    savedSearches: function() {
+      if (this.collectionPane) this.collectionPane.savedResults();
+    },
+    processSavedSearches: function(items, totalRecords, nextPage, startRec, endRec) {},
 
   //  var open = window.XMLHttpRequest.prototype.open,
   //  send = window.XMLHttpRequest.prototype.send,

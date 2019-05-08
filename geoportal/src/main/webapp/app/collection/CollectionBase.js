@@ -271,7 +271,7 @@ getMdRecordsPaged: function(qField, query, startAt=1, pageSize=10)
         return {totalRecords: mda.length, startRec:startAt, endRec:endAt, nextPage: nextPage,  records: records }
 
     },
-            getSavedSearchRecords: function (sp, savedSearch, curPage = 0, pageSize = 10 ) {
+    getSavedSearchRecords: function (sp, savedSearch, curPage = 0, pageSize = 10 ) {
                 // Show DDH records on search page
                 sType = "csw";
                 var aggUrl;
@@ -281,29 +281,23 @@ getMdRecordsPaged: function(qField, query, startAt=1, pageSize=10)
                     this.curPage = sp;
                     $("#PageCnt").html("Page " + curPage);
                 }
-
                 var bref = 'http://132.249.238.169:8080/geoportal/opensearch?f=json&from=' + startP + '&size=10&sort=sys_modified_dt:desc&esdsl={"query":{"bool":{"must":[{"query_string":{"analyze_wildcard":true,"query":"';
                 var eref = '","fields":["_source.title^5","_source.*_cat^10","_all"],"default_operator":"and"}}]}}}';
 
                 if (savedSearch) {
                     aggUrl = savedSearch;
                 } else {
-                    var inp = $("#gSvSearch option:selected").text();
-
+                    var menu = registry.byId("savedSearchMenu");
+                    var inp= menu.get("displayedValue");
                     var inJ = inp.split(" ").join('+');
                     var inParams = '&from=' + startP + '&q=' + inJ;
 
                     aggUrl = bref + inJ + eref;
                 }
 
-                ItemPane.itemNode.find('.g-item-card').each(function (d) {
-                    $(this).remove();
-                });
 
                 mdArray = [];
 
-                var uniq = $('#' + mdRecordsId);
-                var cp = $('<div class="g-drop-pane dijitTitlePane" id="' + recordsDropPaneId + '" widgetid="' + recordsDropPaneId + '">');
 
                 $.ajax({
                     type: "GET",
@@ -326,7 +320,6 @@ getMdRecordsPaged: function(qField, query, startAt=1, pageSize=10)
 
                         totRecords = hal;
 
-                        $("#PageTotals").html("Total Records " + hal);
                         for (i = 0; i < ha.length; i++) {
                             if (ha[i]._id) {
                                 var hid = ha[i]._id;
@@ -343,21 +336,12 @@ getMdRecordsPaged: function(qField, query, startAt=1, pageSize=10)
 
                             mdArray.push(mdRec);
 
-                            var gCard = recordPanelItem(mdRec);
-                            cp.append(gCard);
+
                         }
+                        return mdArray;
+                        return {totalRecords: totRecords, startRec:startP, endRec:startP+pageSize, nextPage: nextPage,  records: mdArray }
 
 
-                        uniq.append(cp);
-                        uniq.show();
-
-                        var sb = $('#' + recordsDropPaneId + '_titleBarNode');
-                        var tlab = sb[0].childNodes[0];
-                        tlab.nodeValue = "Results - DDS Records for Saved Search  " + inp;
-
-                        sb.hide();
-
-                        sb.show();
 
                     },
                     error: function (xhr, status, error) {
