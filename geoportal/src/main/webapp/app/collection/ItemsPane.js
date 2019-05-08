@@ -15,8 +15,10 @@
 define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
+      "dojo/topic",
         "dojo/aspect",
         "dojo/dom-construct",
+      "dijit/registry",
       "app/common/Templated",
         "dojo/text!./templates/ItemsPane.html",
         "dojo/i18n!app/nls/resources",
@@ -26,7 +28,7 @@ define(["dojo/_base/declare",
         "app/collection/PagingCollections",
         "app/search/DropPane",
         "dojox/widget/Standby"],
-function(declare, lang, array, aspect, domConstruct, Templated,template, i18n, CollectionComponent, CollectionBase, SavedItemCard,
+function(declare, lang, array, topic, aspect, domConstruct,registry, Templated,template, i18n, CollectionComponent, CollectionBase, SavedItemCard,
     PagingCollections,DropPane, Standby) {
   
   var oThisClass = declare([CollectionComponent], {
@@ -42,11 +44,35 @@ function(declare, lang, array, aspect, domConstruct, Templated,template, i18n, C
     sortDir: null,
     
     postCreate: function() {
-      this.inherited(arguments);
+      var self = this;
       this.inherited(arguments);
      // this.addSort();
       this.paging = new PagingCollections({});
       this.paging.placeAt(this.dropPane.toolsNode);
+      if (typeof this.numPerPage === "undefined" || this.numPerPage === null) {
+        this.numPerPage = 10;
+      }
+      if (typeof this.showPageCount === "undefined" || this.showPageCount === null) {
+        this.showPageCount = AppContext.appConfig.searchResults.showPageCount;
+      }
+      if (typeof this.showPageCount === "undefined" || this.showPageCount === null) {
+        this.showPageCount = false;
+      }
+
+      if (typeof this.maxShowPageCount === "undefined" || this.maxShowPageCount === null) {
+        this.maxShowPageCount = AppContext.appConfig.searchResults.maxShowPageCount;
+      }
+      if (typeof this.maxShowPageCount === "undefined" || this.maxShowPageCount === null) {
+        this.maxShowPageCount = 9999;
+      }
+      this.own(topic.subscribe("app/collection/selectCollection",function(params){
+        var menu = registry.byId("collectionMenuNode");
+        var coll = menu.get("displayedValue");
+        self.dropPane.set("label" ,  "Collection Items from " + coll);
+
+        self.dropPane.set("title" ,  "Collection Items from " + coll);
+
+      }));
     //  document.body.appendChild(this.statusNode.domNode);
      // this.statusNode.target = this.dropPane.domNode;
      //  this.own(topic.subscribe("app/collection/assignEvent",function(item){
@@ -58,10 +84,14 @@ function(declare, lang, array, aspect, domConstruct, Templated,template, i18n, C
       //setSavedCard();
     },
 
-    processSavedResults: function(records, totalRecords, nextPage){
+    processSavedResults: function(records, totalRecords, nextPage, startRec, endRec){
       var self = this;
       domConstruct.empty(this.itemsNode);
+      this.paging.collectionPane = this.collectionPane;
+      this.paging.processSavedResults(records, totalRecords, nextPage, startRec, endRec);
+
      if (Array.isArray(records))  {
+
        array.forEach( records, function(md ){
          var itemCard = new SavedItemCard({
            itemsNode: self.itemsNode,
@@ -80,6 +110,17 @@ function(declare, lang, array, aspect, domConstruct, Templated,template, i18n, C
        itemCard.placeAt(self.itemsNode);
 
      }
+    },
+    destroyItems: function(searchContext,searchResponse) {
+      this.noMatchNode.style.display = "none";
+      this.noMatchNode.innerHTML = "";
+      var rm = [];
+      array.forEach(this.dropPane.getChildren(),function(child){
+        if (child.isItemCard) rm.push(child);
+      });
+      array.forEach(rm,function(child){
+        this.dropPane.removeChild(child);
+      },this);
     },
 
     addSort: function() {

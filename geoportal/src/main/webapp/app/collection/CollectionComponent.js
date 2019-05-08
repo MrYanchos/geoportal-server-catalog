@@ -46,7 +46,7 @@ function(declare, lang, array, Templated, util, CollectionBase) {
     savedResults: function() {
       if (this.collectionPane) this.collectionPane.savedResults();
     },
-    processSavedResults: function(items, totalRecords, nextPage) {},
+    processSavedResults: function(items, totalRecords, nextPage, startRec, endRec) {},
 
 
   //  var open = window.XMLHttpRequest.prototype.open,

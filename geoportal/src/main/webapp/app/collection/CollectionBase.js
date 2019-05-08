@@ -242,36 +242,33 @@ define(["dojo/_base/lang",
 
                 return md;
             },
-getMdRecordsPaged: function(qField, query, curPage=0, pageSize=10)
+getMdRecordsPaged: function(qField, query, startAt=1, pageSize=10)
     {
-        var startAt = 0;
+        //var startAt = 1;
         var hasNext = true;
       var mda = this.getMdRecords(qField, query);
       var  totRecords = mda.length;
 
-        if (curPage > 0 ) {
-            startAt = curPage * pageSize ;
-        }
+        var endAt = startAt  + pageSize ;
 
-
-        var endAt = curPage * pageSize  + pageSize;
-
-        var nextPage = curPage + 1;
+        var nextPage = Math.trunc(totRecords/(endAt*pageSize));
         if (endAt > mda.length ) {
             endAt = mda.length;
             hasNext = false;
-            nextPage =curPage;
+            nextPage =Math.trunc(totRecords/pageSize);;
         }
 
         var records = [];
-        for (var i =startAt; i < endAt; i++) {
+        for (var i =startAt-1; i < endAt-1; i++) {
 
             records.push( mda[i]);
+        }
+        if (mda.length == 1) {
+            records = mda;
+        }
 
-                }
 
-
-        return {totalRecords: mda.length, startRec:startAt, nextPage: nextPage, hasNext: hasNext, records: records }
+        return {totalRecords: mda.length, startRec:startAt, endRec:endAt, nextPage: nextPage,  records: records }
 
     },
             getSavedSearchRecords: function (sp, savedSearch, curPage = 0, pageSize = 10 ) {

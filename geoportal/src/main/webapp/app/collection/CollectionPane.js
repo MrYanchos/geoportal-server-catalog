@@ -28,14 +28,21 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
 
         defaultSort: null,
         showItemsOnStart: true,
-        curPage: 0,
-        pageSize: 10,
         lastQuery: null,
         lastQueryCount: 0,
         lastQueryWasMyContent: false,
         highlightQuery: null,
         lastSavedField: null,
         lastSavedQuery: null,
+
+        nextStart: -1,
+        numHits: 0,
+        numPerPage: 10,
+        showPageCount: null,
+        maxShowPageCount: null,
+        maxShowPageCountText: null,
+        previousStart: -1,
+        start: 1,
 
         _dfd: null,
 
@@ -166,14 +173,14 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
             var self = this;
 
            // var mda = CollectionBase.getMdRecords(Field,query);
-            var paged = CollectionBase.getMdRecordsPaged(Field,query, this.curPage, this.pageSize);
+            var paged = CollectionBase.getMdRecordsPaged(Field,query, this.start, this.numPerPage);
             var mda = paged.records;
             var totalRecords = paged.totalRecords;
-            if (paged.nextPage !== null){
-                this.curPage = paged.nextPage;
-            }
+            this.previousStart = this.start;
+            this.start = paged.endRec;
+
             array.forEach(components, function (component) {
-                component.processSavedResults(mda, totalRecords, paged.nextPage);
+                component.processSavedResults(mda, totalRecords, paged.nextPage, paged.startRec, paged.endRec);
             });
             this.lastSavedQuery = query;
             this.lastSavedField = Field;
