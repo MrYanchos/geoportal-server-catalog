@@ -165,6 +165,16 @@ define(["dojo/_base/lang",
                 return key;
 
             },
+            getSearchById: function(id ){
+                if (id === "default") return null;
+                var key = "sItem-" +id;
+                var sItem = this.findLocalItems (key);
+                if (sItem.length > 0){
+                    return sItem[0].val;
+                }
+                return null;
+
+            },
             isSavedItem: function(itemId){
                 var isSaved = false;
                 var collections = [];
@@ -244,34 +254,36 @@ define(["dojo/_base/lang",
             },
 getMdRecordsPaged: function(qField, query, startAt=1, pageSize=10)
     {
-        //var startAt = 1;
+        var firstRec = startAt - 1;
         var hasNext = true;
       var mda = this.getMdRecords(qField, query);
       var  totRecords = mda.length;
 
-        var endAt = startAt  + pageSize ;
+        var lastRec = firstRec  + pageSize ;
 
-        var nextPage = Math.trunc(totRecords/(endAt*pageSize));
-        if (endAt > mda.length ) {
-            endAt = mda.length;
+        var nextPage = Math.trunc(totRecords/(lastRec*pageSize));
+        if (lastRec > mda.length ) {
+            lastRec = mda.length;
             hasNext = false;
             nextPage =Math.trunc(totRecords/pageSize);;
         }
 
         var records = [];
-        for (var i =startAt-1; i < endAt-1; i++) {
-
-            records.push( mda[i]);
+        for (var i =firstRec; i < lastRec; i++) {
+            if (mda[i] ) {
+                records.push(mda[i]);
+            }
         }
         if (mda.length == 1) {
             records = mda;
         }
 
 
-        return {totalRecords: mda.length, startRec:startAt, endRec:endAt, nextPage: nextPage,  records: records }
+        return {totalRecords: mda.length, startRec:startAt, endRec:lastRec+1, nextPage: nextPage,  records: records }
 
     },
     getSavedSearchRecords: function (sp, savedSearch, curPage = 0, pageSize = 10 ) {
+                var self = this;
                 // Show DDH records on search page
                 sType = "csw";
                 var aggUrl;
@@ -281,22 +293,29 @@ getMdRecordsPaged: function(qField, query, startAt=1, pageSize=10)
                     this.curPage = sp;
                     $("#PageCnt").html("Page " + curPage);
                 }
-                var bref = 'http://132.249.238.169:8080/geoportal/opensearch?f=json&from=' + startP + '&size=10&sort=sys_modified_dt:desc&esdsl={"query":{"bool":{"must":[{"query_string":{"analyze_wildcard":true,"query":"';
-                var eref = '","fields":["_source.title^5","_source.*_cat^10","_all"],"default_operator":"and"}}]}}}';
+                // var bref = 'http://132.249.238.169:8080/geoportal/opensearch?f=json&from=' + startP + '&size=10&sort=sys_modified_dt:desc&esdsl={"query":{"bool":{"must":[{"query_string":{"analyze_wildcard":true,"query":"';
+                // var eref = '","fields":["_source.title^5","_source.*_cat^10","_all"],"default_operator":"and"}}]}}}';
+                //
+                // if (savedSearch) {
+                //     aggUrl = savedSearch;
+                // } else {
+                //     var menu = registry.byId("savedSearchMenu");
+                //     var inp= menu.get("displayedValue");
+                //     var inJ = inp.split(" ").join('+');
+                //     var inParams = '&from=' + startP + '&q=' + inJ;
+                //
+                //     aggUrl = bref + inJ + eref;
+                // }
 
-                if (savedSearch) {
-                    aggUrl = savedSearch;
-                } else {
-                    var menu = registry.byId("savedSearchMenu");
-                    var inp= menu.get("displayedValue");
-                    var inJ = inp.split(" ").join('+');
-                    var inParams = '&from=' + startP + '&q=' + inJ;
+         var bref = 'http://localhost:8081/geoportal/opensearch?f=json&from=' +
+             startP +
+             '&size=10&sort=sys_modified_dt:desc&esdsl="';
+            var esdsl= JSON.stringify(savedSearch.params.query);
 
-                    aggUrl = bref + inJ + eref;
-                }
+        aggUrl = bref+esdsl;
 
+        mdArray = [];
 
-                mdArray = [];
 
 
                 $.ajax({
@@ -332,14 +351,14 @@ getMdRecordsPaged: function(qField, query, startAt=1, pageSize=10)
 
                             var idlink = 'http://datadiscoverystudio.org/geoportal/rest/metadata/item/' + hid + '/html';
                             var col = [];
-                            var mdRec = mdRecord(hid, src_fileid, src_title, idlink, src_desc, col);
+                            var mdRec = self.mdRecord(hid, src_fileid, src_title, idlink, src_desc, col);
 
                             mdArray.push(mdRec);
 
 
                         }
-                        return mdArray;
-                        return {totalRecords: totRecords, startRec:startP, endRec:startP+pageSize, nextPage: nextPage,  records: mdArray }
+                       // return mdArray;
+                      //  return {totalRecords: totRecords, startRec:startP, endRec:startP+pageSize, nextPage: null,  records: mdArray }
 
 
 
@@ -348,7 +367,10 @@ getMdRecordsPaged: function(qField, query, startAt=1, pageSize=10)
                         console.log(xhr);
                     }
                 });
-            },
+
+        return {totalRecords: 10000, startRec:startP, endRec:startP+pageSize, nextPage: null,  records: mdArray }
+
+    },
         }
         return oThisObject;
     });

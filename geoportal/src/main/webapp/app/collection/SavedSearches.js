@@ -17,6 +17,7 @@ define(["dojo/_base/declare",
         "dojo/_base/array",
         "app/common/Templated",
         "dojo/topic",
+        "dijit/registry",
         "app/context/app-topics",
         "dojo/text!./templates/SavedSearches.html",
         "dojo/i18n!../nls/resources",
@@ -26,7 +27,7 @@ define(["dojo/_base/declare",
         "dijit/form/Select",
         "dijit/form/Button"
     ],
-    function(declare, lang, ArrayUtil, Templated, topic, appTopics, template, i18n, CollectionComponent, CollectionBase) {
+    function(declare, lang, ArrayUtil, Templated, topic,registry, appTopics, template, i18n, CollectionComponent, CollectionBase) {
 
         var oThisClass = declare([CollectionComponent], {
 
@@ -82,7 +83,13 @@ define(["dojo/_base/declare",
                 var sa = ss.query.bool.must;
                 var sQry = '';
                 for (var i in sa) {
-                    sQry = sa[i].query_string.query;
+                    if (sa[i].query_string){
+                        sQry = sQry +"["+sa[i].query_string.query+"] ";
+                    } else if (sa[i].geo_shape){
+                        sQry = sQry + " [Location ]";
+                    } else {
+                        sQry = sQry + " ]Other facet] ";
+                    }
                 }
 
                 if (sQry.length < 2) {
@@ -99,6 +106,7 @@ define(["dojo/_base/declare",
 
                 var newSearch = { value: si.id, label: newSearchText };
                 this.menuNode.addOption(newSearch);
+                this.menuNode.set("value", si.id);
                 console.log(' Add search' + newSearchText);
 
             },
@@ -118,100 +126,17 @@ define(["dojo/_base/declare",
                 this.menuNode.removeOption(seaID);
 
             },
-            show_cinergi: function (sp, savedSearch) {
-                // Show DDH records on search page
-                sType = "csw";
-                var aggUrl;
-                var startP = this.curPage * 10;
-                if (typeof sp !== "undefined") {
-                    startP = sp * 10;
-                    this.curPage = sp;
-                    $("#PageCnt").html("Page " + this.curPage);
-                }
+            showSearchResults: function (sp, savedSearch){
+                var collId = this.menuNode.value;
+                var searchTitle = this.menuNode.get("displayedValue");
+                var search = CollectionBase.getSearchById(collId);
+                var mda = this.collectionPane.savedSearch(search);
 
-                var bref = 'http://132.249.238.169:8080/geoportal/opensearch?f=json&from=' + startP + '&size=10&sort=sys_modified_dt:desc&esdsl={"query":{"bool":{"must":[{"query_string":{"analyze_wildcard":true,"query":"';
-                var eref = '","fields":["_source.title^5","_source.*_cat^10","_all"],"default_operator":"and"}}]}}}';
-
-                if (savedSearch) {
-                    aggUrl = savedSearch;
-                } else {
-                    var inp = $("#gSvSearch option:selected").text();
-
-                    var inJ = inp.split(" ").join('+');
-                    var inParams = '&from=' + startP + '&q=' + inJ;
-
-                    aggUrl = bref + inJ + eref;
-                }
-
-                ItemPane.itemNode.find('.g-item-card').each(function (d) {
-                    $(this).remove();
-                });
-
-                mdArray = [];
-
-                var uniq = $('#' + mdRecordsId);
-                var cp = $('<div class="g-drop-pane dijitTitlePane" id="' + recordsDropPaneId + '" widgetid="' + recordsDropPaneId + '">');
-
-                $.ajax({
-                    type: "GET",
-                    url: aggUrl,
-                    dataType: 'json',
-                    data: {"datatype": "query"},
-                    contentType: 'application/json',
-                    success: function (data) {
-                        //console.log(data);
-                        var ha = [];
-
-                        if (data.hits) {
-                            ha = data.hits.hits;
-                            var hal = data.hits.total;
-
-                        } else {
-                            ha = data.results;
-                            var hal = data.total;
-                        }
-
-                        totRecords = hal;
-
-                        $("#PageTotals").html("Total Records " + hal);
-                        for (i = 0; i < ha.length; i++) {
-                            if (ha[i]._id) {
-                                var hid = ha[i]._id;
-                            } else {
-                                var hid = ha[i].id;
-                            }
-                            var src_title = ha[i]._source.title;
-                            var src_desc = ha[i]._source.description;
-                            var src_fileid = ha[i]._source.fileid;
-
-                            var idlink = 'http://datadiscoverystudio.org/geoportal/rest/metadata/item/' + hid + '/html';
-                            var col = [];
-                            var mdRec = mdRecord(hid, src_fileid, src_title, idlink, src_desc, col);
-
-                            mdArray.push(mdRec);
-
-                            var gCard = recordPanelItem(mdRec);
-                            cp.append(gCard);
-                        }
-
-
-                        uniq.append(cp);
-                        uniq.show();
-
-                        var sb = $('#' + recordsDropPaneId + '_titleBarNode');
-                        var tlab = sb[0].childNodes[0];
-                        tlab.nodeValue = "Results - DDS Records for Saved Search  " + inp;
-
-                        sb.hide();
-
-                        sb.show();
-
-                    },
-                    error: function (xhr, status, error) {
-                        console.log(xhr);
-                    }
-                });
+                var dp = registry.byId("itemDropPane");
+                dp.set("label" ,  "Results from Search " + searchTitle);
+                dp.set("title" ,  "Results from Search " + searchTitle);
             },
+
             saveSearchItem: function (SeaItem) {
 
             var key = "sItem-"+ SeaItem.id;

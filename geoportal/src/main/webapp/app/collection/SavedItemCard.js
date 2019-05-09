@@ -127,18 +127,17 @@ define(["dojo/_base/declare",
 
             _renderCollections: function (mdRecord) {
                 var collections = mdRecord.collections;
-                var collString = "collections:"
-                array.forEach(collections, function(coll){
-                    var collName = CollectionBase.getCollectionNameById(coll);
-                    collString = collString + ", " +collName ;
-                })
-                util.setNodeText(this.collectionsNode,collString);
+                if (collections !== null && collections.length >0 ) {
+                    var collString = "collections:"
+                    array.forEach(collections, function (coll) {
+                        var collName = CollectionBase.getCollectionNameById(coll);
+                        collString = collString + ", " + collName;
+                    })
+                    util.setNodeText(this.collectionsNode, collString);
+                }
 
             },
-            /*
 
-        DVW 2018-80-23 Restore Logic to allow for highlighting of HTML.
-        */
             _renderDescription: function (mdRecord, highlight) {
                 var desc = mdRecord.description;
                 if (desc && desc.indexOf("REQUIRED FIELD") > -1 ) {
@@ -182,6 +181,7 @@ define(["dojo/_base/declare",
               var add = this.addButton ;
               var rmColl = this.rmCollectionButton;
               var rmMd = this.rmMdRecordButton;
+              var recSaved = CollectionBase.isSavedItem(mdRecord.id);
 
                 var collTxtBox = registry.byId("collectionMenuNode");
                 var coll= collTxtBox.value;
@@ -206,7 +206,22 @@ define(["dojo/_base/declare",
                         rmColl.title = "Select a collection";
                         break;
               }
-            },
+                if (recSaved.isSaved) {
+                    rmMd.disabled =false;
+                    rmMd.visibility = "visible";
+                } else {
+                    rmMd.disabled =true;
+                    rmMd.visibility = "hidden";
+                    rmMd.title = "Search Items cannot be saved, at present" ;
+                    add.disabled = true;
+                    add.title = "Search Items cannot be saved, at present";
+                    rmColl.disabled =true;
+                    rmColl.title = "Search Items cannot be saved, at present";
+                }
+
+
+            }
+            ,
         });
 
         return oThisClass;

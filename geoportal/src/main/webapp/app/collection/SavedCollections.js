@@ -99,7 +99,7 @@ define(["dojo/_base/declare",
 
                 if ( ColID == "default" ) {
                    // var mda = CollectionBase.getMdRecords("collections","default");
-                    var mda = this.collectionPane.savedResults("collections","default");
+                    var mda = this.collectionPane.savedSearch("collections","default");
 
 
                 } else if ( ColID == "All" ){

@@ -5,7 +5,7 @@
         <div class="form-group">
             <div data-dojo-type="dijit/form/Select" data-dojo-attach-point="menuNode"
             id="savedSearchMenu">
-            <span value="Your Saved Searches"><i>Your Saved Searches</i></span>
+            <span value="default"><i>Your Saved Searches</i></span>
         </div>
         <button data-dojo-attach-point="saveBtn" data-dojo-type="dijit/form/Button"
                 data-dojo-attach-event="onClick: _addSearch"
@@ -15,10 +15,10 @@
         </div>
         <div class="form-group">
         <button data-dojo-attach-point="showBtn" data-dojo-type="dijit/form/Button"
-                data-dojo-attach-event="onClick: show_cinergi"
+                data-dojo-attach-event="onClick: showSearchResults"
                 type="button"
         class="btn btn-primary"
-        disabled="disabled"
+
         title="To be reimplemented">Show Search Results
 
         </button>

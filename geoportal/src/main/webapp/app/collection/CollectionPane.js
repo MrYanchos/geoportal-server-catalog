@@ -34,6 +34,7 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
         highlightQuery: null,
         lastSavedField: null,
         lastSavedQuery: null,
+        displayResultType: "collection", // collection or search for
 
         nextStart: -1,
         numHits: 0,
@@ -168,17 +169,17 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
             return components;
         },
 
-        savedResults: function (Field, query){
-
+        savedResults: function (Field, query, startRec=1){
+            displayResultType = "collection";
             var components = this.getCollectionComponents();
             var self = this;
 
            // var mda = CollectionBase.getMdRecords(Field,query);
-            var paged = CollectionBase.getMdRecordsPaged(Field,query, this.start, this.numPerPage);
+            var paged = CollectionBase.getMdRecordsPaged(Field,query, startRec, this.numPerPage);
             var mda = paged.records;
             var totalRecords = paged.totalRecords;
             this.previousStart = this.start;
-            this.start = paged.endRec;
+            this.start = startRec;
 
             array.forEach(components, function (component) {
                 component.processSavedResults(mda, totalRecords, paged.nextPage, paged.startRec, paged.endRec);
@@ -191,17 +192,95 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
             this.savedResults(this.lastSavedField, this.lastSavedQuery);
 
         },
-        savedSearch: function (esdsl){
+        savedSearch: function (savedSearch, start, ){
+            displayResultType="search" ;
             var components = this.getCollectionComponents();
             var self = this;
+            var postData = null;
 
-            //var mda = CollectionBase.getMdRecords(Field,query);
+            // var paged = CollectionBase.getSavedSearchRecords(this.nextPage, esdsl, this.start, this.numPerPage);
+            // var mda = paged.records;
+            // var totalRecords = paged.totalRecords;
+            // this.previousStart = this.start;
+            // this.start = paged.endRec;
+            // array.forEach(components, function (component) {
+            //     component.processSavedResults(mda, totalRecords, paged.nextPage, paged.startRec, paged.endRec);
+            // });
+            // this.lastQuery = esdsl;
+            var bref = 'http://localhost:8081/geoportal/opensearch?f=json&from=' +
+                this.start +
+                '&size='+ this.numPerPage+' &sort=sys_modified_dt:desc&esdsl=';
+           var esdsl= JSON.stringify({query:savedSearch.params.query});
+           // var esdsl=encodeURI( JSON.stringify({"query":{"bool":{"must":[{"query_string":{"analyze_wildcard":true,"query":"water","fields":["_source.title^5","_source.*_cat^10","_all"],"default_operator":"and"}}]}}}));
+            var esdsl=encodeURI(esdsl);
+            var url = bref+esdsl;
 
-            array.forEach(components, function (component) {
-                component.processSavedResults(mda);
-            });
-            this.lastQuery = esdsl;
+            if (this._dfd !== null && !this._dfd.isCanceled()) {
+                this._dfd.cancel("Search aborted.", false);
+            }
 
+            var dfd = null;
+            var mdArray = [];
+
+            try {
+
+
+                    dfd = this._dfd = dojoRequest.get(url, {handleAs: "json"});
+
+                dfd.then(function (response) {
+                    if (!dfd.isCanceled()) {
+                        //console.warn("search-response",response);
+                        var data = response;
+                        if (data.hits) {
+                            ha = data.hits.hits;
+                            var hal = data.hits.total;
+
+                        } else {
+                            ha = data.results;
+                            var hal = data.total;
+                        }
+
+                        totRecords = hal;
+
+                        for (i = 0; i < ha.length; i++) {
+                            if (ha[i]._id) {
+                                var hid = ha[i]._id;
+                            } else {
+                                var hid = ha[i].id;
+                            }
+                            var src_title = ha[i]._source.title;
+                            var src_desc = ha[i]._source.description;
+                            var src_fileid = ha[i]._source.fileid;
+
+                            var idlink = 'http://datadiscoverystudio.org/geoportal/rest/metadata/item/' + hid + '/html';
+                            var col = [];
+                            var mdRec = CollectionBase.mdRecord(hid, src_fileid, src_title, idlink, src_desc, col);
+
+                            mdArray.push({key:hid,val:mdRec});
+
+
+                        }
+                        array.forEach(components, function (component) {
+                            //items, totalRecords, nextPage, startRec, endRec
+                            component.processSavedResults(mdArray,totRecords);
+                        });
+                    }
+                }).otherwise(function (error) {
+                    if (!dfd.isCanceled()) {
+                        if (error && error.dojoType && error.dojoType === "cancel") {
+                        } else {
+                            console.warn("search-error");
+                            console.warn(error);
+                            array.forEach(components, function (component) {
+                                component.processError(error);
+                            });
+                        }
+                    }
+                });
+                return dfd;
+            } catch(error) {
+                console.warn("search-error");
+            }
 
         },
     });

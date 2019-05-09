@@ -42,6 +42,7 @@ function(declare, lang, array, topic, aspect, domConstruct,registry, Templated,t
     paging: null,
     sortField: null,
     sortDir: null,
+
     
     postCreate: function() {
       var self = this;
