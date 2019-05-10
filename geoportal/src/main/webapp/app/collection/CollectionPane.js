@@ -171,7 +171,7 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
         },
 
         savedResults: function (Field, query, startRec=1){
-            displayResultType = "collection";
+            this.displayResultType = "collection";
             var components = this.getCollectionComponents();
             var self = this;
 
@@ -194,7 +194,7 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
 
         },
         savedSearch: function (savedSearch, start, ){
-            displayResultType="search" ;
+            this.displayResultType="search" ;
             var components = this.getCollectionComponents();
             var self = this;
             var postData = null;

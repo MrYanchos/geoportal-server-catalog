@@ -92,7 +92,13 @@ define(["dojo/_base/declare",
                 topic.subscribe(colllTopics.collectionRefreshRequest, function (params) {
                     if (params.collectionPane && self.collectionPane === params.collectionPane) {
                         self.start = self._start;
-                        self.savedResults();
+                        switch (this.collectionPane.displayResultType){
+                            case "search":
+                                self.savedSearches(self.collectionPane.lastSavedField, self.collectionPane.start);
+                            case "collection":
+                            default:
+                                self.savedResults(self.collectionPane.lastSavedField, self.collectionPane.lastSavedQuery,self.collectionPane.start);
+                        }
                     }
                 });
             },
@@ -105,7 +111,7 @@ define(["dojo/_base/declare",
                     this.collectionPane.start = 1;
                     switch (this.collectionPane.displayResultType){
                         case "search":
-                            this.savedSearch(this.collectionPane.lastSavedField, this.collectionPane.start);
+                            this.savedSearches(this.collectionPane.lastSavedField, this.collectionPane.start);
                         case "collection":
                         default:
                             this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery,this.collectionPane.start);
@@ -119,7 +125,7 @@ define(["dojo/_base/declare",
                     this.collectionPane.start = this.previousStart;
                     switch (this.collectionPane.displayResultType){
                         case "search":
-                            this.savedSearch(this.collectionPane.lastSavedField, this.collectionPane.start);
+                            this.savedSearches(this.collectionPane.lastSavedField, this.collectionPane.start);
                         case "collection":
                         default:
                             this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery,this.collectionPane.start);
@@ -133,7 +139,7 @@ define(["dojo/_base/declare",
                     this.collectionPane.start = this.nextStart;
                     switch (this.collectionPane.displayResultType){
                         case "search":
-                            this.savedSearch(this.collectionPane.lastSavedField, this.collectionPane.start);
+                            this.savedSearches(this.collectionPane.lastSavedField, this.collectionPane.start);
                         case "collection":
                         default:
                             this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery,this.collectionPane.start);
@@ -159,7 +165,7 @@ define(["dojo/_base/declare",
                 if (this.hasMore) {
                     switch (this.collectionPane.displayResultType){
                         case "search":
-                            this.savedSearch(this.collectionPane.lastSavedField, this.collectionPane.start);
+                            this.savedSearches(this.collectionPane.lastSavedField, this.collectionPane.start);
                         case "collection":
                         default:
                             this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery,this.collectionPane.start);
@@ -173,7 +179,7 @@ define(["dojo/_base/declare",
                 if (this.hasMore) {
                     switch (this.collectionPane.displayResultType){
                         case "search":
-                            this.savedSearch(this.collectionPane.lastSavedField, this.collectionPane.start);
+                            this.savedSearches(this.collectionPane.lastSavedField, this.collectionPane.start);
                         case "collection":
                         default:
                             this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery,this.collectionPane.start);
@@ -202,7 +208,7 @@ define(["dojo/_base/declare",
                 s = s.replace("{count}", "" + djNumber.format(nHits, {}));
                 s = s.replace("{type}", sType);
                 this.setNodeText(this.countNode, s);
-                if (this.searchPane) this.searchPane.lastQueryCount = nHits;
+                if (this.collectionPane) this.collectionPane.lastQueryCount = nHits;
             },
             _hasMore: function () {
                 var nStart = this._start, nHits = this.numHits, nPer = this.numPerPage;
