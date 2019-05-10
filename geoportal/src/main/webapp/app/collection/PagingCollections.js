@@ -103,7 +103,13 @@ define(["dojo/_base/declare",
                 if (this.hasLess) {
                     this.start = 1;
                     this.collectionPane.start = 1;
-                    this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery);
+                    switch (this.collectionPane.displayResultType){
+                        case "search":
+                            this.savedSearch(this.collectionPane.lastSavedField, this.collectionPane.start);
+                        case "collection":
+                        default:
+                            this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery,this.collectionPane.start);
+                    }
                 }
             },
 
@@ -111,7 +117,13 @@ define(["dojo/_base/declare",
                 if (this.hasLess) {
                     this.start = this.previousStart;
                     this.collectionPane.start = this.previousStart;
-                    this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery);
+                    switch (this.collectionPane.displayResultType){
+                        case "search":
+                            this.savedSearch(this.collectionPane.lastSavedField, this.collectionPane.start);
+                        case "collection":
+                        default:
+                            this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery,this.collectionPane.start);
+                    }
                 }
             },
 
@@ -119,7 +131,13 @@ define(["dojo/_base/declare",
                 if (this.hasMore) {
                     this.start = this.nextStart;
                     this.collectionPane.start = this.nextStart;
-                    this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery);
+                    switch (this.collectionPane.displayResultType){
+                        case "search":
+                            this.savedSearch(this.collectionPane.lastSavedField, this.collectionPane.start);
+                        case "collection":
+                        default:
+                            this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery,this.collectionPane.start);
+                    }
                 }
             },
 
@@ -139,8 +157,13 @@ define(["dojo/_base/declare",
 
                 this._hasMore();
                 if (this.hasMore) {
-
-                    this.savedResults();
+                    switch (this.collectionPane.displayResultType){
+                        case "search":
+                            this.savedSearch(this.collectionPane.lastSavedField, this.collectionPane.start);
+                        case "collection":
+                        default:
+                            this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery,this.collectionPane.start);
+                    }
                 }
             },
 
@@ -148,8 +171,13 @@ define(["dojo/_base/declare",
                 this.start = parseInt(this.goToPageNode.value - 1) * this.numPerPage + 1;
                 this._hasMore();
                 if (this.hasMore) {
-
-                    this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery);
+                    switch (this.collectionPane.displayResultType){
+                        case "search":
+                            this.savedSearch(this.collectionPane.lastSavedField, this.collectionPane.start);
+                        case "collection":
+                        default:
+                            this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery,this.collectionPane.start);
+                    }
                 }
             },
 

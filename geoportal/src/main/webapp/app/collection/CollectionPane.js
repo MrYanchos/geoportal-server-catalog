@@ -34,6 +34,7 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
         highlightQuery: null,
         lastSavedField: null,
         lastSavedQuery: null,
+        lastSavedSearch: null,
         displayResultType: "collection", // collection or search for
 
         nextStart: -1,
@@ -234,10 +235,13 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
                         if (data.hits) {
                             ha = data.hits.hits;
                             var hal = data.hits.total;
-
+                            var start = data.hits.start;
+                            var nextStart = data.hits.nextStart;
                         } else {
                             ha = data.results;
                             var hal = data.total;
+                            var start = data.start;
+                            var nextStart = data.nextStart;
                         }
 
                         totRecords = hal;
@@ -262,7 +266,8 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
                         }
                         array.forEach(components, function (component) {
                             //items, totalRecords, nextPage, startRec, endRec
-                            component.processSavedResults(mdArray,totRecords);
+                            //mda, totalRecords, paged.nextPage, paged.startRec, paged.endRec
+                            component.processSavedResults(mdArray,totRecords, null, start, nextStart);
                         });
                     }
                 }).otherwise(function (error) {
@@ -277,6 +282,7 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
                         }
                     }
                 });
+                lastSavedSearch = savedSearch;
                 return dfd;
             } catch(error) {
                 console.warn("search-error");
