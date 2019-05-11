@@ -44,7 +44,9 @@ define(["dojo/_base/declare",
 
                 for (var k in sea) {
                     var seak = sea[k].val;
-                    var colOpt = [{value: seak.id, title: seak.searchUrl, label: seak.searchText}];
+                    var colText = seak.searchText.length > 25 ? seak.searchText.substr(0,25): seak.searchText;
+
+                    var colOpt = [{value: seak.id, title: seak.searchUrl, label: colText}];
                     this.menuNode.addOption(colOpt);
                 }
                 topic.subscribe(appTopics.LastQuery,function(params){
@@ -86,8 +88,18 @@ define(["dojo/_base/declare",
                     if (sa[i].query_string){
                         sQry = sQry +"["+sa[i].query_string.query+"] ";
                     } else if (sa[i].geo_shape){
-                        sQry = sQry + " [Location ]";
-                    } else {
+                        var coord1= sa[i].geo_shape.envelope_geo.shape.coordinates[0];
+                        var coord2= sa[i].geo_shape.envelope_geo.shape.coordinates[1];
+                        sQry = sQry + " [Location:"+coord1 + coord2+" ]";
+                    }  else if (sa[i].range){
+                        var key = Object.keys(sa[i].range)[0];
+                        var gte = sa[i].range[key].gte;
+                        var lte = sa[i].range[key].lte;
+                    sQry = sQry + " [range:"+ lte +":"+gte+" ]";
+                }  else if (sa[i].term){
+                        var jsons = JSON.stringify(sa[i].term)
+                    sQry = sQry + " [term:"+jsons+" ]";
+                } else {
                         sQry = sQry + " ]Other facet] ";
                     }
                 }
@@ -98,7 +110,7 @@ define(["dojo/_base/declare",
                 }
                 sUrl = sUrl + sQry;
                 //var seaID = cObj.id.substr(6);
-                var newSearchText = sQry;
+                var newSearchText = sQry.length > 25 ? sQry.substr(0,25): sQry;
 
                 var nid = CollectionBase.createUUID();
                 var si = CollectionBase.searchItem(nid, newSearchText, sUrl, ss);
