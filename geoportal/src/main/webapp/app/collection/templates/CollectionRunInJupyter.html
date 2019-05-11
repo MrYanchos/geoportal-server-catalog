@@ -1,20 +1,14 @@
 <div>
-    <button data-dojo-type="dijit/form/Button" type="button" class="btn btn-primary">
+    <button data-dojo-type="dijit/form/Button" type="button" class="btn btn-primary"
+    data-dojo-attach-point="sendSavedPage"
+    data-dojo-attach-event="click: click_sendSavedPage">
 Send Page to a Studio
-        <script type="dojo/on" data-dojo-event="click">
-            require(["dojo/dom"], function(dom){
-                 with(dom.byId('myform'))with(elements[0])with(elements[checked?0:1])alert(name+'='+value);
-                 return false;
-            });
-        </script>
+
     </button>
-    <button data-dojo-type="dijit/form/Button" type="button" class="btn btn-primary">
+    <button data-dojo-type="dijit/form/Button" type="button" class="btn btn-primary"
+            data-dojo-attach-point="sendSavedCollection"
+            data-dojo-attach-event="click: click_sendSavedCollection">
         Send Collection to Studio
-        <script type="dojo/on" data-dojo-event="click">
-            require(["dojo/dom"], function(dom){
-                 with(dom.byId('myform'))with(elements[0])with(elements[checked?0:1])alert(name+'='+value);
-                 return false;
-            });
-        </script>
+
     </button>
 </div>

@@ -193,7 +193,7 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
             this.savedResults(this.lastSavedField, this.lastSavedQuery);
 
         },
-        savedSearch: function (savedSearch, start, ){
+        savedSearch: function (savedSearch, start ){
             this.displayResultType="search" ;
             var components = this.getCollectionComponents();
             var self = this;

@@ -27,9 +27,10 @@ define(["dojo/_base/declare",
       "app/collection/SavedItemCard",
         "app/collection/PagingCollections",
         "app/search/DropPane",
-        "dojox/widget/Standby"],
+        "dojox/widget/Standby",
+      "app/collection/CollectionRunInJupyter"],
 function(declare, lang, array, topic, aspect, domConstruct,registry, Templated,template, i18n, CollectionComponent, CollectionBase, SavedItemCard,
-    PagingCollections,DropPane, Standby) {
+    PagingCollections,DropPane, Standby, jupyterHub) {
   
   var oThisClass = declare([CollectionComponent], {
 //var oThisClass = declare([Templated], {

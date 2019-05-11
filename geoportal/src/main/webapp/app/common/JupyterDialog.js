@@ -127,6 +127,12 @@ if ( user!== null && user.length > 0){
 
             init: function(item) {
                 var self = this;
+                if (item !== undefined && item._id){
+                    var docId= item._id;
+
+                } else {
+                    docId='collection';
+                }
                 var m = registry.byId(self.hubMenu.id);
                 if (lang.isArray(this.jupyter_hubs.hubs)) {
                     var optionsHub = [];
