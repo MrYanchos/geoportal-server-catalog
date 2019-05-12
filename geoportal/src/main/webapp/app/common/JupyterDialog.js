@@ -139,7 +139,7 @@ if ( user!== null && user.length > 0){
                     array.forEach(this.jupyter_hubs.hubs, function (hub) {
 
                        // var ddli = domConstruct.create("li", {}, ddul);
-                        var uri = hub.uri_template.replace("{docId}", encodeURIComponent(item._id));
+                        var uri = hub.uri_template.replace("{docId}", encodeURIComponent(docId));
                        // var divClass = "small";
                         if (hub.disabled){
                             divClass = "small disabled";
