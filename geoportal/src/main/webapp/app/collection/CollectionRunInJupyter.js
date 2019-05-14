@@ -15,10 +15,11 @@ define(["dojo/_base/declare",
             records: [],
 
 
-            recordPackage: function (id, title, packageType, link,  recordIds) {
+            recordPackage: function (id, collectionId, title,  recordIds,packageType, link ) {
                 var self = this;
                 var recPack = {
                     "id": id,
+                    "collectionId": collectionId,
                     "title": title,
                     "collectionlink": link,
                     "packageType": packageType,
@@ -53,6 +54,26 @@ define(["dojo/_base/declare",
                 this.records = records;
 
              },
+            createRecordPackage: function(packageType, link){
+
+                var collection =registry.byId("collectionMenuNode");
+                var collID = collection.value;
+                var collName = collection.get("displayedValue");
+                var id = CollectionBase.createUUID();
+                var rp = new recordPackage(id, collectionId, collName,packageType, link, records);
+
+
+
+            },
+            createRecordIds: function(saveRecords) {
+                var records = [];
+                Array.foreach(savedRecords, function(rec){
+                    var recId = new recordId( rec.id, "");
+
+                    records.put()
+                })
+                return records;
+            },
             click_sendSavedPage: function(evt) {
 
                     var dialog = new JupyterDialog();

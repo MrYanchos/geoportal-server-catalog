@@ -171,6 +171,7 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
         },
 
         savedResults: function (Field, query, startRec=1){
+
             this.displayResultType = "collection";
             var components = this.getCollectionComponents();
             var self = this;
