@@ -15,11 +15,14 @@ define(["dojo/_base/declare",
         "dojo/request",
         "app/context/AppClient",
         "app/collection/ItemsPane",
-        "app/collection/CollectionBase"
+        "app/collection/CollectionBase",
+        "app/collection/CollectionRunInJupyter"
     ],
 function(declare, lang, array, query, domClass, topic, appTopics, registry,
          _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, template, i18n,
-         dojoRequest, AppClient,ItemsPane , CollectionBase) {
+         dojoRequest, AppClient,ItemsPane , CollectionBase,
+         CollectionRunInJupyter
+) {
 
     var oThisClass = declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
 

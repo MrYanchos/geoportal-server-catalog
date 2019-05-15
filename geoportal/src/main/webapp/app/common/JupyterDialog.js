@@ -131,7 +131,7 @@ if ( user!== null && user.length > 0){
                     var docId= item._id;
 
                 } else {
-                    docId='collection';
+                    docId=item;
                 }
                 var m = registry.byId(self.hubMenu.id);
                 if (lang.isArray(this.jupyter_hubs.hubs)) {

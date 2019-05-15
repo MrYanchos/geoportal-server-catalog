@@ -3,16 +3,19 @@ define(["dojo/_base/declare",
         "dojo/_base/array",
         "dojo/dom-construct",
         "dojo/io-query",
+        "dijit/registry",
         "dojo/text!./templates/CollectionRunInJupyter.html",
         "dojo/i18n!app/nls/resources",
         "app/collection/CollectionComponent",
+        "app/collection/CollectionBase",
         "app/common/JupyterDialog",],
-    function (declare, lang, array, domConstruct, ioQuery, template, i18n, CollectionComponent, JupyterDialog) {
+    function (declare, lang, array, domConstruct, ioQuery, registry, template, i18n, CollectionComponent,CollectionBase, JupyterDialog) {
         var oThisClass = declare([CollectionComponent], {
 
             i18n: i18n,
             templateString: template,
             records: [],
+            encodedRecords : null,
 
 
             recordPackage: function (id, collectionId, title,  recordIds,packageType, link ) {
@@ -23,7 +26,7 @@ define(["dojo/_base/declare",
                     "title": title,
                     "collectionlink": link,
                     "packageType": packageType,
-                    "description": description,
+
                     "recordIds": recordIds,
 
                 };
@@ -40,18 +43,22 @@ define(["dojo/_base/declare",
             },
             postCreate: function(){
                 this.inherited(arguments);
+                this.sendSavedPage.title="Send Page";
+                this.sendSavedCollection.title="Send Collection";
+
 
             },
             startup: function(){
 
             },
             processSavedResults: function(records, totalRecords, nextPage, startRec, endRec){
-                this.sendSavedPage.title="Send Page";
-                this.sendSavedCollection.title="Send Collection";
                 if (totalRecords > 20){
                     this.sendSavedCollection.set({"display": "hidden", disabled: true})  ;
                 }
-                this.records = records;
+                this.records = this.createRecordIds(records);
+                var package = this.createRecordPackage("included","");
+                this.encodedRecords = JSON.stringify(package);
+
 
              },
             createRecordPackage: function(packageType, link){
@@ -60,24 +67,25 @@ define(["dojo/_base/declare",
                 var collID = collection.value;
                 var collName = collection.get("displayedValue");
                 var id = CollectionBase.createUUID();
-                var rp = new recordPackage(id, collectionId, collName,packageType, link, records);
+                var rp = this.recordPackage(id, collID, collName,packageType, link, this.records);
 
-
+                return rp;
 
             },
-            createRecordIds: function(saveRecords) {
+            createRecordIds: function(savedRecords) {
+                var self = this;
                 var records = [];
-                Array.foreach(savedRecords, function(rec){
-                    var recId = new recordId( rec.id, "");
+                array.forEach(savedRecords, function(rec){
+                    var recId = self.recordId( rec.val.id, "");
 
-                    records.put()
+                    records.push(recId);
                 })
                 return records;
             },
             click_sendSavedPage: function(evt) {
 
                     var dialog = new JupyterDialog();
-                    dialog.show(this.records);
+                    dialog.show(this.encodedRecords);
 
             },
             click_sendSavedCollection: function(evt) {},

@@ -23,9 +23,10 @@
             "app/collection/SavedSearches",
             "app/collection/CollectionImport",
             "app/collection/SavedCollections",
-            "app/collection/ItemsPane"
+            "app/collection/ItemsPane",
+        ,  "app/collection/CollectionRunInJupyter"
         ],
-        function(declare, lang, Templated, template, i18n, collectionScripts) {
+        function(declare, lang, Templated, template, i18n, collectionScripts, CollectionRunInJupyter) {
 
             var oThisClass = declare([Templated], {
 
