@@ -2,27 +2,46 @@
     <div class="g-drop-pane" data-dojo-type="app/search/DropPane"
          data-dojo-attach-point="dropPane"
          data-dojo-props="title:'${label}',open:${open}" >
-        <form id="myform" >
-            <fieldset disabled="disabled">
-                <div>Disabled. To be Implemented</div>
-            <input type="radio" data-dojo-type="dijit/form/RadioButton"
-                   name="importFormat" id="radioOne" checked value="Merge"/>
-            <label for="radioOne">Merge</label> <br />
-            <input type="radio" data-dojo-type="dijit/form/RadioButton"
-                   name="importFormat" id="radioTwo" value="Overwrite"/>
-            <label for="radioTwo">Overwrite</label>
-            <br />
 
-            <button data-dojo-type="dijit/form/Button" type="button" class="btn btn-primary">
-                Show form submit value
-                <script type="dojo/on" data-dojo-event="click">
-            require(["dojo/dom"], function(dom){
-                 with(dom.byId('myform'))with(elements[0])with(elements[checked?0:1])alert(name+'='+value);
-                 return false;
-            });
-        </script>
-            </button>
-            </fieldset>
-        </form>
+        <fieldset  >
+
+            <input type="radio" data-dojo-type="dijit/form/RadioButton"
+                   name="importFormat" id="radioMerge" checked value="Merge"/>
+            <label for="radioMerge">Merge</label> <br />
+            <input type="radio" data-dojo-type="dijit/form/RadioButton"
+                   name="importFormat" id="radioOverwrite" value="Overwrite"/>
+            <label for="radioOverwrite">Overwrite</label>
+
+
+
+        </fieldset>
+          <fieldset>
+
+            <!--  force:'html5',
+              uploadOnSelect: true,
+               data-dojo-attach-event="onComplete: changeDataFromUpload"
+                data-dojo-type="dojox/form/Uploader"
+              -->
+              <label class="custom-file-label" for="uploader">Select a CSV File:</label>
+                  <div class="custom-file">
+                      <input name="uploadedfile" class="custom-file-input"
+                   multiple=false type="file" id="uploader"
+                   accept=".csv"
+title="Choose File"
+                   data-dojo-attach-point="uploader"
+                   data-dojo-attach-event="onChange: changeDataFromUpload"
+                   data-dojo-props="label: 'Select a CSV File',
+                  multiple:false,
+                  uploadOnSelect: false,"
+
+            />
+
+                  </div>
+
+
+          </fieldset>
+
+
     </div>
+
 </div>

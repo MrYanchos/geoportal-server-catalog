@@ -74,7 +74,8 @@ define(["dojo/_base/declare",
             },
             _addSearch: function (cObj) {
                 // Puts a record into saved search
-                if (!this.lastQuery){
+
+                if (this.lastQuery === null){
                     return;
                 }
                 //var sUrl='http://cinergi.sdsc.edu/geoportal/?q=';
@@ -128,6 +129,7 @@ define(["dojo/_base/declare",
 
               //  var seaID = cObj.id;
                 var seaID = this.menuNode.value;
+                if (seaID === "default") return;
                 localStorage.removeItem("sItem-"+ seaID);
                 console.log('cleared  ' + seaID);
 

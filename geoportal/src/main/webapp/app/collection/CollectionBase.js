@@ -1,6 +1,6 @@
 define(["dojo/_base/lang",
         "dojo/_base/array",
-        "dojo/topic",],
+        "dojo/topic"],
     function (lang, array, topic) {
 
         var oThisObject = {

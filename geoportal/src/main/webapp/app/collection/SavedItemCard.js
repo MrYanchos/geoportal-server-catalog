@@ -127,7 +127,7 @@ define(["dojo/_base/declare",
 
             _renderCollections: function (mdRecord) {
                 var collections = mdRecord.collections;
-                if (collections !== null && collections.length >0 ) {
+                if (collections !== null && lang.isArray(collections) && collections.length >0 ) {
                     var collString = "collections:"
                     array.forEach(collections, function (coll) {
                         var collName = CollectionBase.getCollectionNameById(coll);

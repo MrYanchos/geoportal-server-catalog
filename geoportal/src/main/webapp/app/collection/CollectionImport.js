@@ -14,16 +14,21 @@
  */
 define(["dojo/_base/declare",
         "dojo/_base/lang",
+        "dojo/query",
+        "dojo/on",
+        "dojox/form/Uploader",
+        "dojox/form/uploader/FileList",
         "app/common/Templated",
         "dojo/text!./templates/CollectionImport.html",
         "dojo/i18n!../nls/resources",
         "app/collection/CollectionBase",
         "app/search/DropPane",
         "dijit/form/RadioButton",
-        "dijit/form/Button",
+        "dijit/form/Button"
+
 
     ],
-    function(declare, lang, Templated, template, i18n, CollectionBase) {
+    function(declare, lang,query, on, Uploader, UploadFiles,  Templated, template, i18n, CollectionBase) {
 
         var oThisClass = declare([Templated], {
 
@@ -31,37 +36,106 @@ define(["dojo/_base/declare",
             templateString: template,
             label: "Collection Import",
             open: false,
+            //     $("#import-all-file").change(function(e){
+            //     changeDataFromUpload(e, function(data){
+            //         console.log(data);
+            //     });
+            // });
             postCreate: function() {
                 this.inherited(arguments);
-            },
-        //     $("#import-all-file").change(function(e){
-        //     changeDataFromUpload(e, function(data){
-        //         console.log(data);
-        //     });
-        // });
 
+
+              var self = this;
+
+              var target = this.dropTarget;
+
+              var uploader =  this.uploader;
+this.own(on(uploader,"onChange",function(file){
+    changeDataFromUpload(file);
+}))
+            },
          importAll:function(o) {
             $("#import-all-file").trigger("click");
 
         },
+            _change: function(e) {
+                // console.log(e);
+                var uploader = this;
+                if (e.target.files && e.target.files[0]) {
+                    var FR = new FileReader();
+                    FR.onload = function(up) {
+                        var format = up.target.result.substring(up.target.result.indexOf("/") + 1, up.target.result.indexOf(";"));
+                        if (format == "csv") {
+                            var base64 = up.target.result.substring(up.target.result.indexOf(",") + 1, up.target.result.length);
+                            var csv = window.atob(base64);
 
+                            // Split the input into lines
+                            var lines = csv.split('\n');
+                            // Extract column names from the first line
+                            var columnNamesLine = lines[0];
+                            var columnNames = parse(columnNamesLine);
+                            // Extract data from subsequent lines
+                            var dataLines = lines.slice(1);
+                            var data = dataLines.map(parse);
+                            // Prints the array of the colomuns
+                            // console.log(columnNames);
+                            if (columnNames[0] == "Code" && columnNames[1] == "Description") {
+                                // Prints the data
+                                // console.log(data);
+                                var dataObjects = data.map(function(arr) {
+                                    var dataObject = {};
+                                    columnNames.forEach(function(columnName, i) {
+                                        dataObject[columnName] = arr[i];
+                                    });
+                                    return dataObject;
+                                });
+                                // Prints the DATA object
+                                console.log(dataObjects); // FINAL DATA
+
+                            } else {
+                                // NOTIFICATION: format error
+                            }
+
+                        } else {
+                            // NOTIFICATION: file format error
+                        }
+                        uploader.value = "";
+                    };
+                    FR.readAsDataURL(e.target.files[0]);
+                }
+            },
          changeDataFromUpload:function(evt, cb){
-            if (!browserSupportFileUpload()) {
+                var self =this;
+            if (!this.browserSupportFileUpload()) {
                 console.error("The File APIs are not fully supported in this browser!");
             } else {
                 var data = null;
-                var file = evt.target.files[0];
+               var file = evt.target.files[0];
+              //   var file = this.uploader.getFileList()[0];
                 var fileName = file.name;
-                $("#filename").html(fileName);
+              //  $("#filename").html(fileName);
 
                 if (file !== "") {
                     var reader = new FileReader();
 
                     reader.onload = function(event) {
                         var csvData = event.target.result;
-                        parseImport(csvData);
-
+                        self.parseImport(csvData);
                     };
+
+                    // reader.onload = function(theFile) {
+                    //     parseImport(reader.result);
+                    // }
+
+                    // reader.loadend = (function(theFile) {
+                    //     return function(e) {
+                    //         // Render thumbnail.
+                    //         var span = document.createElement('span');
+                    //         span.innerHTML = ['<img class="thumb" src="', e.target.result,
+                    //             '" title="', escape(theFile.name), '"/>'].join('');
+                    //         document.getElementById('list').insertBefore(span, null);
+                    //     };
+                    // })(file);
                     reader.onerror = function() {
                         console.error("Unable to read " + file.fileName);
                     };
@@ -95,11 +169,15 @@ define(["dojo/_base/declare",
             }
             return out;
         },
-             parseImport:function(csvData) {
+        parseImport:function(csvData) {
 
-            var ovi = $('input[name=uniqName_9_2_radio]:checked').val();
-
-            if ( ovi == 'over') {
+            //var ovi = $('input[name=uniqName_9_2_radio]:checked').val();
+          //  var ovi = query('input[name=importFormat]:checked').val();
+            var ovi = query('input[name=importFormat]:checked');
+            if ( ovi !== undefined && (ovi instanceof Array) ) {
+                ovi = ovi[0];
+            }
+            if ( ovi !== undefined && ovi.value === 'Overwrite') {
                 if ( confirm ("Are you sure you want to overwrite your current collection records ? ") ) {
                     ovi = 'over';
                     // clear out records here;
@@ -135,16 +213,16 @@ define(["dojo/_base/declare",
                             if ( cname == "Default" ) {
                                 defaultLoad = true;
                             }
-                            var cx = _getCollections("id", cid);
+                            var cx = CollectionBase.getCollections("id", cid);
                             if ( cx.length && ovi == 'over' ) {
                                 // already there
-                                var cItem = collectionItem(rowA[2], rowA[1]);
-                                saveCollectionItem(cItem);
+                                var cItem = CollectionBase.collectionItem(rowA[2], rowA[1]);
+                                CollectionBase.saveCollectionItem(cItem);
                                 var nop ="";
 
                             } else {
-                                var cItem = collectionItem(rowA[2], rowA[1]);
-                                saveCollectionItem(cItem);
+                                var cItem = CollectionBase.collectionItem(rowA[2], rowA[1]);
+                                CollectionBase.saveCollectionItem(cItem);
 
                             }
 
@@ -171,14 +249,15 @@ define(["dojo/_base/declare",
                         if ( rowA[0] == "Saved Record"  ) {
 
                             var rid = rowA[3];
-                            var rx = getMdRecords("id", rid);
+                            var rx = CollectionBase.getMdRecords("id", rid);
 
                             if ( rx.length ) {
                                 if (defaultLoad) {
                                     var nop = true;
                                 } else {
+                                    var rec= rx[0].val;
                                     // collections may have changed reload
-                                    var storeCol = rx.collections;
+                                    var storeCol = rec.collections;
                                     //storeCol.split()
                                     storeCol.push(oneCID);
                                     var rtitle = rowA[1];
@@ -188,8 +267,8 @@ define(["dojo/_base/declare",
 
                                     localStorage.removeItem("mdRec-"+rid);
 
-                                    var rItem = mdRecord( rid, fid, rtitle, rUrl, des, collections );
-                                    saveMdRecord(rItem);
+                                    var rItem = CollectionBase.mdRecord( rid, fid, rtitle, rUrl, des, collections );
+                                    CollectionBase.saveMdRecord(rItem);
 
 
                                 }
@@ -202,8 +281,8 @@ define(["dojo/_base/declare",
                                 var collections = rowA[5];
                                 ( collections.length == 0 ) ? collections = "default" : collections = collections.split('|');
                                 var des = row[6];
-                                var rItem = mdRecord( rid, fid, rtitle, rUrl, des, collections );
-                                saveMdRecord(rItem);
+                                var rItem = CollectionBase.mdRecord( rid, fid, rtitle, rUrl, des, collections );
+                                CollectionBase.saveMdRecord(rItem);
 
                             }
 

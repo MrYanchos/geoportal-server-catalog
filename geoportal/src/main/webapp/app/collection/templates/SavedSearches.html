@@ -4,25 +4,25 @@
          data-dojo-props="title:'${label}',open:${open}">
         <div class="form-group">
             <div data-dojo-type="dijit/form/Select" data-dojo-attach-point="menuNode"
-            id="savedSearchMenu" class="selectpicker col-10" data-width="100%">
-            <span value="default"><i>Your Saved Searches</i></span>
+            id="savedSearchMenu" class="selectpicker col-10" data-width="30em">
+            <span title="select a value from menu" value="default"><i>Your Saved Searches</i></span>
         </div>
-        <button data-dojo-attach-point="saveBtn" data-dojo-type="dijit/form/Button"
-                data-dojo-attach-event="onClick: _addSearch"
-                type="button" class="btn btn-primary">Save Current Search
+            <button data-dojo-attach-point="showBtn" data-dojo-type="dijit/form/Button"
+                    data-dojo-attach-event="onClick: showSearchResults"
+                    type="button"
+                    class="btn btn-primary"
 
-        </button>
+                    title="Show Search Results">Show Search
+
+            </button>
         </div>
         <div class="form-group">
-        <button data-dojo-attach-point="showBtn" data-dojo-type="dijit/form/Button"
-                data-dojo-attach-event="onClick: showSearchResults"
-                type="button"
-        class="btn btn-primary"
 
-        title="To be reimplemented">Show Search Results
+            <button data-dojo-attach-point="saveBtn" data-dojo-type="dijit/form/Button"
+                    data-dojo-attach-event="onClick: _addSearch"
+                    type="button" class="btn btn-primary">Save Current Search
 
-        </button>
-
+            </button>
         <button data-dojo-attach-point="removeBtn" data-dojo-type="dijit/form/Button"
                 data-dojo-attach-event="onClick: _removeSearch" type="button"
         class="btn btn-danger">Remove Search

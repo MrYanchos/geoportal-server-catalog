@@ -18,15 +18,14 @@
             "app/common/Templated",
             "dojo/text!./templates/CollectionsPanel.html",
             "dojo/i18n!../nls/resources",
-        "app/collection/CollectionScripts",
             "app/collection/CollectionPane",
             "app/collection/SavedSearches",
-            "app/collection/CollectionImport",
+           "app/collection/CollectionImport",
             "app/collection/SavedCollections",
             "app/collection/ItemsPane",
-        ,  "app/collection/CollectionRunInJupyter"
+          "app/collection/CollectionRunInJupyter"
         ],
-        function(declare, lang, Templated, template, i18n, collectionScripts, CollectionRunInJupyter) {
+        function(declare, lang, Templated, template, i18n,  CollectionRunInJupyter) {
 
             var oThisClass = declare([Templated], {
 

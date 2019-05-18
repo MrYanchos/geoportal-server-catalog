@@ -149,6 +149,8 @@ define(["dojo/_base/declare",
             _addCollection: function (C){
 
                 var newCollection = this.newCollection.value;
+                if (newCollection ==="default") return;
+
                 var ncID = CollectionBase.createUUID();
 
 
@@ -201,15 +203,7 @@ define(["dojo/_base/declare",
 
                     this.menuNode.removeOption(ColID);
 
-                    //this.menuNode.options= this.menuNode.options.slice(i,1);
 
-
-                  //  $('#gSvCollection').find(":selected").remove();
-                  //  $('#gSvCollection').val('default');
-                    // code remove
-
-                  //  makeRecordPanel();
-                   // gCard.append(colOpt1);
                 }
 
 
