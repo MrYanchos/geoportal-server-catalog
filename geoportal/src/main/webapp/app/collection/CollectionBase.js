@@ -22,6 +22,8 @@ define(["dojo/_base/lang",
             "_addCollectionMdRecord": function (mdRecord, coll) {
                 if (coll === "All" | coll === "default") return;
                 if (mdRecord) {
+                    if (mdRecord.collections === undefined) mdRecord.collections = ['default'];
+                    if (mdRecord.collections instanceof Array) mdRecord.collections = [mdRecord.collections];
                     if (array.indexOf(mdRecord.collections, coll) < 0) {
                         mdRecord.collections.push(coll);
                         mdRecord.collections = array.filter(mdRecord.collections, function (collection) {

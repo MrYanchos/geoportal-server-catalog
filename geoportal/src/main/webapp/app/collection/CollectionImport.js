@@ -14,6 +14,7 @@
  */
 define(["dojo/_base/declare",
         "dojo/_base/lang",
+        "dojo/_base/array",
         "dojo/query",
         "dojo/on",
         "dojox/form/Uploader",
@@ -28,7 +29,7 @@ define(["dojo/_base/declare",
 
 
     ],
-    function(declare, lang,query, on, Uploader, UploadFiles,  Templated, template, i18n, CollectionBase) {
+    function(declare, lang, array, query, on, Uploader, UploadFiles,  Templated, template, i18n, CollectionBase) {
 
         var oThisClass = declare([Templated], {
 
@@ -219,13 +220,13 @@ this.own(on(uploader,"onChange",function(file){
                                     ( collections.length == 0 ) ? collections = ["default"] : collections = collections.split('|');
                                     if (rec.collections instanceof Array) {
 
-                                       array.forEach(collections, function(col, rec){
+                                       array.forEach(collections, function(col){
                                            CollectionBase._addCollectionMdRecord(rec, col);
                                        })
 
                                     } else {
                                         rec.collections = ['default'];
-                                        array.forEach(collections, function(col, rec){
+                                        array.forEach(collections, function(col){
                                             CollectionBase._addCollectionMdRecord(rec, col);
                                         })
                                     }
@@ -238,7 +239,7 @@ this.own(on(uploader,"onChange",function(file){
 
                                     // var rItem = CollectionBase.mdRecord( rid, fid, rtitle, rUrl, des, storeCol );
                                     // CollectionBase.saveMdRecord(rItem);
-                                    ollectionBase.saveMdRecord(rec);
+                                    CollectionBase.saveMdRecord(rec);
 
                                 }
 
