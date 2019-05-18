@@ -58,52 +58,7 @@ this.own(on(uploader,"onChange",function(file){
             $("#import-all-file").trigger("click");
 
         },
-            _change: function(e) {
-                // console.log(e);
-                var uploader = this;
-                if (e.target.files && e.target.files[0]) {
-                    var FR = new FileReader();
-                    FR.onload = function(up) {
-                        var format = up.target.result.substring(up.target.result.indexOf("/") + 1, up.target.result.indexOf(";"));
-                        if (format == "csv") {
-                            var base64 = up.target.result.substring(up.target.result.indexOf(",") + 1, up.target.result.length);
-                            var csv = window.atob(base64);
 
-                            // Split the input into lines
-                            var lines = csv.split('\n');
-                            // Extract column names from the first line
-                            var columnNamesLine = lines[0];
-                            var columnNames = parse(columnNamesLine);
-                            // Extract data from subsequent lines
-                            var dataLines = lines.slice(1);
-                            var data = dataLines.map(parse);
-                            // Prints the array of the colomuns
-                            // console.log(columnNames);
-                            if (columnNames[0] == "Code" && columnNames[1] == "Description") {
-                                // Prints the data
-                                // console.log(data);
-                                var dataObjects = data.map(function(arr) {
-                                    var dataObject = {};
-                                    columnNames.forEach(function(columnName, i) {
-                                        dataObject[columnName] = arr[i];
-                                    });
-                                    return dataObject;
-                                });
-                                // Prints the DATA object
-                                console.log(dataObjects); // FINAL DATA
-
-                            } else {
-                                // NOTIFICATION: format error
-                            }
-
-                        } else {
-                            // NOTIFICATION: file format error
-                        }
-                        uploader.value = "";
-                    };
-                    FR.readAsDataURL(e.target.files[0]);
-                }
-            },
          changeDataFromUpload:function(evt, cb){
                 var self =this;
             if (!this.browserSupportFileUpload()) {
@@ -221,9 +176,10 @@ this.own(on(uploader,"onChange",function(file){
                                 var nop ="";
 
                             } else {
+                                if (cid !== 'default') {
                                 var cItem = CollectionBase.collectionItem(rowA[2], rowA[1]);
                                 CollectionBase.saveCollectionItem(cItem);
-
+                              }
                             }
 
                         }
@@ -251,25 +207,38 @@ this.own(on(uploader,"onChange",function(file){
                             var rid = rowA[3];
                             var rx = CollectionBase.getMdRecords("id", rid);
 
-                            if ( rx.length ) {
+                            if ( rx instanceof Array && rx.length > 0 ) {
                                 if (defaultLoad) {
                                     var nop = true;
                                 } else {
                                     var rec= rx[0].val;
                                     // collections may have changed reload
-                                    var storeCol = rec.collections;
+                                   // var storeCol = rec.collections;
                                     //storeCol.split()
-                                    storeCol.push(oneCID);
+                                    var collections = rowA[5];
+                                    ( collections.length == 0 ) ? collections = ["default"] : collections = collections.split('|');
+                                    if (rec.collections instanceof Array) {
+
+                                       array.forEach(collections, function(col, rec){
+                                           CollectionBase._addCollectionMdRecord(rec, col);
+                                       })
+
+                                    } else {
+                                        rec.collections = ['default'];
+                                        array.forEach(collections, function(col, rec){
+                                            CollectionBase._addCollectionMdRecord(rec, col);
+                                        })
+                                    }
                                     var rtitle = rowA[1];
                                     var rUrl = rowA[2];
                                     var fid = rowA[4];
-                                    var des = row[6];
+                                    var des = rowA[6];
 
                                     localStorage.removeItem("mdRec-"+rid);
 
-                                    var rItem = CollectionBase.mdRecord( rid, fid, rtitle, rUrl, des, collections );
-                                    CollectionBase.saveMdRecord(rItem);
-
+                                    // var rItem = CollectionBase.mdRecord( rid, fid, rtitle, rUrl, des, storeCol );
+                                    // CollectionBase.saveMdRecord(rItem);
+                                    ollectionBase.saveMdRecord(rec);
 
                                 }
 
@@ -279,8 +248,8 @@ this.own(on(uploader,"onChange",function(file){
                                 var rUrl = rowA[2];
                                 var fid = rowA[4];
                                 var collections = rowA[5];
-                                ( collections.length == 0 ) ? collections = "default" : collections = collections.split('|');
-                                var des = row[6];
+                                ( collections.length == 0 ) ? collections = ["default"] : collections = collections.split('|');
+                                var des = rowA[6];
                                 var rItem = CollectionBase.mdRecord( rid, fid, rtitle, rUrl, des, collections );
                                 CollectionBase.saveMdRecord(rItem);
 

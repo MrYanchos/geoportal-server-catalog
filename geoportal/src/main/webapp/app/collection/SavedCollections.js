@@ -99,7 +99,7 @@ define(["dojo/_base/declare",
 
                 if ( ColID == "default" ) {
                    // var mda = CollectionBase.getMdRecords("collections","default");
-                    var mda = this.collectionPane.savedSearch("collections","default");
+                    var mda = this.collectionPane.savedResults("collections","default");
 
 
                 } else if ( ColID == "All" ){
@@ -266,10 +266,13 @@ define(["dojo/_base/declare",
 
 
             var mdLabel= "Saved Record,";
-            var mdText = "SAVED RECORD, TITLE, URL, ID, FILEID, COLLECTION_IDS, CITATION\n";
-            if ( ColID == "default" ) {
+            var mdText = "SAVED RECORD, TITLE, URL, ID, FILEID, COLLECTION_IDS, DESCRIPTION\n";
+            if ( ColID === "All" ) {
                 var md =  CollectionBase.findLocalItems("mdRec");
-            } else {
+            } if ( ColID === "default" ) {
+                CollectionBase.getMdRecords('collections', "default");
+            }else
+             {
                 var md = CollectionBase.getMdRecords('collections', ColID);
             }
 
@@ -326,21 +329,22 @@ define(["dojo/_base/declare",
                 colText = colText + coLabel + 'default,default,Records not in a Collection\n';
 
             } else if ( ColID == "all" ) {
-                alert("Select a collection ");
-                return;
-
+               // alert("Select a collection ");
+               // return;
+                var sc = CollectionBase.findLocalItems("cItem");
             } else {
-                var sc = CollectionBase.findLocalItems("cItem-"+ColID)
+               // var sc = CollectionBase.findLocalItems("cItem-"+ColID);
+                var sc = CollectionBase.getCollections('id',ColID)
 
                 //var sc = findLocalItems("cItem-"+ColID);
 
                 if ( Array.isArray(sc) ) {
                     for ( var c in sc ) {
-                        var cId = sc[c].key;
+                        var cId = sc[c].val.id;
                         var cName = sc[c].val.colName;
                         var cDesc = sc[c].val.colDesc;
-                        var cIndex = cId.substr(6);
-                        colText = colText + coLabel + cName +  ',' + cIndex + ',' + cDesc + '\n';
+                       // var cIndex = cId.substr(6);
+                        colText = colText + coLabel + cName +  ',' + cId + ',' + cDesc + '\n';
                     }
                 }
                 // var fields = [ {id : "id"},
@@ -362,12 +366,16 @@ define(["dojo/_base/declare",
 
 
             var mdLabel= "Saved Record,";
-            var mdText = "SAVED RECORD, TITLE, URL, ID, FILEID, COLLECTION_IDS, CITATION\n";
-            if ( ColID == "default" ) {
+            var mdText = "SAVED RECORD, TITLE, URL, ID, FILEID, COLLECTION_IDS, DESCRIPTION\n";
+            if (ColID === "ALL") {
                 var md =  CollectionBase.findLocalItems("mdRec");
-            } else {
-                var md = CollectionBase.getMdRecords('collections', ColID);
-            }
+            } else if ( ColID == "default" ) {
+                    // var md =  CollectionBase.findLocalItems("mdRec");
+                    CollectionBase.getMdRecords('collections', "default");
+                } else {
+                    var md = CollectionBase.getMdRecords('collections', ColID);
+                }
+
 // var mdarray= [];
 //              ArrayUtil.forEach(md, function(m ){
 //     mdarray.push(m.val) ;
@@ -395,7 +403,7 @@ define(["dojo/_base/declare",
                         var mLink = md[c].val.mdlink;
                         var mId = md[c].val.id;
                         var fId = md[c].val.fileId;
-                        var mDesc = "";
+                        var mDesc = md[c].val.description;
                         if (md[c].val.hasOwnProperty("description")) {
                             var mDesc = md[c].val.description;
 
@@ -408,11 +416,11 @@ define(["dojo/_base/declare",
 
                         if (ColID == "default") {
                             if (xol.length == 1 && xol[0] == "default") {
-                                mdText = mdText + mdLabel + mName + ',' + mLink + ',' + mId + ',' + fId + ',' + col + ',Citation_Description\n';
+                                mdText = mdText + mdLabel + mName + ',' + mLink + ',' + mId + ',' + fId + ',' + col + ', '+mDesc+'\n';
                             }
 
                         } else {
-                            mdText = mdText + mdLabel + mName + ',' + mLink + ',' + mId + ',' + fId + ',' + col + ',Citation_Description\n';
+                            mdText = mdText + mdLabel + mName + ',' + mLink + ',' + mId + ',' + fId + ',' + col + ', '+mDesc+'\n';
                         }
 
                     } catch (error) {
