@@ -92,12 +92,12 @@ define(["dojo/_base/declare",
                 topic.subscribe(colllTopics.collectionRefreshRequest, function (params) {
                     if (params.collectionPane && self.collectionPane === params.collectionPane) {
                         self.start = self._start;
-                        switch (this.collectionPane.displayResultType){
+                        switch (this.collectionPane.displayResultType) {
                             case "search":
                                 self.savedSearches(self.collectionPane.lastSavedField, self.collectionPane.start);
                             case "collection":
                             default:
-                                self.savedResults(self.collectionPane.lastSavedField, self.collectionPane.lastSavedQuery,self.collectionPane.start);
+                                self.savedResults(self.collectionPane.lastSavedField, self.collectionPane.lastSavedQuery, self.collectionPane.start);
                         }
                     }
                 });
@@ -109,12 +109,12 @@ define(["dojo/_base/declare",
                 if (this.hasLess) {
                     this.start = 1;
                     this.collectionPane.start = 1;
-                    switch (this.collectionPane.displayResultType){
+                    switch (this.collectionPane.displayResultType) {
                         case "search":
                             this.savedSearches(this.collectionPane.lastSavedField, this.collectionPane.start);
                         case "collection":
                         default:
-                            this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery,this.collectionPane.start);
+                            this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery, this.collectionPane.start);
                     }
                 }
             },
@@ -123,12 +123,12 @@ define(["dojo/_base/declare",
                 if (this.hasLess) {
                     this.start = this.previousStart;
                     this.collectionPane.start = this.previousStart;
-                    switch (this.collectionPane.displayResultType){
+                    switch (this.collectionPane.displayResultType) {
                         case "search":
                             this.savedSearches(this.collectionPane.lastSavedField, this.collectionPane.start);
                         case "collection":
                         default:
-                            this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery,this.collectionPane.start);
+                            this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery, this.collectionPane.start);
                     }
                 }
             },
@@ -137,12 +137,12 @@ define(["dojo/_base/declare",
                 if (this.hasMore) {
                     this.start = this.nextStart;
                     this.collectionPane.start = this.nextStart;
-                    switch (this.collectionPane.displayResultType){
+                    switch (this.collectionPane.displayResultType) {
                         case "search":
                             this.savedSearches(this.collectionPane.lastSavedField, this.collectionPane.start);
                         case "collection":
                         default:
-                            this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery,this.collectionPane.start);
+                            this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery, this.collectionPane.start);
                     }
                 }
             },
@@ -163,12 +163,12 @@ define(["dojo/_base/declare",
 
                 this._hasMore();
                 if (this.hasMore) {
-                    switch (this.collectionPane.displayResultType){
+                    switch (this.collectionPane.displayResultType) {
                         case "search":
                             this.savedSearches(this.collectionPane.lastSavedField, this.collectionPane.start);
                         case "collection":
                         default:
-                            this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery,this.collectionPane.start);
+                            this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery, this.collectionPane.start);
                     }
                 }
             },
@@ -177,12 +177,12 @@ define(["dojo/_base/declare",
                 this.start = parseInt(this.goToPageNode.value - 1) * this.numPerPage + 1;
                 this._hasMore();
                 if (this.hasMore) {
-                    switch (this.collectionPane.displayResultType){
+                    switch (this.collectionPane.displayResultType) {
                         case "search":
                             this.savedSearches(this.collectionPane.lastSavedField, this.collectionPane.start);
                         case "collection":
                         default:
-                            this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery,this.collectionPane.start);
+                            this.savedResults(this.collectionPane.lastSavedField, this.collectionPane.lastSavedQuery, this.collectionPane.start);
                     }
                 }
             },

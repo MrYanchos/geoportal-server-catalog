@@ -17,44 +17,46 @@ define(["dojo/_base/declare",
         "dojo/_base/array",
         "app/common/Templated",
         "app/etc/util",
-    "app/collection/CollectionBase"],
-function(declare, lang, array, Templated, util, CollectionBase) {
-  
-  var oThisClass = declare([Templated], {
+        "app/collection/CollectionBase"],
+    function (declare, lang, array, Templated, util, CollectionBase) {
 
-    conditionallyDisabled: false,
-    isCollectionComponent: true,
-    collectionPane: null,
+        var oThisClass = declare([Templated], {
 
-     mdArray : [],
-  curPage : 0,
-   sType : "local",
-   search: "",
-  totRecords : 0,
-    /* params - {geoportalUser:obj} */
-    ItemAdded: "app/SignedIn",
-    /* params - {geoportalUser:obj} */
-    Item: "app/SignedIn",
+            conditionallyDisabled: false,
+            isCollectionComponent: true,
+            collectionPane: null,
 
-    postCreate: function() {
-      this.inherited(arguments);
-      if (this.conditionallyDisabled) {
-        if (this.domNode) this.domNode.style.display = "none";
-      }
-    },
-    processError: function(searchError) {},
-    savedResults: function(Field, query, startRec) {
-      if (this.collectionPane) this.collectionPane.savedResults(Field, query, startRec);
-    },
-    processSavedResults: function(items, totalRecords, nextPage, startRec, endRec) {},
-    savedSearches: function(savedSearch, start) {
-      if (this.collectionPane) this.collectionPane.savedResults(savedSearch, start);
-    },
-    //processSavedSearches: function(items, totalRecords, nextPage, startRec, endRec) {},
+            mdArray: [],
+            curPage: 0,
+            sType: "local",
+            search: "",
+            totRecords: 0,
+            /* params - {geoportalUser:obj} */
+            ItemAdded: "app/SignedIn",
+            /* params - {geoportalUser:obj} */
+            Item: "app/SignedIn",
 
-  //  var open = window.XMLHttpRequest.prototype.open,
-  //  send = window.XMLHttpRequest.prototype.send,
-   // onReadyStateChange;
+            postCreate: function () {
+                this.inherited(arguments);
+                if (this.conditionallyDisabled) {
+                    if (this.domNode) this.domNode.style.display = "none";
+                }
+            },
+            processError: function (searchError) {
+            },
+            savedResults: function (Field, query, startRec) {
+                if (this.collectionPane) this.collectionPane.savedResults(Field, query, startRec);
+            },
+            processSavedResults: function (items, totalRecords, nextPage, startRec, endRec) {
+            },
+            savedSearches: function (savedSearch, start) {
+                if (this.collectionPane) this.collectionPane.savedResults(savedSearch, start);
+            },
+            //processSavedSearches: function(items, totalRecords, nextPage, startRec, endRec) {},
+
+            //  var open = window.XMLHttpRequest.prototype.open,
+            //  send = window.XMLHttpRequest.prototype.send,
+            // onReadyStateChange;
 
 // * entry point - attach to button class
 
@@ -252,142 +254,142 @@ function(declare, lang, array, Templated, util, CollectionBase) {
 //     return key;
 // }
 
-  setSavedCard :function (gC) {
-    console.log('click Card:setSavedEvent');
-    //var topGC = gC;
-    $(gC).find('*').each(function () {
-      //console.log('a');
-      if (typeof($(this).attr('href')) !== "undefined") {
-        var href = $(this).attr('href');
-        if (href.substr(0, 6) == "./rest" && href.substring(href.length - 4) == "html") {
+            setSavedCard: function (gC) {
+                console.log('click Card:setSavedEvent');
+                //var topGC = gC;
+                $(gC).find('*').each(function () {
+                    //console.log('a');
+                    if (typeof ($(this).attr('href')) !== "undefined") {
+                        var href = $(this).attr('href');
+                        if (href.substr(0, 6) == "./rest" && href.substring(href.length - 4) == "html") {
 
-          var ahr = href.split("/");
-          xid = ahr[ahr.length - 2];
-          var md = localStorage.getItem("mdRec-" + xid);
-          if (typeof(md) !== "undefined" && md !== null) {
-            $(gC).css("background-color", "#aaa");
-          }
-          console.log('e' + href);
-        }
+                            var ahr = href.split("/");
+                            xid = ahr[ahr.length - 2];
+                            var md = localStorage.getItem("mdRec-" + xid);
+                            if (typeof (md) !== "undefined" && md !== null) {
+                                $(gC).css("background-color", "#aaa");
+                            }
+                            console.log('e' + href);
+                        }
 
-      }
+                    }
 
-    });
-  }
+                });
+            }
 
-,
-  assignEvent: function (gC) {
-    console.log('click Card:assignEvent');
-    // $(gC).click(function () {
-    var tlval = '',
-        fileId = '',
-        DescVal = '',
-        mLink = '',
-        xid = '',
-        cState = 'f',
-        xLinks = '';
+            ,
+            assignEvent: function (gC) {
+                console.log('click Card:assignEvent');
+                // $(gC).click(function () {
+                var tlval = '',
+                    fileId = '',
+                    DescVal = '',
+                    mLink = '',
+                    xid = '',
+                    cState = 'f',
+                    xLinks = '';
 
-    var gRgb = $(this).css("background-color");
-    if (gRgb == "rgb(170, 170, 170)") {
-      cState = 'f';
-    } else {
-      $(this).css("background-color", "#aaa");
-      cState = 't';
-    }
+                var gRgb = $(this).css("background-color");
+                if (gRgb == "rgb(170, 170, 170)") {
+                    cState = 'f';
+                } else {
+                    $(this).css("background-color", "#aaa");
+                    cState = 't';
+                }
 
-    $(this).find('*').each(function () {
-          var iClass = $(this).attr('class');
+                $(this).find('*').each(function () {
+                        var iClass = $(this).attr('class');
 
-          if (iClass == 'g-item-title') {
-            tlval = $(this).html();
-          }
+                        if (iClass == 'g-item-title') {
+                            tlval = $(this).html();
+                        }
 
-          if (iClass == 'g-item-description') {
-            DescVal = $(this).html();
-          }
+                        if (iClass == 'g-item-description') {
+                            DescVal = $(this).html();
+                        }
 
-          if (typeof($(this).attr('href')) !== "undefined") {
-            var href = $(this).attr('href');
+                        if (typeof ($(this).attr('href')) !== "undefined") {
+                            var href = $(this).attr('href');
 
-            if (href.substr(0, 6) == "./rest" && href.substring(href.length - 4) == "html") {
-              mLink = "http://datadiscoverystudio.org/geoportal/" + href.substr(2);
-              var ahr = href.split("/");
-              xid = ahr[ahr.length - 2];
+                            if (href.substr(0, 6) == "./rest" && href.substring(href.length - 4) == "html") {
+                                mLink = "http://datadiscoverystudio.org/geoportal/" + href.substr(2);
+                                var ahr = href.split("/");
+                                xid = ahr[ahr.length - 2];
+
+                            }
+
+                        }
+                    }
+                );
+
+                if (cState == 't') {
+                    var col = ["default"];
+                    var newMdRecord = CollectionBase.mdRecord(xid, fileId, tlval, mLink, DescVal, col);
+                    CollectionBase.saveMdRecord(newMdRecord);
+
+                } else {
+
+                    console.log('Removing if in just default');
+                    var mdRec = localStorage.getItem("mdRec-" + xid);
+                    if (mdRec.length) {
+                        var mo = JSON.parse(mdRec);
+
+                        if (mo.collections.length < 2) {
+                            localStorage.removeItem("mdRec-" + xid)
+                            $(this).css("background-color", "white");
+                        } else {
+                            mo.collections.pop();
+                            mdRec = JSON.stringify(mo);
+                            CollectionBase.saveMdRecord(newMdRecord);
+                        }
+                    }
+
+                }
+                console.log('click card');
+                //  });
+
+
+            }
+            ,
+
+            openReplacement: function (method, url, async, user, password) {
+                var syncMode = async !== false ? 'async' : 'sync';
+                return open.apply(this, arguments);
+            }
+            ,
+            sendReplacement: function (data) {
+
+                if (data !== null & typeof (data) !== "undefined") {
+                    var dt = typeof data;
+                    var io = data.indexOf("query");
+
+                    if (typeof data === "string" && data.indexOf("query") > 0) {
+                        localStorage.setItem("saveSearch", data);
+                    }
+                    if (this.onreadystatechange) {
+                        this._onreadystatechange = this.onreadystatechange;
+                    }
+                    this.onreadystatechange = onReadyStateChangeReplacement;
+                    return send.apply(this, arguments);
+                } else {
+                    return send.apply(this, arguments);
+                }
 
             }
 
-          }
-        }
-    );
+            ,
+            onReadyStateChangeReplacement: function () {
 
-    if (cState == 't') {
-      var col = ["default"];
-      var newMdRecord = CollectionBase.mdRecord(xid, fileId, tlval, mLink, DescVal, col);
-      CollectionBase.saveMdRecord(newMdRecord);
+                if (this._onreadystatechange) {
+                    return this._onreadystatechange.apply(this, arguments);
+                }
+            },
 
-    } else {
-
-      console.log('Removing if in just default');
-      var mdRec = localStorage.getItem("mdRec-" + xid);
-      if (mdRec.length) {
-        var mo = JSON.parse(mdRec);
-
-        if (mo.collections.length < 2) {
-          localStorage.removeItem("mdRec-" + xid)
-          $(this).css("background-color", "white");
-        } else {
-          mo.collections.pop();
-          mdRec = JSON.stringify(mo);
-          CollectionBase.saveMdRecord(newMdRecord);
-        }
-      }
-
-    }
-    console.log('click card');
-    //  });
-
-
-  }
-,
-
-  openReplacement: function (method, url, async, user, password) {
-    var syncMode = async !== false ? 'async' : 'sync';
-    return open.apply(this, arguments);
-  }
-,
-  sendReplacement: function (data) {
-
-    if ( data !== null & typeof(data) !== "undefined") {
-      var dt = typeof data;
-      var io = data.indexOf("query");
-
-      if ( typeof data === "string" && data.indexOf("query") > 0 ) {
-        localStorage.setItem("saveSearch", data);
-      }
-      if(this.onreadystatechange) {
-        this._onreadystatechange = this.onreadystatechange;
-      }
-      this.onreadystatechange = onReadyStateChangeReplacement;
-      return send.apply(this, arguments);
-    } else {
-      return send.apply(this, arguments);
-    }
-
-  }
-
-,
-    onReadyStateChangeReplacement:  function () {
-
-    if (this._onreadystatechange) {
-      return this._onreadystatechange.apply(this, arguments);
-    }
-  },
-
- // window.XMLHttpRequest.prototype.open = openReplacement;
+            // window.XMLHttpRequest.prototype.open = openReplacement;
 //  window.XMLHttpRequest.prototype.send = sendReplacement;
 
 
-  });
-  
-  return oThisClass;
-});
+        });
+
+        return oThisClass;
+    });

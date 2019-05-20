@@ -29,7 +29,7 @@ define(["dojo/_base/declare",
 
 
     ],
-    function(declare, lang, array, query, on, Uploader, UploadFiles,  Templated, template, i18n, CollectionBase) {
+    function (declare, lang, array, query, on, Uploader, UploadFiles, Templated, template, i18n, CollectionBase) {
 
         var oThisClass = declare([Templated], {
 
@@ -42,231 +42,230 @@ define(["dojo/_base/declare",
             //         console.log(data);
             //     });
             // });
-            postCreate: function() {
+            postCreate: function () {
                 this.inherited(arguments);
 
 
-              var self = this;
+                var self = this;
 
-              var target = this.dropTarget;
+                var target = this.dropTarget;
 
-              var uploader =  this.uploader;
-this.own(on(uploader,"onChange",function(file){
-    changeDataFromUpload(file);
-}))
+                var uploader = this.uploader;
+                this.own(on(uploader, "onChange", function (file) {
+                    changeDataFromUpload(file);
+                }))
             },
-         importAll:function(o) {
-            $("#import-all-file").trigger("click");
+            importAll: function (o) {
+                $("#import-all-file").trigger("click");
 
-        },
+            },
 
-         changeDataFromUpload:function(evt, cb){
-                var self =this;
-            if (!this.browserSupportFileUpload()) {
-                console.error("The File APIs are not fully supported in this browser!");
-            } else {
-                var data = null;
-               var file = evt.target.files[0];
-              //   var file = this.uploader.getFileList()[0];
-                var fileName = file.name;
-              //  $("#filename").html(fileName);
+            changeDataFromUpload: function (evt, cb) {
+                var self = this;
+                if (!this.browserSupportFileUpload()) {
+                    console.error("The File APIs are not fully supported in this browser!");
+                } else {
+                    var data = null;
+                    var file = evt.target.files[0];
+                    //   var file = this.uploader.getFileList()[0];
+                    var fileName = file.name;
+                    //  $("#filename").html(fileName);
 
-                if (file !== "") {
-                    var reader = new FileReader();
+                    if (file !== "") {
+                        var reader = new FileReader();
 
-                    reader.onload = function(event) {
-                        var csvData = event.target.result;
-                        self.parseImport(csvData);
-                    };
+                        reader.onload = function (event) {
+                            var csvData = event.target.result;
+                            self.parseImport(csvData);
+                        };
 
-                    // reader.onload = function(theFile) {
-                    //     parseImport(reader.result);
-                    // }
+                        // reader.onload = function(theFile) {
+                        //     parseImport(reader.result);
+                        // }
 
-                    // reader.loadend = (function(theFile) {
-                    //     return function(e) {
-                    //         // Render thumbnail.
-                    //         var span = document.createElement('span');
-                    //         span.innerHTML = ['<img class="thumb" src="', e.target.result,
-                    //             '" title="', escape(theFile.name), '"/>'].join('');
-                    //         document.getElementById('list').insertBefore(span, null);
-                    //     };
-                    // })(file);
-                    reader.onerror = function() {
-                        console.error("Unable to read " + file.fileName);
-                    };
+                        // reader.loadend = (function(theFile) {
+                        //     return function(e) {
+                        //         // Render thumbnail.
+                        //         var span = document.createElement('span');
+                        //         span.innerHTML = ['<img class="thumb" src="', e.target.result,
+                        //             '" title="', escape(theFile.name), '"/>'].join('');
+                        //         document.getElementById('list').insertBefore(span, null);
+                        //     };
+                        // })(file);
+                        reader.onerror = function () {
+                            console.error("Unable to read " + file.fileName);
+                        };
+                    }
+
+                    reader.readAsText(file);
+
                 }
-
-                reader.readAsText(file);
-
-            }
-        },
+            },
 
 // Method that checks that the browser supports the HTML5 File API
-         browserSupportFileUpload:function() {
-            var isCompatible = false;
-            if (window.File && window.FileReader && window.FileList && window.Blob) {
-                isCompatible = true;
-            }
-            return isCompatible;
-        },
+            browserSupportFileUpload: function () {
+                var isCompatible = false;
+                if (window.File && window.FileReader && window.FileList && window.Blob) {
+                    isCompatible = true;
+                }
+                return isCompatible;
+            },
 
 // Parse the CSV input into JSON
-         csvToJson:function(data) {
-            var cols = data[0];
-            var out = [];
-            for (var i = 1; i < data.length; i++){
-                var obj = {};
-                var row = data[i];
-                cols.forEach(function(col, index){
-                    obj[col] = row[index];
-                });
-                out.push(obj);
-            }
-            return out;
-        },
-        parseImport:function(csvData) {
-
-            //var ovi = $('input[name=uniqName_9_2_radio]:checked').val();
-          //  var ovi = query('input[name=importFormat]:checked').val();
-            var ovi = query('input[name=importFormat]:checked');
-            if ( ovi !== undefined && (ovi instanceof Array) ) {
-                ovi = ovi[0];
-            }
-            if ( ovi !== undefined && ovi.value === 'Overwrite') {
-                if ( confirm ("Are you sure you want to overwrite your current collection records ? ") ) {
-                    ovi = 'over';
-                    // clear out records here;
-                    /*
-                    var ca =[];
-                    for (var i = 0; i < localStorage.length; i++){
-                        if (localStorage.key(i) !== 'saveSearch') {
-                            ca.push(localStorage.key(i));
-                        }
-                    }
-                    for (var z = 0; z < ca.length; z++ ) {
-                        localStorage.removeItem(ca[z]);
-                    }
-                    */
-                } else {
-                    ovi = 'not-over';
+            csvToJson: function (data) {
+                var cols = data[0];
+                var out = [];
+                for (var i = 1; i < data.length; i++) {
+                    var obj = {};
+                    var row = data[i];
+                    cols.forEach(function (col, index) {
+                        obj[col] = row[index];
+                    });
+                    out.push(obj);
                 }
-            }
-            var defaultLoad = false;
-            var oneCID="default";
+                return out;
+            },
+            parseImport: function (csvData) {
 
-            var rArr = csvData.split('\n');
-            if ( rArr.length )  {
-                for (var k = 0; k < rArr.length; k++) {
-                    var row = rArr[k];
-                    if ( typeof row !== "undefined" ) {
-                        var rowA = row.split(',');
-                        if ( rowA[0] == "Collection"  ) {
-
-                            var cname = rowA[1];
-                            var cid = rowA[2];
-                            oneCID = cid;
-                            if ( cname == "Default" ) {
-                                defaultLoad = true;
-                            }
-                            var cx = CollectionBase.getCollections("id", cid);
-                            if ( cx.length && ovi == 'over' ) {
-                                // already there
-                                var cItem = CollectionBase.collectionItem(rowA[2], rowA[1]);
-                                CollectionBase.saveCollectionItem(cItem);
-                                var nop ="";
-
-                            } else {
-                                if (cid !== 'default') {
-                                var cItem = CollectionBase.collectionItem(rowA[2], rowA[1]);
-                                CollectionBase.saveCollectionItem(cItem);
-                              }
-                            }
-
-                        }
+                //var ovi = $('input[name=uniqName_9_2_radio]:checked').val();
+                //  var ovi = query('input[name=importFormat]:checked').val();
+                var ovi = query('input[name=importFormat]:checked');
+                if (ovi !== undefined && (ovi instanceof Array)) {
+                    ovi = ovi[0];
+                }
+                if (ovi !== undefined && ovi.value === 'Overwrite') {
+                    if (confirm("Are you sure you want to overwrite your current collection records ? ")) {
+                        ovi = 'over';
+                        // clear out records here;
                         /*
-                        if ( rowA[0] == "Saved Search"  ) {
-
-                            var sid = rowA[2];
-                            var sx = _getSavedSearches("id", sid);
-                            if ( sx.length && ovi == 'over' ) {
-                                // already here
-                                 var sItem = searchItem(rowA[2], rowA[1], rowA[3], params);
-                                saveSearchItem(sItem);
-                                var nop ="";
-                            } else {
-                                var params = {};
-                                var sItem = searchItem(rowA[2], rowA[1], rowA[3], params);
-                                saveSearchItem(sItem);
-
+                        var ca =[];
+                        for (var i = 0; i < localStorage.length; i++){
+                            if (localStorage.key(i) !== 'saveSearch') {
+                                ca.push(localStorage.key(i));
                             }
-
+                        }
+                        for (var z = 0; z < ca.length; z++ ) {
+                            localStorage.removeItem(ca[z]);
                         }
                         */
-                        if ( rowA[0] == "Saved Record"  ) {
+                    } else {
+                        ovi = 'not-over';
+                    }
+                }
+                var defaultLoad = false;
+                var oneCID = "default";
 
-                            var rid = rowA[3];
-                            var rx = CollectionBase.getMdRecords("id", rid);
+                var rArr = csvData.split('\n');
+                if (rArr.length) {
+                    for (var k = 0; k < rArr.length; k++) {
+                        var row = rArr[k];
+                        if (typeof row !== "undefined") {
+                            var rowA = row.split(',');
+                            if (rowA[0] == "Collection") {
 
-                            if ( rx instanceof Array && rx.length > 0 ) {
-                                if (defaultLoad) {
-                                    var nop = true;
+                                var cname = rowA[1];
+                                var cid = rowA[2];
+                                oneCID = cid;
+                                if (cname == "Default") {
+                                    defaultLoad = true;
+                                }
+                                var cx = CollectionBase.getCollections("id", cid);
+                                if (cx.length && ovi == 'over') {
+                                    // already there
+                                    var cItem = CollectionBase.collectionItem(rowA[2], rowA[1]);
+                                    CollectionBase.saveCollectionItem(cItem);
+                                    var nop = "";
+
                                 } else {
-                                    var rec= rx[0].val;
-                                    // collections may have changed reload
-                                   // var storeCol = rec.collections;
-                                    //storeCol.split()
-                                    var collections = rowA[5];
-                                    ( collections.length == 0 ) ? collections = ["default"] : collections = collections.split('|');
-                                    if (rec.collections instanceof Array) {
-
-                                       array.forEach(collections, function(col){
-                                           CollectionBase._addCollectionMdRecord(rec, col);
-                                       })
-
-                                    } else {
-                                        rec.collections = ['default'];
-                                        array.forEach(collections, function(col){
-                                            CollectionBase._addCollectionMdRecord(rec, col);
-                                        })
+                                    if (cid !== 'default') {
+                                        var cItem = CollectionBase.collectionItem(rowA[2], rowA[1]);
+                                        CollectionBase.saveCollectionItem(cItem);
                                     }
-                                    var rtitle = rowA[1];
-                                    var rUrl = rowA[2];
-                                    var fid = rowA[4];
-                                    var des = rowA[6];
+                                }
 
-                                    localStorage.removeItem("mdRec-"+rid);
+                            }
+                            /*
+                            if ( rowA[0] == "Saved Search"  ) {
 
-                                    // var rItem = CollectionBase.mdRecord( rid, fid, rtitle, rUrl, des, storeCol );
-                                    // CollectionBase.saveMdRecord(rItem);
-                                    CollectionBase.saveMdRecord(rec);
+                                var sid = rowA[2];
+                                var sx = _getSavedSearches("id", sid);
+                                if ( sx.length && ovi == 'over' ) {
+                                    // already here
+                                     var sItem = searchItem(rowA[2], rowA[1], rowA[3], params);
+                                    saveSearchItem(sItem);
+                                    var nop ="";
+                                } else {
+                                    var params = {};
+                                    var sItem = searchItem(rowA[2], rowA[1], rowA[3], params);
+                                    saveSearchItem(sItem);
 
                                 }
 
-                            } else {
+                            }
+                            */
+                            if (rowA[0] == "Saved Record") {
 
-                                var rtitle = rowA[1];
-                                var rUrl = rowA[2];
-                                var fid = rowA[4];
-                                var collections = rowA[5];
-                                ( collections.length == 0 ) ? collections = ["default"] : collections = collections.split('|');
-                                var des = rowA[6];
-                                var rItem = CollectionBase.mdRecord( rid, fid, rtitle, rUrl, des, collections );
-                                CollectionBase.saveMdRecord(rItem);
+                                var rid = rowA[3];
+                                var rx = CollectionBase.getMdRecords("id", rid);
+
+                                if (rx instanceof Array && rx.length > 0) {
+                                    if (defaultLoad) {
+                                        var nop = true;
+                                    } else {
+                                        var rec = rx[0].val;
+                                        // collections may have changed reload
+                                        // var storeCol = rec.collections;
+                                        //storeCol.split()
+                                        var collections = rowA[5];
+                                        (collections.length == 0) ? collections = ["default"] : collections = collections.split('|');
+                                        if (rec.collections instanceof Array) {
+
+                                            array.forEach(collections, function (col) {
+                                                CollectionBase._addCollectionMdRecord(rec, col);
+                                            })
+
+                                        } else {
+                                            rec.collections = ['default'];
+                                            array.forEach(collections, function (col) {
+                                                CollectionBase._addCollectionMdRecord(rec, col);
+                                            })
+                                        }
+                                        var rtitle = rowA[1];
+                                        var rUrl = rowA[2];
+                                        var fid = rowA[4];
+                                        var des = rowA[6];
+
+                                    //    localStorage.removeItem("mdRec-" + rid);
+
+                                        // var rItem = CollectionBase.mdRecord( rid, fid, rtitle, rUrl, des, storeCol );
+                                        // CollectionBase.saveMdRecord(rItem);
+                                        CollectionBase.saveMdRecord(rec);
+
+                                    }
+
+                                } else {
+
+                                    var rtitle = rowA[1];
+                                    var rUrl = rowA[2];
+                                    var fid = rowA[4];
+                                    var collections = rowA[5];
+                                    (collections.length == 0) ? collections = ["default"] : collections = collections.split('|');
+                                    var des = rowA[6];
+                                    var rItem = CollectionBase.mdRecord(rid, fid, rtitle, rUrl, des, collections);
+                                    CollectionBase.saveMdRecord(rItem);
+
+                                }
+
 
                             }
 
-
-
                         }
-
                     }
                 }
+
+                console.log('import completed ');
+
             }
-
-            console.log('import completed ');
-
-        }
 
         });
 
