@@ -126,7 +126,10 @@ define(["dojo/_base/declare",
                 return out;
             },
             parseImport: function (csvData) {
-
+                var countRec = 0;
+                var countLoaded = 0;
+                var countMatched = 0;
+                var countCollectionsRecords = 0;
                 //var ovi = $('input[name=uniqName_9_2_radio]:checked').val();
                 //  var ovi = query('input[name=importFormat]:checked').val();
                 var ovi = query('input[name=importFormat]:checked');
@@ -135,7 +138,7 @@ define(["dojo/_base/declare",
                 }
                 if (ovi !== undefined && ovi.value === 'Overwrite') {
                     if (confirm("Are you sure you want to overwrite your current collection records ? ")) {
-                        ovi = 'over';
+                        ovi = 'Overwrite';
                         // clear out records here;
                         /*
                         var ca =[];
@@ -162,7 +165,7 @@ define(["dojo/_base/declare",
                         if (typeof row !== "undefined") {
                             var rowA = row.split(',');
                             if (rowA[0] == "Collection") {
-
+                                countCollectionsRecords++;
                                 var cname = rowA[1];
                                 var cid = rowA[2];
                                 oneCID = cid;
@@ -170,7 +173,7 @@ define(["dojo/_base/declare",
                                     defaultLoad = true;
                                 }
                                 var cx = CollectionBase.getCollections("id", cid);
-                                if (cx.length && ovi == 'over') {
+                                if (cx.length && ovi == 'Overwrite') {
                                     // already there
                                     var cItem = CollectionBase.collectionItem(rowA[2], rowA[1]);
                                     CollectionBase.saveCollectionItem(cItem);
@@ -204,7 +207,7 @@ define(["dojo/_base/declare",
                             }
                             */
                             if (rowA[0] == "Saved Record") {
-
+                                countRec++;
                                 var rid = rowA[3];
                                 var rx = CollectionBase.getMdRecords("id", rid);
 
@@ -240,6 +243,8 @@ define(["dojo/_base/declare",
                                         // var rItem = CollectionBase.mdRecord( rid, fid, rtitle, rUrl, des, storeCol );
                                         // CollectionBase.saveMdRecord(rItem);
                                         CollectionBase.saveMdRecord(rec);
+                                        countLoaded++;
+                                        countMatched++;
 
                                     }
 
@@ -253,6 +258,7 @@ define(["dojo/_base/declare",
                                     var des = rowA[6];
                                     var rItem = CollectionBase.mdRecord(rid, fid, rtitle, rUrl, des, collections);
                                     CollectionBase.saveMdRecord(rItem);
+                                    countLoaded++;
 
                                 }
 
@@ -263,7 +269,7 @@ define(["dojo/_base/declare",
                     }
                 }
 
-                console.log('import completed ');
+                console.log('import completed countRecs:{0} countLoaded {1} countUpdated {2}', countRec,countLoaded, countMatched );
 
             }
 
