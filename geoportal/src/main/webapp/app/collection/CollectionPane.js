@@ -218,7 +218,7 @@ define(["dojo/_base/declare",
                         this.savedResults(this.lastCollectionsSearch, this.lastCollectionsQuery, this.start);
                 }
             },
-            savedSearch: function (savedSearch, start) {
+            savedSearch: function (savedSearchObj, start) {
                 this.displayResultType = "search";
                 var components = this.getCollectionComponents();
                 var self = this;
@@ -236,7 +236,7 @@ define(["dojo/_base/declare",
                 var bref = 'http://localhost:8081/geoportal/opensearch?f=json&from=' +
                     this.start +
                     '&size=' + this.numPerPage + ' &sort=sys_modified_dt:desc&esdsl=';
-                var esdsl = JSON.stringify({query: savedSearch.params.query});
+                var esdsl = JSON.stringify({query: savedSearchObj.params.query});
                 // var esdsl=encodeURI( JSON.stringify({"query":{"bool":{"must":[{"query_string":{"analyze_wildcard":true,"query":"water","fields":["_source.title^5","_source.*_cat^10","_all"],"default_operator":"and"}}]}}}));
                 var esdsl = encodeURI(esdsl);
                 var url = bref + esdsl;
@@ -255,7 +255,7 @@ define(["dojo/_base/declare",
 
                     dfd.then(function (response) {
                         if (!dfd.isCanceled()) {
-                            self.lastSavedSearchObject = savedSearch;
+                            self.lastSavedSearchObject = savedSearchObj;
                             status.hide();
                             //console.warn("search-response",response);
                             var data = response;

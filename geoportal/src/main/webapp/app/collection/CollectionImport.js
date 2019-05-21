@@ -39,6 +39,8 @@ define(["dojo/_base/declare",
             templateString: template,
             label: "Collection Import",
             open: false,
+            data: null,
+
             //     $("#import-all-file").change(function(e){
             //     changeDataFromUpload(e, function(data){
             //         console.log(data);
@@ -62,6 +64,13 @@ define(["dojo/_base/declare",
 
             },
 
+
+            clickUpload: function (evt, cb) {
+            var self = this;
+
+                        self.parseImport(self.data);
+
+        },
             changeDataFromUpload: function (evt, cb) {
                 var self = this;
                 if (!this.browserSupportFileUpload()) {
@@ -71,14 +80,16 @@ define(["dojo/_base/declare",
                     var file = evt.target.files[0];
                     //   var file = this.uploader.getFileList()[0];
                     var fileName = file.name;
+                    this.importFile = file;
                     //  $("#filename").html(fileName);
 
                     if (file !== "") {
                         var reader = new FileReader();
 
                         reader.onload = function (event) {
-                            var csvData = event.target.result;
-                            self.parseImport(csvData);
+                           // var csvData = event.target.result;
+                            self.data = event.target.result;
+                            //self.parseImport(csvData);
                         };
 
                         // reader.onload = function(theFile) {

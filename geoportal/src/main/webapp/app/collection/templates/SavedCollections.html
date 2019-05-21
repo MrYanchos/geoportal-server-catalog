@@ -3,46 +3,58 @@
          data-dojo-attach-point="dropPane"
          data-dojo-props="title:'${label}',open:${open}">
         <div class="form-group">
-        <div data-dojo-type="dijit/form/Select"
-             data-dojo-attach-point="menuNode"
-        id="collectionMenuNode" class="selectpicker col-9" >
-            <span value="default" selected><i>Unnassigned Results</i></span>
-            <span value="All"><i>Show All</i></span>
-        </div>
-        <button data-dojo-attach-point="viewBtn" data-dojo-type="dijit/form/Button"
-                data-dojo-attach-event="onClick:_selCollection"
-                type="button" class="btn btn-primary col-3">View
+            <div data-dojo-type="dijit/form/Select"
+                 data-dojo-attach-point="menuNode"
+                 id="collectionMenuNode" class="selectpicker col-9">
+                <span value="default" ><i>Unnassigned Results</i></span>
+                <span value="All" selected><i>Show All</i></span>
+            </div>
+            <button data-dojo-attach-point="viewBtn" data-dojo-type="dijit/form/Button"
+                    data-dojo-attach-event="onClick:_selCollection"
+                    type="button" class="btn btn-primary col-3">View
 
-        </button>
-        </div>
-        <div class="form-group">
-        <input type="text" id="newCollection" value=""
-               placeHolder="Enter a New Collection"
-                       data-dojo-type="dijit/form/TextBox"
-               data-dojo-props="trim:true, propercase:true, "
-               data-dojo-attach-point="newCollection" />
-        <button data-dojo-attach-point="newBtn"
-                data-dojo-type="dijit/form/Button"
-                data-dojo-attach-event="onClick:_addCollection"
-                type="button" class="btn btn-primary">Create New Collection
-
-        </button>
+            </button>
+            <!--<div>-->
+                <!--<label class="toggle-switch modifier-class">-->
+                    <!--<input type="checkbox" class="toggle-switch-input">-->
+                    <!--<span class="toggle-switch-track margin-right-1"></span>-->
+                    <!--<span class="toggle-switch-label font-size&#45;&#45;1">Show Unassigned Records</span>-->
+                <!--</label>-->
+            <!--</div>-->
         </div>
         <div class="form-group">
-        <button data-dojo-attach-point="removeBtn"
-                data-dojo-type="dijit/form/Button"
-                data-dojo-attach-event="onClick:_removeCollection"
-                type="button"
-        class="btn btn-danger">Remove Collection
+            <div data-dojo-type="dijit/form/DropDownButton" class="btn btn-primary">
+                <span>Enter a New Collection Name</span>
+                <div data-dojo-type="dijit/TooltipDialog">
+                    <input type="text" id="newCollection" value=""
+                           placeHolder="Enter a New Collection"
+                           data-dojo-type="dijit/form/TextBox"
+                           data-dojo-props="trim:true, propercase:true, "
+                           data-dojo-attach-point="newCollection"/>
+                    <button data-dojo-attach-point="newBtn"
+                            data-dojo-type="dijit/form/Button"
+                            data-dojo-attach-event="onClick:_addCollection"
+                            type="button" class="btn btn-primary">Create New Collection
 
-        </button>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <button data-dojo-attach-point="removeBtn"
+                    data-dojo-type="dijit/form/Button"
+                    data-dojo-attach-event="onClick:_removeCollection"
+                    type="button"
+                    class="btn btn-danger">Remove Collection
+
+            </button>
         </div>
         <div class="form-group">
 
-    <a data-dojo-attach-point="exportBtn"  download="exportCollection.csv" class="btn btn-primary btn-sm"
-            data-dojo-attach-event="onClick:expAll2">Export Collection
+            <a data-dojo-attach-point="exportBtn" download="exportCollection.csv" class="btn btn-primary btn-sm"
+               data-dojo-attach-event="onClick:expAll2">Export Collection
 
-    </a>
+            </a>
         </div>
     </div>
 </div>

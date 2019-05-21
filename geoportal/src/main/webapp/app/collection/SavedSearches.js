@@ -75,6 +75,7 @@ define(["dojo/_base/declare",
             },
             _addSearch: function (cObj) {
                 // Puts a record into saved search
+                var name = this.newSearchName.value;
 
                 if (this.lastQuery === null) {
                     return;
@@ -112,7 +113,7 @@ define(["dojo/_base/declare",
                 }
                 sUrl = sUrl + sQry;
                 //var seaID = cObj.id.substr(6);
-                var newSearchText = sQry.length > 25 ? sQry.substr(0, 25) : sQry;
+                var newSearchText = name? name : sQry;
 
                 var nid = CollectionBase.createUUID();
                 var si = CollectionBase.searchItem(nid, newSearchText, sUrl, ss);
@@ -122,8 +123,8 @@ define(["dojo/_base/declare",
                 this.menuNode.addOption(newSearch);
                 this.menuNode.set("value", si.id);
                // this.showBtn.setDisabled(false);
-                console.log(' Add search' + newSearchText);
-
+                console.log(' Add search:' + newSearchText);
+                this.collectionPane.savedSearch(si,1);
             },
 
             _removeSearch: function (cObj) {
@@ -140,6 +141,8 @@ define(["dojo/_base/declare",
                 //  this.menuNode.options = ArrayUtil.filter(this.menuNode.options, function(item, index){
                 //      return item.value!==seaID  });
                 this.menuNode.removeOption(seaID);
+
+                this.collectionPane.savedResults('All',1);
 
             },
             showSearchResults: function (sp, savedSearch) {
