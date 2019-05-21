@@ -16,7 +16,7 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/on",
-        "dojo/topic",     "dijit/registry",
+        "dojo/topic", "dijit/registry",
         "app/common/Templated",
         "dojo/text!./templates/SavedCollections.html",
         "dojo/i18n!../nls/resources",
@@ -29,7 +29,7 @@ define(["dojo/_base/declare",
         "dijit/form/TextBox",
 
     ],
-    function(declare, lang, ArrayUtil, on, topic, registry, Templated, template, i18n, CollectionComponent,CollectionBase,  ItemsPane) {
+    function (declare, lang, ArrayUtil, on, topic, registry, Templated, template, i18n, CollectionComponent, CollectionBase, ItemsPane) {
 
         var oThisClass = declare([CollectionComponent], {
 
@@ -37,16 +37,16 @@ define(["dojo/_base/declare",
             templateString: template,
             label: "Saved Collections",
             open: true,
-            postCreate: function() {
+            postCreate: function () {
                 var self = this;
                 this.inherited(arguments);
                 var col = CollectionBase.getCollections();
                 for (var k in col) {
                     var colk = col[k].val
-                    var colOpt = [{value: colk.id , label: colk.colName }];
+                    var colOpt = [{value: colk.id, label: colk.colName}];
                     this.menuNode.addOption(colOpt);
                 }
-                this.menuNode.on( "change", function(evt){
+                this.menuNode.on("change", function (evt) {
                     topic.publish("app/collection/selectCollection", self.menuNode.value);
                 });
                 //viewBtn, newBtn, removeBtn
@@ -61,24 +61,24 @@ define(["dojo/_base/declare",
                 // });
 
             }
-,
+            ,
 
             _selCollection: function (colVal) {
 
                 var xc = colVal;
 
-               // if ( colVal.id =="vBtn" ) {
-                    curPage = 0;
-                    $("#PageCnt").html("Page 0");
-               // }
+                // if ( colVal.id =="vBtn" ) {
+                curPage = 0;
+                $("#PageCnt").html("Page 0");
+                // }
 
 
-                var pageRec=10*curPage;
+                var pageRec = 10 * curPage;
                 sType = "local";
 
                 var ColID = this.menuNode.value; // $('#gSvCollection').find(":selected").val();
-                var coltxt =   this.menuNode.get("displayedValue"); // $('#gSvCollection').find(":selected").text(); //dijit_TitlePane_0_titleBarNode
-                if ( ColID !== "default") {
+                var coltxt = this.menuNode.get("displayedValue"); // $('#gSvCollection').find(":selected").text(); //dijit_TitlePane_0_titleBarNode
+                if (ColID !== "default") {
 
                     // var sb =ItemsPane.itemsNode;// container.find('#'+recordsDropPaneId);
                     // var tlab = sb[0].childNodes[0];
@@ -93,23 +93,25 @@ define(["dojo/_base/declare",
 
                 }
 
-                  var dp = registry.byId("itemDropPane");
-                dp.set("label" ,  "Collection Items from " + coltxt);
-                dp.set("title" ,  "Collection Items from " + coltxt);
-
-                if ( ColID == "default" ) {
-                   // var mda = CollectionBase.getMdRecords("collections","default");
-                    var mda = this.collectionPane.savedResults("collections","default");
 
 
-                } else if ( ColID == "All" ){
-                   // var mda = CollectionBase.getMdRecords("collections","");
-                    var mda = this.collectionPane.savedResults("collections","");
+                if (ColID == "default") {
+                    // var mda = CollectionBase.getMdRecords("collections","default");
+                    var mda = this.collectionPane.savedResults("collections", "default");
+
+
+                } else if (ColID == "All") {
+                    // var mda = CollectionBase.getMdRecords("collections","");
+                    var mda = this.collectionPane.savedResults("collections", "");
                 } else {
-                   // var mda = CollectionBase.getMdRecords("collections",ColID);
-                    var mda = this.collectionPane.savedResults("collections",ColID);
+                    // var mda = CollectionBase.getMdRecords("collections",ColID);
+                    var mda = this.collectionPane.savedResults("collections", ColID);
                 }
-               // ItemsPane.addItem(mda);
+                var dp = registry.byId("itemDropPane");
+                dp.set("label", "Collection Items from " + coltxt);
+                dp.set("title", "Collection Items from " + coltxt);
+
+                // ItemsPane.addItem(mda);
                 // totRecords = mda.length;
                 //
                 // if (mda.length > pageRec ) {
@@ -145,23 +147,23 @@ define(["dojo/_base/declare",
                 // uniq.show();
 
             }
-,
-            _addCollection: function (C){
+            ,
+            _addCollection: function (C) {
 
                 var newCollection = this.newCollection.value;
-                if (newCollection ==="default") return;
+                if (newCollection === "default") return;
 
                 var ncID = CollectionBase.createUUID();
 
 
-                if (newCollection.length ) {
-                    var nco = CollectionBase.collectionItem(ncID, newCollection,"")
-                    localStorage.setItem("cItem-"+ncID, JSON.stringify(nco));
+                if (newCollection.length) {
+                    var nco = CollectionBase.collectionItem(ncID, newCollection, "")
+                    localStorage.setItem("cItem-" + ncID, JSON.stringify(nco));
 
-                    var newColOpt = [{value: ncID ,  label:newCollection }];
+                    var newColOpt = [{value: ncID, label: newCollection}];
 
-                   // $("#gSvCollection").append(newColOpt);
-                  // this.menuNode.options.push(newColOpt);
+                    // $("#gSvCollection").append(newColOpt);
+                    // this.menuNode.options.push(newColOpt);
                     this.menuNode.addOption(newColOpt);
                     this.menuNode.set("value", ncID);
                     this.newCollection.set('displayedValue', '');
@@ -169,34 +171,36 @@ define(["dojo/_base/declare",
 
             },
 
-            _removeCollection: function (C){
+            _removeCollection: function (C) {
 
                 var ColID = this.menuNode.value;
 
-                if ( ColID !== "default" && ColID !== "All" ) {
+                if (ColID !== "default" && ColID !== "All") {
 
-                    var mdRem  = CollectionBase.getMdRecords("collections", ColID );
+                    var mdRem = CollectionBase.getMdRecords("collections", ColID);
 
-                    for ( var k in mdRem ) {
+                    for (var k in mdRem) {
                         var mCol = mdRem[k].val.collections;
                         var mid = mdRem[k].val.id;
                         var saveMe = false;
-                        if ( mCol.length < 2 ) {
-                            localStorage.removeItem("mdRec-"+mid);
+                        if (mCol.length < 2) {
+                            localStorage.removeItem("mdRec-" + mid);
                         } else {
-                            for ( var c in mCol ) {
+                            for (var c in mCol) {
 
-                                if ( mCol[c].match(ColID) ) {
+                                if (mCol[c].match(ColID)) {
                                     mCol.splice(c, 1);
                                     saveMe = true;
                                     //results.push({key:mkey,val:mkr});
                                 }
                             }
-                            if ( saveMe ) { localStorage.setItem("mdRec-"+mid, JSON.stringify(mdRem)); }
+                            if (saveMe) {
+                                localStorage.setItem("mdRec-" + mid, JSON.stringify(mdRem));
+                            }
                         }
                     }
 
-                    localStorage.removeItem("cItem-"+ColID);
+                    localStorage.removeItem("cItem-" + ColID);
                     // this.menuNode.options = ArrayUtil.filter(this.menuNode.options, function(item, index){
                     //     return item.value!==ColID  });
                     this.menuNode.set("value", "All");
@@ -209,167 +213,167 @@ define(["dojo/_base/declare",
 
             },
             expAll2: function (e) {
+                var ColLabel = this.menuNode.get("displayedValue");
+                var fn = "exportCollection" + ColLabel+ $.now() + ".csv";
 
-            var fn = "exportCollection" + $.now() + ".csv";
+                var x = this.exportBtn.download = fn;
 
-            var x = this.exportBtn.download =fn;
+                var ez = this.getExpAll();
 
-            var ez = this.getExpAll();
-
-            var exFile = "data:application/octet-stream," + encodeURIComponent(ez);
+                var exFile = "data:application/octet-stream," + encodeURIComponent(ez);
                 this.exportBtn.href = exFile;
 
-        },
+            },
 
-         exp2Notebook:function(e) {
+            exp2Notebook: function (e) {
+                var ColLabel= this.menuNode.get("displayedValue");
+                var fn = "exportCollection" + ColLabel + $.now() + ".json";
 
-            var fn = "exportCollection" + $.now() + ".json";
+                var x = $(e).attr("download", fn);
 
-            var x = $(e).attr("download", fn);
+                var ez = this.getExpJson();
 
-            var ez = this.getExpJson();
+                var exFile = "data:application/octet-stream," + encodeURIComponent(ez);
+                $(e).attr("href", exFile);
 
-            var exFile = "data:application/octet-stream," + encodeURIComponent(ez);
-            $(e).attr("href", exFile);
+            },
+            getExpJson: function () {
+                //exports selected collection
+                //var ColID = $('#gSvCollection').find(":selected").val();
+                var ColID = this.menuNode.value;
 
-        },
-        getExpJson:function () {
-            //exports selected collection
-            //var ColID = $('#gSvCollection').find(":selected").val();
-            var ColID = this.menuNode.value;
+                var coLabel = "Collection,";
+                var colText = "COLLECTION, NAME, ID, DESCRIPTION\n";
 
-            var coLabel = "Collection,";
-            var colText = "COLLECTION, NAME, ID, DESCRIPTION\n";
+                if (ColID == "default") {
+                    colText = colText + coLabel + 'default,default,Records not in a Collection\n';
 
-            if ( ColID == "default" ) {
-                colText = colText + coLabel + 'default,default,Records not in a Collection\n';
+                } else if (ColID == "all") {
+                    alert("Select a collection ");
+                    return;
 
-            } else if ( ColID == "all" ) {
-                alert("Select a collection ");
-                return;
+                } else {
+                    var sc = CollectionBase.findLocalItems("cItem-" + ColID)
 
-            } else {
-                var sc = CollectionBase.findLocalItems("cItem-"+ColID)
+                    //var sc = findLocalItems("cItem-"+ColID);
 
-                //var sc = findLocalItems("cItem-"+ColID);
-
-                if ( Array.isArray(sc) ) {
-                    for ( var c in sc ) {
-                        var cId = sc[c].key;
-                        var cName = sc[c].val.colName;
-                        var cDesc = sc[c].val.colDesc;
-                        var cIndex = cId.substr(6);
-                        colText = colText + coLabel + cName +  ',' + cIndex + ',' + cDesc + '\n';
+                    if (Array.isArray(sc)) {
+                        for (var c in sc) {
+                            var cId = sc[c].key;
+                            var cName = sc[c].val.colName;
+                            var cDesc = sc[c].val.colDesc;
+                            var cIndex = cId.substr(6);
+                            colText = colText + coLabel + cName + ',' + cIndex + ',' + cDesc + '\n';
+                        }
                     }
                 }
-            }
 
 
-            var mdLabel= "Saved Record,";
-            var mdText = "SAVED RECORD, TITLE, URL, ID, FILEID, COLLECTION_IDS, DESCRIPTION\n";
-            if ( ColID === "All" ) {
-                var md =  CollectionBase.findLocalItems("mdRec");
-            } if ( ColID === "default" ) {
-                CollectionBase.getMdRecords('collections', "default");
-            }else
-             {
-                var md = CollectionBase.getMdRecords('collections', ColID);
-            }
-
-            if ( Array.isArray(md) ) {
-                // for ( var c in md ) {
-                //
-                //     var mName = md[c].val.title;
-                //     mName = mName.replace(/,/g, '|');
-                //     var mLink = md[c].val.mdlink;
-                //     var mId =  md[c].val.id;
-                //     var fId =  md[c].val.fileId;
-                //     var mDesc ="";
-                //     if ( md[c].val.hasOwnProperty("description") ) {
-                //         var mDesc = md[c].val.description;
-                //         ( typeof mDesc !== "undefined" ) ? mDesc = mDesc.replace(/,/g, '|'): mDesc ="";
-                //     }
-                //
-                //     var xol = md[c].val.collections;
-                //     var col = xol.join('|');
-                //
-                //     if ( ColID == "default" ) {
-                //         if ( xol.length == 1 && xol[0]=="default") {
-                //             mdText = mdText + mdLabel + mName +  ',' + mLink + ',' + mId + ',' + fId  +  ',' + col +  ',Citation_Description\n';
-                //         }
-                //
-                //     } else {
-                //         mdText = mdText + mdLabel + mName +  ',' + mLink + ',' + mId + ',' + fId  +  ',' + col +  ',Citation_Description\n';
-                //     }
-                //
-                //
-                //
-                //
-                //
-                // }
-                var j = JSON.stringify(md);
-                return j;
-            }
-
-            // var xft =  colText + mdText;
-            // return xft;
-            return null;
-
-        },
-
-        getExpAll:function () {
-            //exports selected collection
-           // var ColID = $('#gSvCollection').find(":selected").val();
-            var ColID = this.menuNode.value;
-
-            var coLabel = "Collection,";
-            var colText = "COLLECTION, NAME, ID, DESCRIPTION\n";
-
-            if ( ColID == "default" ) {
-                colText = colText + coLabel + 'default,default,Records not in a Collection\n';
-
-            } else if ( ColID == "all" ) {
-               // alert("Select a collection ");
-               // return;
-                var sc = CollectionBase.findLocalItems("cItem");
-            } else {
-               // var sc = CollectionBase.findLocalItems("cItem-"+ColID);
-                var sc = CollectionBase.getCollections('id',ColID)
-
-                //var sc = findLocalItems("cItem-"+ColID);
-
-                if ( Array.isArray(sc) ) {
-                    for ( var c in sc ) {
-                        var cId = sc[c].val.id;
-                        var cName = sc[c].val.colName;
-                        var cDesc = sc[c].val.colDesc;
-                       // var cIndex = cId.substr(6);
-                        colText = colText + coLabel + cName +  ',' + cId + ',' + cDesc + '\n';
-                    }
+                var mdLabel = "Saved Record,";
+                var mdText = "SAVED RECORD, TITLE, URL, ID, FILEID, COLLECTION_IDS, DESCRIPTION\n";
+                if (ColID === "All") {
+                    var md = CollectionBase.findLocalItems("mdRec");
                 }
-                // var fields = [ {id : "id"},
-                //     {id :"colName"},
-                //     {id :"colDesc" }]
-                // var collConfig = {
-                //     quotes: false, //or array of booleans
-                //     quoteChar: '"',
-                //     escapeChar: '"',
-                //     delimiter: ",",
-                //     header: true,
-                //     newline: "\r\n",
-                //     skipEmptyLines: false, //or 'greedy',
-                //     columns: ["id","colName","colDesc"] //or array of strings
-                // }
-                //
-                // colText = colText+ CSV.serialize({fields:fields, records:sc});
-            }
+                if (ColID === "default") {
+                    CollectionBase.getMdRecords('collections', "default");
+                } else {
+                    var md = CollectionBase.getMdRecords('collections', ColID);
+                }
+
+                if (Array.isArray(md)) {
+                    // for ( var c in md ) {
+                    //
+                    //     var mName = md[c].val.title;
+                    //     mName = mName.replace(/,/g, '|');
+                    //     var mLink = md[c].val.mdlink;
+                    //     var mId =  md[c].val.id;
+                    //     var fId =  md[c].val.fileId;
+                    //     var mDesc ="";
+                    //     if ( md[c].val.hasOwnProperty("description") ) {
+                    //         var mDesc = md[c].val.description;
+                    //         ( typeof mDesc !== "undefined" ) ? mDesc = mDesc.replace(/,/g, '|'): mDesc ="";
+                    //     }
+                    //
+                    //     var xol = md[c].val.collections;
+                    //     var col = xol.join('|');
+                    //
+                    //     if ( ColID == "default" ) {
+                    //         if ( xol.length == 1 && xol[0]=="default") {
+                    //             mdText = mdText + mdLabel + mName +  ',' + mLink + ',' + mId + ',' + fId  +  ',' + col +  ',Citation_Description\n';
+                    //         }
+                    //
+                    //     } else {
+                    //         mdText = mdText + mdLabel + mName +  ',' + mLink + ',' + mId + ',' + fId  +  ',' + col +  ',Citation_Description\n';
+                    //     }
+                    //
+                    //
+                    //
+                    //
+                    //
+                    // }
+                    var j = JSON.stringify(md);
+                    return j;
+                }
+
+                // var xft =  colText + mdText;
+                // return xft;
+                return null;
+
+            },
+
+            getExpAll: function () {
+                //exports selected collection
+                // var ColID = $('#gSvCollection').find(":selected").val();
+                var ColID = this.menuNode.value;
+                var ColName = this.menuNode.displayedValue;
+                var coLabel = "Collection,";
+                var colText = "COLLECTION, NAME, ID, DESCRIPTION\n";
+
+                if (ColID == "default") {
+                    colText = colText + coLabel + 'default,default,Records not in a Collection\n';
+
+                } else if (ColID == "all") {
+                    // alert("Select a collection ");
+                    // return;
+                    var sc = CollectionBase.findLocalItems("cItem");
+                } else {
+                    // var sc = CollectionBase.findLocalItems("cItem-"+ColID);
+                    var sc = CollectionBase.getCollections('id', ColID)
+
+                    //var sc = findLocalItems("cItem-"+ColID);
+
+                    if (Array.isArray(sc)) {
+                        for (var c in sc) {
+                            var cId = sc[c].val.id;
+                            var cName = sc[c].val.colName;
+                            var cDesc = sc[c].val.colDesc;
+                            // var cIndex = cId.substr(6);
+                            colText = colText + coLabel + cName + ',' + cId + ',' + cDesc + '\n';
+                        }
+                    }
+                    // var fields = [ {id : "id"},
+                    //     {id :"colName"},
+                    //     {id :"colDesc" }]
+                    // var collConfig = {
+                    //     quotes: false, //or array of booleans
+                    //     quoteChar: '"',
+                    //     escapeChar: '"',
+                    //     delimiter: ",",
+                    //     header: true,
+                    //     newline: "\r\n",
+                    //     skipEmptyLines: false, //or 'greedy',
+                    //     columns: ["id","colName","colDesc"] //or array of strings
+                    // }
+                    //
+                    // colText = colText+ CSV.serialize({fields:fields, records:sc});
+                }
 
 
-            var mdLabel= "Saved Record,";
-            var mdText = "SAVED RECORD, TITLE, URL, ID, FILEID, COLLECTION_IDS, DESCRIPTION\n";
-            if (ColID === "ALL") {
-                var md =  CollectionBase.findLocalItems("mdRec");
-            } else if ( ColID == "default" ) {
+                var mdLabel = "Saved Record,";
+                var mdText = "SAVED RECORD, TITLE, URL, ID, FILEID, COLLECTION_IDS, DESCRIPTION\n";
+                if (ColID === "ALL") {
+                    var md = CollectionBase.findLocalItems("mdRec");
+                } else if (ColID == "default") {
                     // var md =  CollectionBase.findLocalItems("mdRec");
                     CollectionBase.getMdRecords('collections', "default");
                 } else {
@@ -394,48 +398,47 @@ define(["dojo/_base/declare",
 //             ]
 //             mdRecsText = mdText+ CSV.serialize({fields:recfields, records: mdarray});
 
-            if ( Array.isArray(md) ) {
-                for ( var c in md ) {
-                    try {
-                        var mName = md[c].val.title.toString();
-                        mName = mName.replace(/,/g, '--');
-                        mName = mName.replace(/\r?\n/g,' ');
-                        var mLink = md[c].val.mdlink;
-                        var mId = md[c].val.id;
-                        var fId = md[c].val.fileId;
-                        var mDesc = md[c].val.description;
-                        if (md[c].val.hasOwnProperty("description")) {
+                if (Array.isArray(md)) {
+                    for (var c in md) {
+                        try {
+                            var mName = md[c].val.title.toString();
+                            mName = mName.replace(/,/g, '--');
+                            mName = mName.replace(/\r?\n/g, ' ');
+                            var mLink = md[c].val.mdlink;
+                            var mId = md[c].val.id;
+                            var fId = md[c].val.fileId;
                             var mDesc = md[c].val.description;
+                            if (md[c].val.hasOwnProperty("description")) {
+                                var mDesc = md[c].val.description;
 
-                            (typeof mDesc !== "undefined") ? mDesc = mDesc.replace(/,/g, '|') : mDesc = "";
-                            mDesc = mDesc.replace(/\r?\n/g,' ');
-                        }
-
-                        var xol = md[c].val.collections;
-                        var col = xol.join('|');
-
-                        if (ColID == "default") {
-                            if (xol.length == 1 && xol[0] == "default") {
-                                mdText = mdText + mdLabel + mName + ',' + mLink + ',' + mId + ',' + fId + ',' + col + ', '+mDesc+'\n';
+                                (typeof mDesc !== "undefined") ? mDesc = mDesc.replace(/,/g, '|') : mDesc = "";
+                                mDesc = mDesc.replace(/\r?\n/g, ' ');
                             }
 
-                        } else {
-                            mdText = mdText + mdLabel + mName + ',' + mLink + ',' + mId + ',' + fId + ',' + col + ', '+mDesc+'\n';
+                            var xol = md[c].val.collections;
+                            var col = xol.join('|');
+
+                            if (ColID == "default") {
+                                if (xol.length == 1 && xol[0] == "default") {
+                                    mdText = mdText + mdLabel + mName + ',' + mLink + ',' + mId + ',' + fId + ',' + col + ', ' + mDesc + '\n';
+                                }
+
+                            } else {
+                                mdText = mdText + mdLabel + mName + ',' + mLink + ',' + mId + ',' + fId + ',' + col + ', ' + mDesc + '\n';
+                            }
+
+                        } catch (error) {
+                            console.warn("did not convert record")
                         }
 
-                    } catch (error) {
-                        console.warn ("did not convert record")
+
                     }
-
-
-
                 }
+
+                var xft = colText + mdText;
+                return xft;
+
             }
-
-            var xft =  colText + mdText;
-            return xft;
-
-        }
         });
 
         return oThisClass;

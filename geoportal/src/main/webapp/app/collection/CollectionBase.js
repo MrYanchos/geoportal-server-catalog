@@ -166,7 +166,7 @@ define(["dojo/_base/lang",
             getCollections: function (qField, query) {
                 var col = this.findLocalItems("cItem");
                 // If there is a query
-                if (typeof (qField) !== "undefined" && typeof (query) !== "undefined") {
+                if (typeof (qField) !== "undefined" && (typeof (query) === "string" | query instanceof String)) {
                     results = [];
                     for (var k in col) {
                         var kd = col[k].val;
@@ -232,7 +232,7 @@ define(["dojo/_base/lang",
             getMdRecords: function (qField, query) {
                 var md = this.findLocalItems("mdRec");
                 // If there is a query
-                if (typeof (qField) !== "undefined" && typeof (query) !== "undefined") {
+                if (typeof (qField) !== "undefined" && (typeof (query) === "string" | query instanceof String)) {
                     results = [];
                     for (var k in md) {
                         var mkr = md[k].val;

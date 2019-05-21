@@ -23,13 +23,15 @@ define(["dojo/_base/declare",
         "dojo/text!./templates/CollectionImport.html",
         "dojo/i18n!../nls/resources",
         "app/collection/CollectionBase",
+        "dojo/topic",
+        "app/context/app-topics",
         "app/search/DropPane",
         "dijit/form/RadioButton",
         "dijit/form/Button"
 
 
     ],
-    function (declare, lang, array, query, on, Uploader, UploadFiles, Templated, template, i18n, CollectionBase) {
+    function (declare, lang, array, query, on, Uploader, UploadFiles, Templated, template, i18n, CollectionBase, topic, appTopics) {
 
         var oThisClass = declare([Templated], {
 
@@ -238,7 +240,7 @@ define(["dojo/_base/declare",
                                         var fid = rowA[4];
                                         var des = rowA[6];
 
-                                    //    localStorage.removeItem("mdRec-" + rid);
+                                        //    localStorage.removeItem("mdRec-" + rid);
 
                                         // var rItem = CollectionBase.mdRecord( rid, fid, rtitle, rUrl, des, storeCol );
                                         // CollectionBase.saveMdRecord(rItem);
@@ -269,10 +271,10 @@ define(["dojo/_base/declare",
                     }
                 }
 
-                console.log('import completed countRecs:{0} countLoaded {1} countUpdated {2}', countRec,countLoaded, countMatched );
-
+                console.log('import completed countRecs:{0} countLoaded {1} countUpdated {2}', countRec, countLoaded, countMatched);
+                topic.publish("app/collection/refresh");
+                topic.publish(appTopics.BulkUpdate);
             }
-
         });
 
         return oThisClass;

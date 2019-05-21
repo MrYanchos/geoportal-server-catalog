@@ -50,7 +50,7 @@ define(["dojo/_base/declare",
             processSavedResults: function (items, totalRecords, nextPage, startRec, endRec) {
             },
             savedSearches: function (savedSearch, start) {
-                if (this.collectionPane) this.collectionPane.savedResults(savedSearch, start);
+                if (this.collectionPane) this.collectionPane.savedSearch(savedSearch, start);
             },
             //processSavedSearches: function(items, totalRecords, nextPage, startRec, endRec) {},
 

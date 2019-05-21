@@ -51,6 +51,8 @@ define(["dojo/_base/declare",
                 // this.addSort();
                 this.paging = new PagingCollections({});
                 this.paging.placeAt(this.dropPane.toolsNode);
+                this.collectionStatusNode.target = this.dropPane.domNode;
+
                 if (typeof this.numPerPage === "undefined" || this.numPerPage === null) {
                     this.numPerPage = 10;
                 }

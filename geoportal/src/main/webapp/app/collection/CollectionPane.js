@@ -34,9 +34,9 @@ define(["dojo/_base/declare",
             lastQueryCount: 0,
             lastQueryWasMyContent: false,
             highlightQuery: null,
-            lastSavedField: null,
-            lastSavedQuery: null,
-            lastSavedSearch: null,
+            lastSavedSearchObject: null,
+            lastCollectionsQuery: null,
+            lastCollectionsSearch: null,
             displayResultType: "collection", // collection or search for
 
             nextStart: -1,
@@ -203,13 +203,20 @@ define(["dojo/_base/declare",
                 array.forEach(components, function (component) {
                     component.processSavedResults(mda, totalRecords, paged.nextPage, paged.startRec, paged.endRec);
                 });
-                this.lastSavedQuery = query;
-                this.lastSavedField = Field;
+                this.lastCollectionsQuery = query;
+                this.lastCollectionsSearch = Field;
 
             },
             refreshResults: function () {
-                this.savedResults(this.lastSavedField, this.lastSavedQuery);
-
+               // this.savedResults(this.lastCollectionsSearch, this.lastCollectionsQuery);
+                switch (this.displayResultType) {
+                    case "search":
+                        this.savedSearches(this.lastSavedSearchObject, this.start);
+                        break;
+                    case "collection":
+                    default:
+                        this.savedResults(this.lastCollectionsSearch, this.lastCollectionsQuery, this.start);
+                }
             },
             savedSearch: function (savedSearch, start) {
                 this.displayResultType = "search";
@@ -240,14 +247,16 @@ define(["dojo/_base/declare",
 
                 var dfd = null;
                 var mdArray = [];
-
+                var status = registry.byId("collectionStatusNode");
                 try {
 
-
+                    status.show();
                     dfd = this._dfd = dojoRequest.get(url, {handleAs: "json"});
 
                     dfd.then(function (response) {
                         if (!dfd.isCanceled()) {
+                            self.lastSavedSearchObject = savedSearch;
+                            status.hide();
                             //console.warn("search-response",response);
                             var data = response;
                             if (data.hits) {
@@ -299,8 +308,9 @@ define(["dojo/_base/declare",
                                 });
                             }
                         }
+                        status.hide();
                     });
-                    lastSavedSearch = savedSearch;
+
                     return dfd;
                 } catch (error) {
                     console.warn("search-error");

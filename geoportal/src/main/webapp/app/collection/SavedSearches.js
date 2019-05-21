@@ -53,6 +53,7 @@ define(["dojo/_base/declare",
                     if (params !== null && params.query !== null)
                         self.lastQuery = params;
                 });
+              //  this.showBtn.setDisabled(true);
             },
             getSavedSearches: function (qField, query) {
                 var sea = CollectionBase.findLocalItems("sItem");
@@ -120,6 +121,7 @@ define(["dojo/_base/declare",
                 var newSearch = {value: si.id, label: newSearchText};
                 this.menuNode.addOption(newSearch);
                 this.menuNode.set("value", si.id);
+               // this.showBtn.setDisabled(false);
                 console.log(' Add search' + newSearchText);
 
             },
@@ -141,14 +143,20 @@ define(["dojo/_base/declare",
 
             },
             showSearchResults: function (sp, savedSearch) {
+
+
                 var collId = this.menuNode.value;
                 var searchTitle = this.menuNode.get("displayedValue");
+
                 var search = CollectionBase.getSearchById(collId);
+                this.lastQuery = search;
+                this.collectionPane.lastCollectionsQuery = search;
                 var mda = this.collectionPane.savedSearch(search);
 
                 var dp = registry.byId("itemDropPane");
                 dp.set("label", "Results from Search " + searchTitle);
                 dp.set("title", "Results from Search " + searchTitle);
+
             },
 
             saveSearchItem: function (SeaItem) {
