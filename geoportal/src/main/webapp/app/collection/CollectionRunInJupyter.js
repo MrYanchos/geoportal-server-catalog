@@ -1,6 +1,7 @@
 define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
+        "dojo/dom",
         "dojo/dom-construct",
         "dojo/io-query",
         "dijit/registry",
@@ -9,7 +10,7 @@ define(["dojo/_base/declare",
         "app/collection/CollectionComponent",
         "app/collection/CollectionBase",
         "app/common/JupyterDialog",],
-    function (declare, lang, array, domConstruct, ioQuery, registry, template, i18n, CollectionComponent, CollectionBase, JupyterDialog) {
+    function (declare, lang, array, dom, domConstruct, ioQuery, registry, template, i18n, CollectionComponent, CollectionBase, JupyterDialog) {
         var oThisClass = declare([CollectionComponent], {
 
             i18n: i18n,
@@ -63,9 +64,9 @@ define(["dojo/_base/declare",
             },
             createRecordPackage: function (packageType, link) {
 
-                var collection = registry.byId("collectionMenuNode");
-                var collID = collection.value;
-                var collName = collection.get("displayedValue");
+
+                var collID = this.getSelectedCollectionValue();
+                var collName = this.getSelectedCollectionDisplayedValue();
                 var id = CollectionBase.createUUID();
                 var rp = this.recordPackage(id, collID, collName, packageType, link, this.records);
 
@@ -91,6 +92,20 @@ define(["dojo/_base/declare",
             click_sendSavedCollection: function (evt) {
             },
             click_sendSavedChecked: function (evt) {
+            },
+            // can't use dojo/registry, so these isolates code for future change.
+            getSelectedCollectionValue: function () {
+                var collMenuNode = dom.byId("collectionMenuNode");
+                return collMenuNode.value;
+            }
+            ,
+            setSelectedCollectionValue: function (value) {
+                var collMenuNode = dom.byId("collectionMenuNode");
+                this.collMenuNode.value = value;
+            },
+            getSelectedCollectionDisplayedValue: function () {
+                var collMenuNode = dom.byId("collectionMenuNode");
+                return collMenuNode.selectedOptions[0].label;
             },
         });
 

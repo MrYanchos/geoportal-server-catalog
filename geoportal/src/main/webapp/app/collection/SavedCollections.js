@@ -16,7 +16,10 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/on",
-        "dojo/topic", "dijit/registry",
+        "dojo/topic",
+        "dijit/registry",
+        "dojo/dom-construct",
+        "dojo/dom",
         "app/common/Templated",
         "dojo/text!./templates/SavedCollections.html",
         "dojo/i18n!../nls/resources",
@@ -29,7 +32,8 @@ define(["dojo/_base/declare",
         "dijit/form/TextBox",
 
     ],
-    function (declare, lang, ArrayUtil, on, topic, registry, Templated, template, i18n, CollectionComponent, CollectionBase, ItemsPane) {
+    function (declare, lang, ArrayUtil, on, topic, registry, domConstruct, dom,
+              Templated, template, i18n, CollectionComponent, CollectionBase, ItemsPane) {
 
         var oThisClass = declare([CollectionComponent], {
 
@@ -37,18 +41,26 @@ define(["dojo/_base/declare",
             templateString: template,
             label: "Saved Collections",
             open: true,
+            selectedCollection:"All",
+            previousCollection:null,
+
             postCreate: function () {
                 var self = this;
                 this.inherited(arguments);
-                var col = CollectionBase.getCollections();
-                for (var k in col) {
-                    var colk = col[k].val
-                    var colOpt = [{value: colk.id, label: colk.colName}];
-                    this.menuNode.addOption(colOpt);
-                }
-                this.menuNode.on("change", function (evt) {
-                    topic.publish("app/collection/selectCollection", self.menuNode.value);
-                });
+                this.addOptions();
+                // var col = CollectionBase.getCollections();
+                // for (var k in col) {
+                //     var colk = col[k].val
+                //     var option = domConstruct.create("option",{value:colk.id,label:colk.colName},this.menuNode );
+                //    // option.value= colk.id;
+                //    // option.label= colk.colName;
+                //    // this.menuNode.appendChild(option);
+                //     // var colOpt = [{value: colk.id, label: colk.colName}];
+                //     // this.menuNode.addOption(colOpt);
+                // }
+                // this.menuNode.on("change", function (evt) {
+                //     topic.publish("app/collection/selectCollection", self.menuNode.value);
+                // });
                 //viewBtn, newBtn, removeBtn
                 // on(this.viewBtn, "click", function(evt){
                 //     self._selCollection(evt);
@@ -60,9 +72,35 @@ define(["dojo/_base/declare",
                 //     self._removeCollection(evt);
                 // });
 
+            },
+            addOptions() {
+                var col = CollectionBase.getCollections();
+                for (var k in col) {
+                    var colk = col[k].val
+                    var option = domConstruct.create("option", {value: colk.id, label: colk.colName}, this.menuNode);
+                    // option.value= colk.id;
+                    // option.label= colk.colName;
+                    // this.menuNode.appendChild(option);
+                    // var colOpt = [{value: colk.id, label: colk.colName}];
+                    // this.menuNode.addOption(colOpt);
+                }
+            },
+            // dojo.form.select can only produce a dropdown, and not a scrolling select box
+            // if you use this, it isolates code from future change.
+            getSelectedCollectionValue: function () {
+                return this.menuNode.value;
             }
             ,
+            setSelectedCollectionValue: function (value) {
+                this.menuNode.value = value;
+            },
+            getSelectedCollectionDisplayedValue: function () {
+                return this.menuNode.selectedOptions[0].label;
+            },
+            _menuChange: function(evt, value){
+                 topic.publish("app/collection/selectCollection", self.menuNode.value);
 
+            },
             _selCollection: function (colVal) {
 
                 var xc = colVal;
@@ -76,8 +114,9 @@ define(["dojo/_base/declare",
                 var pageRec = 10 * curPage;
                 sType = "local";
 
-                var ColID = this.menuNode.value; // $('#gSvCollection').find(":selected").val();
-                var coltxt = this.menuNode.get("displayedValue"); // $('#gSvCollection').find(":selected").text(); //dijit_TitlePane_0_titleBarNode
+                var ColID = this.getSelectedCollectionValue(); // $('#gSvCollection').find(":selected").val();
+                //var coltxt = this.menuNode.get("displayedValue"); // $('#gSvCollection').find(":selected").text(); //dijit_TitlePane_0_titleBarNode
+                var coltxt = this.getSelectedCollectionDisplayedValue();
                 if (ColID !== "default") {
 
                     // var sb =ItemsPane.itemsNode;// container.find('#'+recordsDropPaneId);
@@ -92,7 +131,6 @@ define(["dojo/_base/declare",
 
 
                 }
-
 
 
                 if (ColID == "default") {
@@ -160,61 +198,53 @@ define(["dojo/_base/declare",
                     var nco = CollectionBase.collectionItem(ncID, newCollection, "")
                     localStorage.setItem("cItem-" + ncID, JSON.stringify(nco));
 
-                    var newColOpt = [{value: ncID, label: newCollection}];
+                    // var newColOpt = [{value: ncID, label: newCollection}];
 
                     // $("#gSvCollection").append(newColOpt);
                     // this.menuNode.options.push(newColOpt);
-                    this.menuNode.addOption(newColOpt);
-                    this.menuNode.set("value", ncID);
-                    this.newCollection.set('displayedValue', '');
+                    // this.menuNode.addOption(newColOpt);
+                   // var option = domConstruct.create("option", {value: ncID, label: newCollection}, this.menuNode);
+
+                    //this.menuNode.set("value", ncID);
+                    this.menuNode.option =[];
+                    this.addOptions();
+                    this.newCollection.value= '';
                 }
 
             },
 
             _removeCollection: function (C) {
 
-                var ColID = this.menuNode.value;
+                var ColID = this.getSelectedCollectionValue();
 
                 if (ColID !== "default" && ColID !== "All") {
 
-                    var mdRem = CollectionBase.getMdRecords("collections", ColID);
+                    var coll = CollectionBase.getCollectionById(ColID);
 
-                    for (var k in mdRem) {
-                        var mCol = mdRem[k].val.collections;
-                        var mid = mdRem[k].val.id;
-                        var saveMe = false;
-                        if (mCol.length < 2) {
-                            localStorage.removeItem("mdRec-" + mid);
-                        } else {
-                            for (var c in mCol) {
 
-                                if (mCol[c].match(ColID)) {
-                                    mCol.splice(c, 1);
-                                    saveMe = true;
-                                    //results.push({key:mkey,val:mkr});
-                                }
-                            }
-                            if (saveMe) {
-                                localStorage.setItem("mdRec-" + mid, JSON.stringify(mdRem));
-                            }
-                        }
+                            localStorage.removeItem("cItem-" +coll.key);
+
+
+
                     }
 
-                    localStorage.removeItem("cItem-" + ColID);
+                   // localStorage.removeItem("cItem-" + ColID);
                     // this.menuNode.options = ArrayUtil.filter(this.menuNode.options, function(item, index){
                     //     return item.value!==ColID  });
-                    this.menuNode.set("value", "All");
+                    this.menuNode.option = [];
+                    this.addOptions();
+                    this.menuNode.value = "All";
 
-                    this.menuNode.removeOption(ColID);
+                    //this.menuNode.removeOption(ColID);
 
 
-                }
+
 
 
             },
             expAll2: function (e) {
                 var ColLabel = this.menuNode.get("displayedValue");
-                var fn = "exportCollection" + ColLabel+ $.now() + ".csv";
+                var fn = "exportCollection" + ColLabel + $.now() + ".csv";
 
                 var x = this.exportBtn.download = fn;
 
@@ -226,7 +256,7 @@ define(["dojo/_base/declare",
             },
 
             exp2Notebook: function (e) {
-                var ColLabel= this.menuNode.get("displayedValue");
+                var ColLabel = this.menuNode.get("displayedValue");
                 var fn = "exportCollection" + ColLabel + $.now() + ".json";
 
                 var x = $(e).attr("download", fn);
@@ -439,6 +469,7 @@ define(["dojo/_base/declare",
                 return xft;
 
             }
+
         });
 
         return oThisClass;

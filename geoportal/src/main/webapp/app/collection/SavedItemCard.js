@@ -10,6 +10,7 @@ define(["dojo/_base/declare",
         "dojo/request",
         "dojo/on",
         "app/context/app-topics",
+        "dojo/dom",
         "dojo/dom-class",
         "dojo/dom-construct",
         "dijit/registry",
@@ -20,15 +21,18 @@ define(["dojo/_base/declare",
         "dijit/Tooltip",
         "dijit/TooltipDialog",
         "dijit/popup",
+        "app/collection/CollectionBase",
+        "app/collection/SavedCollections",
+        "app/collection/SavedSearches",
         "dojo/text!./templates/SavedItemCard.html",
         "dojo/i18n!app/nls/resources",
-        "app/collection/CollectionBase",
         "app/etc/util",
 
     ],
-    function (declare, lang, array, string, topic, xhr, request, on, appTopics, domClass, domConstruct, registry,
+    function (declare, lang, array, string, topic, xhr, request, on, appTopics, dom, domClass, domConstruct, registry,
               _WidgetBase, _AttachMixin, _TemplatedMixin, _WidgetsInTemplateMixin, Tooltip, TooltipDialog, popup,
-              template, i18n, CollectionBase, util) {
+              CollectionBase, SavedCollections,SavedSearches,
+              template, i18n,  util) {
 
         var oThisClass = declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
 
@@ -103,16 +107,16 @@ define(["dojo/_base/declare",
                 topic.publish("app/collection/OnMouseLeaveSavedItem", {item: this.mdRecord});
             },
             onAddCollectionClicked: function (evt) {
-                var collTxtBox = registry.byId("collectionMenuNode");
-                var coll = collTxtBox.value;
+             //   var collTxtBox = registry.byId("collectionMenuNode");
+                var coll = this.getSelectedCollectionValue();
                 CollectionBase._addCollectionMdRecord(this.mdRecord, coll);
                 this._renderCollections(this.mdRecord)
                 this._renderActionStatus(this.mdRecord);
                 // this.myTempDialog.show();
             },
             onRemoveCollectionClicked: function (evt) {
-                var collTxtBox = registry.byId("collectionMenuNode");
-                var coll = collTxtBox.value;
+               // var collTxtBox = registry.byId("collectionMenuNode");
+                var coll =this.getSelectedCollectionValue();
                 CollectionBase._removeCollectionMdRecord(this.mdRecord, coll);
                 this._renderCollections(this.mdRecord)
                 this._renderActionStatus(this.mdRecord);
@@ -185,8 +189,9 @@ define(["dojo/_base/declare",
                 var rmMd = this.rmMdRecordButton;
                 var recSaved = CollectionBase.isSavedItem(mdRecord.id);
 
-                var collTxtBox = registry.byId("collectionMenuNode");
-                var coll = collTxtBox.value;
+              //  var collTxtBox = registry.byId("collectionMenuNode");
+              //  var coll = collTxtBox.value;
+                var coll = this.getSelectedCollectionValue();
                 switch (CollectionBase._inCollectionMdRecord(mdRecord, coll)) {
                     case true:
                         add.disabled = true;
@@ -222,8 +227,36 @@ define(["dojo/_base/declare",
                 }
 
 
+            },
+            // dojo.form.select can only produce a dropdown, and not a scrolling select box
+            // can't use dojo/registry, so these isolates code for future change.
+            getSelectedCollectionValue: function () {
+                var collMenuNode = dom.byId("collectionMenuNode");
+                return collMenuNode.value;
             }
             ,
+            setSelectedCollectionValue: function (value) {
+                var collMenuNode = dom.byId("collectionMenuNode");
+                this.collMenuNode.value = value;
+            },
+            getSelectedCollectionDisplayedValue: function () {
+                var collMenuNode = dom.byId("collectionMenuNode");
+                return collMenuNode.selectedOptions[0].label;
+            },
+
+            getSelectedSearchValue: function () {
+                var collMenuNode = dom.byId("savedSearchMenu");
+                return collMenuNode.value;
+            }
+            ,
+            setSelectedSearchValue: function (value) {
+                var collMenuNode = dom.byId("savedSearchMenu");
+                this.collMenuNode.value = value;
+            },
+            getSelectedSearchDisplayedValue: function () {
+                var collMenuNode = dom.byId("savedSearchMenu");
+                return collMenuNode.selectedOptions[0].label;
+            },
         });
 
         return oThisClass;

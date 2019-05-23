@@ -236,15 +236,15 @@ define(["dojo/_base/declare",
                                         (collections.length == 0) ? collections = ["default"] : collections = collections.split('|');
                                         if (rec.collections instanceof Array) {
 
-                                            array.forEach(collections, function (col) {
-                                                CollectionBase._addCollectionMdRecord(rec, col);
-                                            })
+                                            // array.forEach(collections, function (col) {
+                                                CollectionBase._addCollectionMdRecord(rec, collections);
+                                            // })
 
                                         } else {
                                             rec.collections = ['default'];
-                                            array.forEach(collections, function (col) {
-                                                CollectionBase._addCollectionMdRecord(rec, col);
-                                            })
+                                           // array.forEach(collections, function (col) {
+                                                CollectionBase._addCollectionMdRecord(rec, collections);
+                                           // })
                                         }
                                         var rtitle = rowA[1];
                                         var rUrl = rowA[2];

@@ -3,23 +3,21 @@
          data-dojo-attach-point="dropPane"
          data-dojo-props="title:'${label}',open:${open}">
         <div class="form-group">
-            <div data-dojo-type="dijit/form/Select"
+            <select size="5"
+                    onChange=" dojo.publish('app/collection/selectCollection',this.options[this.selectedIndex].value)"
                  data-dojo-attach-point="menuNode"
                  id="collectionMenuNode" class="selectpicker col-9">
-                <span value="default" ><i>Unnassigned Results</i></span>
-                <span value="All" selected><i>Show All</i></span>
-            </div>
+                <option  value="default" ><i>Unnassigned Results</i></option>
+                <option value="All" selected><i>Show All</i></option>
+            </select>
             <button data-dojo-attach-point="viewBtn" data-dojo-type="dijit/form/Button"
                     data-dojo-attach-event="onClick:_selCollection"
                     type="button" class="btn btn-primary col-3">View
 
             </button>
             <!--<div>-->
-                <!--<label class="toggle-switch modifier-class">-->
-                    <!--<input type="checkbox" class="toggle-switch-input">-->
-                    <!--<span class="toggle-switch-track margin-right-1"></span>-->
-                    <!--<span class="toggle-switch-label font-size&#45;&#45;1">Show Unassigned Records</span>-->
-                <!--</label>-->
+                <!--<button data-dojo-type="dijit/form/ToggleButton" data-dojo-props="iconClass:'dijitCheckBoxIcon', checked: false">-->
+            <!--Show Unassigned</button>-->
             <!--</div>-->
         </div>
         <div class="form-group">

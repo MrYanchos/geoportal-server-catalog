@@ -3,10 +3,10 @@
          data-dojo-attach-point="dropPane"
          data-dojo-props="title:'${label}',open:${open}">
         <div class="form-group">
-            <div data-dojo-type="dijit/form/Select" data-dojo-attach-point="menuNode"
+            <select size="5" data-dojo-attach-point="menuNode"
             id="savedSearchMenu" class="selectpicker col-10" data-width="30em">
-            <span title="select a value from menu" value="default"><i>Select a Saved Search</i></span>
-        </div>
+
+        </select>
             <button data-dojo-attach-point="showBtn" data-dojo-type="dijit/form/Button"
                     data-dojo-attach-event="onClick: showSearchResults"
                     type="button"

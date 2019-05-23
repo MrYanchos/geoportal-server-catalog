@@ -1,7 +1,9 @@
 define(["dojo/_base/lang",
         "dojo/_base/array",
-        "dojo/topic"],
-    function (lang, array, topic) {
+        "dojo/topic",
+        "dojox/collections",
+        "dojox/collections/Set"],
+    function (lang, array, topic, dojoccollections, Set) {
 
         var oThisObject = {
 
@@ -22,36 +24,39 @@ define(["dojo/_base/lang",
             "_addCollectionMdRecord": function (mdRecord, coll) {
                 var collections = [];
                 if (coll === "All" | coll === "default") return;
-                if ( coll !== undefined && !(coll instanceof Array) ) {
+                if ( coll !== undefined && !Array.isArray (coll )   ) {
                     coll = [coll];
                 }
                 if (mdRecord) {
-                    if (mdRecord.collections === undefined) collections = ['default'];
+                    if (mdRecord.collections === undefined) mdRecord.collections = [];
                     if (!(mdRecord.collections instanceof Array) ) {
                         collections = [mdRecord.collections];
                     }
                     else {
                         collections=mdRecord.collections;
                     }
-                    var newCollections = [];
-                    array.forEach(coll, function (c) {
-                        if (array.indexOf(collections, c) < 0) {
-                            collections.push(c);
-                        }
-                        ;
-                    })
-
-                    var unique = {};
-                    newCollections= array.filter(collections, function(value) {
-                        if (!unique[value] && value !== 'default') {
-                            unique[value] = true;
-                           // return true;
-                            return value;
-                        }
-                        //return false;
-
-                    })
-                    mdRecord.collections= newCollections;
+                    var newCollections = dojox.collections.Set.union(coll, collections);
+                    // var newCollections = [];
+                    // array.forEach(coll, function (c) {
+                    //     if (array.indexOf(collections, c) < 0) {
+                    //         collections.push(c);
+                    //     }
+                    //     ;
+                    // })
+                    //
+                    // var unique = {};
+                    // newCollections= array.filter(collections, function(value) {
+                    //     if (!unique[value] && value !== 'default') {
+                    //         unique[value] = true;
+                    //        // return true;
+                    //         return value;
+                    //     }
+                    //     //return false;
+                    //
+                    // })
+                    newCollections.remove("default"); // dojo ArrayList
+                    mdRecord.collections = newCollections.toArray();
+                    if (mdRecord.collections.length === 0 ) mdRecord.collections = ['default'];
                     this.saveMdRecord(mdRecord);
                 }
 
@@ -60,19 +65,20 @@ define(["dojo/_base/lang",
                 if (coll === "All" | coll === "default") return;
                 if (mdRecord) {
                     if (array.indexOf(mdRecord.collections, coll) >= 0) {
-                        mdRecord.collections.pop(coll);
+                        //mdRecord.collections.pop(coll);
+                        mdRecord.collections.splice( mdRecord.collections.indexOf(coll), 1 );
 
                         if (mdRecord.collections.length === 0) {
                             mdRecord.collections.push("default");
                         }
                     }
-                    ;
+
                     this.saveMdRecord(mdRecord);
                 }
 
             },
             "_inCollectionMdRecord": function (mdRecord, coll) {
-                if (coll === "All" | coll === "default") return null;
+                if (coll === "All" | coll === "default") return null; // Do not render if All or (unassigned records) is selected
                 if (mdRecord) {
                     if (array.indexOf(mdRecord.collections, coll) >= 0) return true;
                 }
@@ -163,6 +169,16 @@ define(["dojo/_base/lang",
                 return null;
 
             },
+            getCollectionById: function (id) {
+                if (id === "default") return null;
+                if (id === "All") return null;
+                var coll = this.getCollections("id", id);
+                if (coll.length > 0) {
+                    return coll[0];
+                }
+                return null;
+
+            },
             getCollections: function (qField, query) {
                 var col = this.findLocalItems("cItem");
                 // If there is a query
@@ -174,7 +190,7 @@ define(["dojo/_base/lang",
                         var cleanKid = kid.replace(/[|&;$%@"<>()+,]/g, "");
                         var cleanQry = query.replace(/[|&;$%@"<>()+,]/g, "");
                         if (cleanKid.match(cleanQry)) {
-                            results.push({key: k, val: kd});
+                            results.push({key: kid, val: kd});
                         }
                     }
                     col = results;
@@ -200,6 +216,25 @@ define(["dojo/_base/lang",
                 return null;
 
             },
+
+            getSavedSearches: function (qField, query) {
+            var sea = this.findLocalItems("sItem");
+            if (typeof (qField) !== "undefined" && typeof (query)) {
+                results = [];
+
+                for (var k in sea) {
+                    var kd = sea[k].val;
+                    var kid = kd[qField];
+                    var cleanKid = kid.replace(/[|&;$%@"<>()+,]/g, "");
+                    if (cleanKid.match(query)) {
+                        results.push({key: k, val: kd});
+                    }
+                }
+                sea = results;
+            }
+            return sea;
+
+        },
             isSavedItem: function (itemId) {
                 var isSaved = false;
                 var collections = [];
@@ -247,18 +282,20 @@ define(["dojo/_base/lang",
                                     results.push({key: mkey, val: mkr});
                                 }
 
-                            } else if (query == "all") {
+                            } else if (query == "All"| query=== undefined | query ==="") {
                                 results.push({key: mkey, val: mkr});
 
                             } else {
                                 var mCol = mkr.collections;
-
-                                for (var c in mCol) {
-
-                                    if (mCol[c].match(query)) {
-                                        results.push({key: mkey, val: mkr});
-                                    }
+                                if (array.indexOf(mCol,query) >= 0){
+                                    results.push({key: mkey, val: mkr});
                                 }
+                                // for (var c in mCol) {
+                                //
+                                //     if (mCol[c].match(query)) {
+                                //         results.push({key: mkey, val: mkr});
+                                //     }
+                                // }
                             }
                         } else if (qField == "id") {
                             if (mkr.id == query) {

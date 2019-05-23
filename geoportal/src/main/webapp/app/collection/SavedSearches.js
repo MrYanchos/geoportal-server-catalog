@@ -18,6 +18,8 @@ define(["dojo/_base/declare",
         "app/common/Templated",
         "dojo/topic",
         "dijit/registry",
+        "dojo/dom-construct",
+        "dojo/dom",
         "app/context/app-topics",
         "dojo/text!./templates/SavedSearches.html",
         "dojo/i18n!../nls/resources",
@@ -27,7 +29,7 @@ define(["dojo/_base/declare",
         "dijit/form/Select",
         "dijit/form/Button"
     ],
-    function (declare, lang, ArrayUtil, Templated, topic, registry, appTopics, template, i18n, CollectionComponent, CollectionBase) {
+    function (declare, lang, ArrayUtil, Templated, topic, registry, domConstruct, dom, appTopics, template, i18n, CollectionComponent, CollectionBase) {
 
         var oThisClass = declare([CollectionComponent], {
 
@@ -40,38 +42,46 @@ define(["dojo/_base/declare",
             postCreate: function () {
                 this.inherited(arguments);
                 var self = this;
-                var sea = this.getSavedSearches();
-
-                for (var k in sea) {
-                    var seak = sea[k].val;
-                    var colText = seak.searchText.length > 25 ? seak.searchText.substr(0, 25) : seak.searchText;
-
-                    var colOpt = [{value: seak.id, title: seak.searchUrl, label: colText}];
-                    this.menuNode.addOption(colOpt);
-                }
+                this.addOptions();
+                // var sea = this.getSavedSearches();
+                //
+                // for (var k in sea) {
+                //     var seak = sea[k].val;
+                //     var colText = seak.searchText.length > 25 ? seak.searchText.substr(0, 25) : seak.searchText;
+                //
+                //     var colOpt = [{value: seak.id, title: seak.searchUrl, label: colText}];
+                //     this.menuNode.addOption(colOpt);
+                // }
                 topic.subscribe(appTopics.LastQuery, function (params) {
                     if (params !== null && params.query !== null)
                         self.lastQuery = params;
                 });
               //  this.showBtn.setDisabled(true);
             },
-            getSavedSearches: function (qField, query) {
-                var sea = CollectionBase.findLocalItems("sItem");
-                if (typeof (qField) !== "undefined" && typeof (query)) {
-                    results = [];
-
-                    for (var k in sea) {
-                        var kd = sea[k].val;
-                        var kid = kd[qField];
-                        var cleanKid = kid.replace(/[|&;$%@"<>()+,]/g, "");
-                        if (cleanKid.match(query)) {
-                            results.push({key: k, val: kd});
-                        }
-                    }
-                    sea = results;
+            addOptions() {
+                var sea = CollectionBase.getSavedSearches();
+                for (var k in sea) {
+                    var seak = sea[k].val;
+                    var colText = seak.searchText.length > 25 ? seak.searchText.substr(0, 25) : seak.searchText;
+                    var option = domConstruct.create("option", {value: seak.id, label: colText, title: seak.searchUrl}, this.menuNode);
+                    // option.value= colk.id;
+                    // option.label= colk.colName;
+                    // this.menuNode.appendChild(option);
+                    // var colOpt = [{value: colk.id, label: colk.colName}];
+                    // this.menuNode.addOption(colOpt);
                 }
-                return sea;
-
+            },
+            // dojo.form.select can only produce a dropdown, and not a scrolling select box
+            // if you use this, it isolates code from future change.
+            getSelectedSearchValue: function () {
+                return this.menuNode.value;
+            }
+            ,
+            setSelectedSearchValue: function (value) {
+                this.menuNode.value = value;
+            },
+            getSelectedSearchDisplayedValue: function () {
+                return this.menuNode.selectedOptions[0].label;
             },
             _addSearch: function (cObj) {
                 // Puts a record into saved search
@@ -118,10 +128,12 @@ define(["dojo/_base/declare",
                 var nid = CollectionBase.createUUID();
                 var si = CollectionBase.searchItem(nid, newSearchText, sUrl, ss);
                 this.saveSearchItem(si);
-
-                var newSearch = {value: si.id, label: newSearchText};
-                this.menuNode.addOption(newSearch);
-                this.menuNode.set("value", si.id);
+                this.menuNode.option=[];
+                this.addOptions();
+                this.setSelectedSearchValue( si.id);
+                // var newSearch = {value: si.id, label: newSearchText};
+                // this.menuNode.addOption(newSearch);
+                // this.menuNode.set("value", si.id);
                // this.showBtn.setDisabled(false);
                 console.log(' Add search:' + newSearchText);
                 this.collectionPane.savedSearch(si,1);
@@ -131,7 +143,7 @@ define(["dojo/_base/declare",
                 // Remove Saved Search
 
                 //  var seaID = cObj.id;
-                var seaID = this.menuNode.value;
+                var seaID = this.getSelectedSearchValue();
                 if (seaID === "default") return;
                 localStorage.removeItem("sItem-" + seaID);
                 console.log('cleared  ' + seaID);
@@ -140,7 +152,9 @@ define(["dojo/_base/declare",
                 // var ColStr = $('#gSvSearch').find(":selected").remove();
                 //  this.menuNode.options = ArrayUtil.filter(this.menuNode.options, function(item, index){
                 //      return item.value!==seaID  });
-                this.menuNode.removeOption(seaID);
+                this.menuNode.option=[];
+                this.addOptions();
+                //this.menuNode.removeOption(seaID);
 
                 this.collectionPane.savedResults('All',1);
 
@@ -148,8 +162,8 @@ define(["dojo/_base/declare",
             showSearchResults: function (sp, savedSearch) {
 
 
-                var collId = this.menuNode.value;
-                var searchTitle = this.menuNode.get("displayedValue");
+                var collId = this.getSelectedSearchValue();
+                var searchTitle = this.getSelectedSearchDisplayedValue();
 
                 var search = CollectionBase.getSearchById(collId);
                 this.lastQuery = search;
@@ -168,7 +182,7 @@ define(["dojo/_base/declare",
                 localStorage.setItem(key, JSON.stringify(SeaItem));
                 return key;
 
-            }
+            },
         });
 
         return oThisClass;
