@@ -248,7 +248,7 @@ define(["dojo/_base/declare",
 
             },
             expAll2: function (e) {
-                var ColLabel = this.menuNode.get("displayedValue");
+                var ColLabel = this.getSelectedCollectionDisplayedValue();
                 var fn = "exportCollection" + ColLabel + $.now() + ".csv";
 
                 var x = this.exportBtn.download = fn;
@@ -261,7 +261,7 @@ define(["dojo/_base/declare",
             },
 
             exp2Notebook: function (e) {
-                var ColLabel = this.menuNode.get("displayedValue");
+                var ColLabel = this.getSelectedCollectionDisplayedValue();
                 var fn = "exportCollection" + ColLabel + $.now() + ".json";
 
                 var x = $(e).attr("download", fn);
@@ -275,7 +275,7 @@ define(["dojo/_base/declare",
             getExpJson: function () {
                 //exports selected collection
                 //var ColID = $('#gSvCollection').find(":selected").val();
-                var ColID = this.menuNode.value;
+                var ColID = this.getSelectedCollectioValue();
 
                 var coLabel = "Collection,";
                 var colText = "COLLECTION, NAME, ID, DESCRIPTION\n";
@@ -359,8 +359,8 @@ define(["dojo/_base/declare",
             getExpAll: function () {
                 //exports selected collection
                 // var ColID = $('#gSvCollection').find(":selected").val();
-                var ColID = this.menuNode.value;
-                var ColName = this.menuNode.displayedValue;
+                var ColID = this.getSelectedCollectionValue();
+                var ColName = this.getSelectedCollectionDisplayedValue();
                 var coLabel = "Collection,";
                 var colText = "COLLECTION, NAME, ID, DESCRIPTION\n";
 
