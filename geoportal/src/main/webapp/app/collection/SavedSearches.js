@@ -90,18 +90,18 @@ define(["dojo/_base/declare",
             getSelectedSearchDisplayedValue: function () {
                 return this.menuNode.selectedOptions[0].label;
             },
-            _addSearch: function (cObj) {
-                // Puts a record into saved search
-                var name = this.newSearchName.value;
 
+            createSearchName: function(){
                 if (this.lastQuery === null) {
-                    return;
+                    alert('Please run a query.');
+                    this.newSearchBtn.toggleDropDown();
+                    return '';
                 }
-                //var sUrl='http://cinergi.sdsc.edu/geoportal/?q=';
-                var port = location.port === 80 ? "" : ':' + location.port;
-                var sUrl = location.protocol + "//" + location.hostname + port + location.pathname + '?q=';
-                // var ss = JSON.parse(localStorage.getItem("saveSearch"));
-                var ss = this.lastQuery;
+                var name = this.suggestNameFromQuery(this.lastQuery);
+                this.newSearchName.set("value" ,name);
+            },
+            suggestNameFromQuery: function(queryObject){
+                var ss = queryObject;
                 var sa = ss.query.bool.must;
                 var sQry = '';
                 for (var i in sa) {
@@ -123,7 +123,42 @@ define(["dojo/_base/declare",
                         sQry = sQry + " ]Other facet] ";
                     }
                 }
+                return sQry;
+            },
+            _addSearch: function (cObj) {
+                // Puts a record into saved search
+                var name = this.newSearchName.value;
 
+                if (this.lastQuery === null) {
+                    return;
+                }
+                //var sUrl='http://cinergi.sdsc.edu/geoportal/?q=';
+                var port = location.port === 80 ? "" : ':' + location.port;
+                var sUrl = location.protocol + "//" + location.hostname + port + location.pathname + '?q=';
+                // var ss = JSON.parse(localStorage.getItem("saveSearch"));
+                // var ss = this.lastQuery;
+                // var sa = ss.query.bool.must;
+                // var sQry = '';
+                // for (var i in sa) {
+                //     if (sa[i].query_string) {
+                //         sQry = sQry + "[" + sa[i].query_string.query + "] ";
+                //     } else if (sa[i].geo_shape) {
+                //         var coord1 = sa[i].geo_shape.envelope_geo.shape.coordinates[0];
+                //         var coord2 = sa[i].geo_shape.envelope_geo.shape.coordinates[1];
+                //         sQry = sQry + " [Location:" + coord1 + coord2 + " ]";
+                //     } else if (sa[i].range) {
+                //         var key = Object.keys(sa[i].range)[0];
+                //         var gte = sa[i].range[key].gte;
+                //         var lte = sa[i].range[key].lte;
+                //         sQry = sQry + " [range:" + lte + ":" + gte + " ]";
+                //     } else if (sa[i].term) {
+                //         var jsons = JSON.stringify(sa[i].term)
+                //         sQry = sQry + " [term:" + jsons + " ]";
+                //     } else {
+                //         sQry = sQry + " ]Other facet] ";
+                //     }
+                // }
+                var sQry = this.suggestNameFromQuery(this.lastQuery);
                 if (sQry.length < 2) {
                     alert('Empty Query ');
                     return;
@@ -133,7 +168,7 @@ define(["dojo/_base/declare",
                 var newSearchText = name? name : sQry;
 
                 var nid = CollectionBase.createUUID();
-                var si = CollectionBase.searchItem(nid, newSearchText, sUrl, ss);
+                var si = CollectionBase.searchItem(nid, newSearchText, sUrl, this.lastQuery);
                 this.saveSearchItem(si);
                 this.menuNode.option=[];
                 this.addOptions();
@@ -144,6 +179,7 @@ define(["dojo/_base/declare",
                // this.showBtn.setDisabled(false);
                 console.log(' Add search:' + newSearchText);
                 this.collectionPane.savedSearch(si,1);
+                this.newSearchBtn.toggleDropDown();
             },
 
             _removeSearch: function (cObj) {

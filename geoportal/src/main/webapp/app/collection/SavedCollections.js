@@ -215,7 +215,7 @@ define(["dojo/_base/declare",
                     this.addOptions();
                     this.newCollection.value= '';
                 }
-
+                this.addCollectionBtn.toggleDropDown();
             },
 
             _removeCollection: function (C) {

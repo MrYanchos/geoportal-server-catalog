@@ -29,7 +29,8 @@
                 <!--</div>-->
             </div>
             <div class="form-group">
-                <div data-dojo-type="dijit/form/DropDownButton" class="btn btn-primary">
+                <div data-dojo-type="dijit/form/DropDownButton" class="btn btn-primary"
+                     data-dojo-attach-point="addCollectionBtn">
                     <span>New Collection</span>
                     <div data-dojo-type="dijit/TooltipDialog">
                         <input type="text" id="newCollection" value=""
@@ -40,7 +41,7 @@
                         <button data-dojo-attach-point="newBtn"
                                 data-dojo-type="dijit/form/Button"
                                 data-dojo-attach-event="onClick:_addCollection"
-                                type="button" class="btn btn-primary">Create New Collection
+                                type="submit" class="btn btn-primary">Create New Collection
 
                         </button>
                     </div>

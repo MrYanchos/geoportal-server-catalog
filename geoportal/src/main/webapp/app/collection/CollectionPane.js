@@ -211,7 +211,7 @@ define(["dojo/_base/declare",
                // this.savedResults(this.lastCollectionsSearch, this.lastCollectionsQuery);
                 switch (this.displayResultType) {
                     case "search":
-                        this.savedSearches(this.lastSavedSearchObject, this.start);
+                        this.savedSearch(this.lastSavedSearchObject, this.start);
                         break;
                     case "collection":
                     default:

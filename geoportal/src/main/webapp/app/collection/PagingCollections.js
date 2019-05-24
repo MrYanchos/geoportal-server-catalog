@@ -165,7 +165,7 @@ define(["dojo/_base/declare",
                 var oldStart = this.start;
 
                 this.numPerPage = parseInt(this.numPerPageNode.value);
-
+                this.collectionPane.numPerPage = this.numPerPage;
                 var itemEnd = oldPerPage + (oldStart - 1);
                 var newStart = Math.floor(itemEnd / this.numPerPage);
                 if (newStart > 0) {
