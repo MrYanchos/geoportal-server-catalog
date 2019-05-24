@@ -73,11 +73,16 @@ define(["dojo/_base/declare",
                 // });
 
             },
-            addOptions() {
+            addOptions: function() {
                 var col = CollectionBase.getCollections();
+                for(i = this.menuNode.options.length - 1 ; i >= 2 ; i--)
+                {
+                    this.menuNode.remove(i);
+                }
                 for (var k in col) {
                     var colk = col[k].val
                     var option = domConstruct.create("option", {value: colk.id, label: colk.colName}, this.menuNode);
+                    option.innerHTML=colk.colName;
                     // option.value= colk.id;
                     // option.label= colk.colName;
                     // this.menuNode.appendChild(option);

@@ -58,12 +58,19 @@ define(["dojo/_base/declare",
                 });
               //  this.showBtn.setDisabled(true);
             },
-            addOptions() {
+            addOptions: function(){
                 var sea = CollectionBase.getSavedSearches();
+
+                var i;
+                for(i = this.menuNode.options.length - 1 ; i >= 0 ; i--)
+                {
+                    this.menuNode.remove(i);
+                }
                 for (var k in sea) {
                     var seak = sea[k].val;
                     var colText = seak.searchText.length > 25 ? seak.searchText.substr(0, 25) : seak.searchText;
                     var option = domConstruct.create("option", {value: seak.id, label: colText, title: seak.searchUrl}, this.menuNode);
+                    option.innerHTML=colText; // firefox
                     // option.value= colk.id;
                     // option.label= colk.colName;
                     // this.menuNode.appendChild(option);

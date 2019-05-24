@@ -2,42 +2,48 @@
     <div class="g-drop-pane" data-dojo-type="app/search/DropPane"
          data-dojo-attach-point="dropPane"
          data-dojo-props="title:'${label}',open:${open}">
-        <div class="form-group">
-            <select size="5" data-dojo-attach-point="menuNode"
-            id="savedSearchMenu" class="selectpicker col-10" data-width="30em">
+        <div class="form-horizontal">
+            <div class="form-group ">
+                <select size="5" data-dojo-attach-point="menuNode"
+                        id="savedSearchMenu" class="col-md-9">
+                    <!--<option value="default">No Saved Searches</option>-->
+                </select>
 
-        </select>
             <button data-dojo-attach-point="showBtn" data-dojo-type="dijit/form/Button"
                     data-dojo-attach-event="onClick: showSearchResults"
                     type="button"
-                    class="btn btn-primary"
+                    class="btn btn-primary col-md-3  btn-sm "
 
-                    title="Show Search Results">Show Search
+                    title="Show Search Results">Show
 
             </button>
+            </div>
         </div>
-        <div class="form-group">
-            <div data-dojo-type="dijit/form/DropDownButton" class="btn btn-primary">
-                <span>Save Search </span>
-                <div data-dojo-type="dijit/TooltipDialog">
-                    <input type="text" id="newSearchName" value=""
-                           placeHolder="Name of Search"
-                           data-dojo-type="dijit/form/TextBox"
-                           data-dojo-props="trim:true, propercase:true, "
-                           data-dojo-attach-point="newSearchName"/>
-                    <button data-dojo-attach-point="saveBtn" data-dojo-type="dijit/form/Button"
-                            data-dojo-attach-event="onClick: _addSearch"
-                            type="button" class="btn btn-primary">Save Current Search
+        <div class="form-inline">
+            <div class="form-group">
+                <div data-dojo-type="dijit/form/DropDownButton" class="btn btn-primary">
+                    <span>Save Search </span>
+                    <div data-dojo-type="dijit/TooltipDialog">
+                        <input type="text" id="newSearchName" value=""
+                               placeHolder="Name of Search"
+                               data-dojo-type="dijit/form/TextBox"
+                               data-dojo-props="trim:true, propercase:true, "
+                               data-dojo-attach-point="newSearchName"/>
+                        <button data-dojo-attach-point="saveBtn" data-dojo-type="dijit/form/Button"
+                                data-dojo-attach-event="onClick: _addSearch"
+                                type="button" class="btn btn-primary btn-sm ">Save Current Search
 
-                    </button>
+                        </button>
+                    </div>
                 </div>
             </div>
+            <div class="form-group">
+                <button data-dojo-attach-point="removeBtn" data-dojo-type="dijit/form/Button"
+                        data-dojo-attach-event="onClick: _removeSearch" type="button"
+                        class="btn btn-danger btn-sm ">Remove Search
 
-        <button data-dojo-attach-point="removeBtn" data-dojo-type="dijit/form/Button"
-                data-dojo-attach-event="onClick: _removeSearch" type="button"
-        class="btn btn-danger">Remove Search
-
-        </button>
+                </button>
+            </div>
         </div>
     </div>
 </div>

@@ -2,57 +2,58 @@
     <div class="g-drop-pane" data-dojo-type="app/search/DropPane"
          data-dojo-attach-point="dropPane"
          data-dojo-props="title:'${label}',open:${open}">
-        <div class="form-group">
-            <select size="5"
-                    onChange=" dojo.publish('app/collection/selectCollection',this.options[this.selectedIndex].value)"
-                 data-dojo-attach-point="menuNode"
-                 id="collectionMenuNode" class="selectpicker col-9">
-                <option  value="default" ><i>Unnassigned Results</i></option>
-                <option value="All" selected><i>Show All</i></option>
-            </select>
-            <button data-dojo-attach-point="viewBtn" data-dojo-type="dijit/form/Button"
-                    data-dojo-attach-event="onClick:_selCollection"
-                    type="button" class="btn btn-primary col-3">View
+        <div class="form-horizontal">
+            <div class="form-group">
+                <select size="5"
+                        onChange=" dojo.publish('app/collection/selectCollection',this.options[this.selectedIndex].value)"
+                        data-dojo-attach-point="menuNode"
+                        id="collectionMenuNode" class="selectpicker col-md-9">
+                    <option value="default"><i>Unnassigned Results</i></option>
+                    <option value="All" selected ><i>Show All</i></option>
+                </select>
+                <button data-dojo-attach-point="viewBtn" data-dojo-type="dijit/form/Button"
+                        data-dojo-attach-event="onClick:_selCollection"
+                        type="button" class="btn btn-primary col-md-3">View
 
-            </button>
-            <!--<div>-->
+                </button>
+                <button data-dojo-attach-point="removeBtn"
+                        data-dojo-type="dijit/form/Button"
+                        data-dojo-attach-event="onClick:_removeCollection"
+                        type="button"
+                        class="btn btn-danger col-md-3">Remove
+
+                </button>
+                <!--<div>-->
                 <!--<button data-dojo-type="dijit/form/ToggleButton" data-dojo-props="iconClass:'dijitCheckBoxIcon', checked: false">-->
-            <!--Show Unassigned</button>-->
-            <!--</div>-->
-        </div>
-        <div class="form-group">
-            <div data-dojo-type="dijit/form/DropDownButton" class="btn btn-primary">
-                <span>Enter a New Collection Name</span>
-                <div data-dojo-type="dijit/TooltipDialog">
-                    <input type="text" id="newCollection" value=""
-                           placeHolder="Enter a New Collection"
-                           data-dojo-type="dijit/form/TextBox"
-                           data-dojo-props="trim:true, propercase:true, "
-                           data-dojo-attach-point="newCollection"/>
-                    <button data-dojo-attach-point="newBtn"
-                            data-dojo-type="dijit/form/Button"
-                            data-dojo-attach-event="onClick:_addCollection"
-                            type="button" class="btn btn-primary">Create New Collection
+                <!--Show Unassigned</button>-->
+                <!--</div>-->
+            </div>
+            <div class="form-group">
+                <div data-dojo-type="dijit/form/DropDownButton" class="btn btn-primary">
+                    <span>New Collection</span>
+                    <div data-dojo-type="dijit/TooltipDialog">
+                        <input type="text" id="newCollection" value=""
+                               placeHolder="Enter a New Collection"
+                               data-dojo-type="dijit/form/TextBox"
+                               data-dojo-props="trim:true, propercase:true, "
+                               data-dojo-attach-point="newCollection"/>
+                        <button data-dojo-attach-point="newBtn"
+                                data-dojo-type="dijit/form/Button"
+                                data-dojo-attach-event="onClick:_addCollection"
+                                type="button" class="btn btn-primary">Create New Collection
 
-                    </button>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="form-group">
-            <button data-dojo-attach-point="removeBtn"
-                    data-dojo-type="dijit/form/Button"
-                    data-dojo-attach-event="onClick:_removeCollection"
-                    type="button"
-                    class="btn btn-danger">Remove Collection
 
-            </button>
-        </div>
-        <div class="form-group">
+            <div class="form-group">
 
-            <a data-dojo-attach-point="exportBtn" download="exportCollection.csv" class="btn btn-primary btn-sm"
-               data-dojo-attach-event="onClick:expAll2">Export Collection
+                <a data-dojo-attach-point="exportBtn" download="exportCollection.csv" class="btn btn-primary btn-sm"
+                   data-dojo-attach-event="onClick:expAll2">Export Collection
 
-            </a>
+                </a>
+            </div>
         </div>
     </div>
 </div>
