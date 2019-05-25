@@ -21,9 +21,11 @@
         </div>
         <div class="form-inline">
             <div class="form-group">
-                <div data-dojo-type="dijit/form/DropDownButton" class="btn btn-primary">
+                <div data-dojo-type="dijit/form/DropDownButton" class="btn btn-primary"
+                     data-dojo-attach-event="onClick: createSearchName"
+                data-dojo-attach-point="newSearchBtn">
                     <span>Save Search </span>
-                    <div data-dojo-type="dijit/TooltipDialog">
+                    <div data-dojo-type="dijit/TooltipDialog" data-dojo-attach-point="newSearchDialog">
                         <input type="text" id="newSearchName" value=""
                                placeHolder="Name of Search"
                                data-dojo-type="dijit/form/TextBox"
@@ -31,7 +33,7 @@
                                data-dojo-attach-point="newSearchName"/>
                         <button data-dojo-attach-point="saveBtn" data-dojo-type="dijit/form/Button"
                                 data-dojo-attach-event="onClick: _addSearch"
-                                type="button" class="btn btn-primary btn-sm ">Save Current Search
+                                type="submit" class="btn btn-primary btn-sm ">Save Current Search
 
                         </button>
                     </div>

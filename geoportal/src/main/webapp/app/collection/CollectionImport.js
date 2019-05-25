@@ -25,13 +25,14 @@ define(["dojo/_base/declare",
         "app/collection/CollectionBase",
         "dojo/topic",
         "app/context/app-topics",
+        "app/collection/coll-topics",
         "app/search/DropPane",
         "dijit/form/RadioButton",
         "dijit/form/Button"
 
 
     ],
-    function (declare, lang, array, query, on, Uploader, UploadFiles, Templated, template, i18n, CollectionBase, topic, appTopics) {
+    function (declare, lang, array, query, on, Uploader, UploadFiles, Templated, template, i18n, CollectionBase, topic, appTopics, collTopics) {
 
         var oThisClass = declare([Templated], {
 
@@ -283,7 +284,7 @@ define(["dojo/_base/declare",
                 }
 
                 console.log('import completed countRecs:{0} countLoaded {1} countUpdated {2}', countRec, countLoaded, countMatched);
-                topic.publish("app/collection/refresh");
+                topic.publish(collTopics.collectionRefreshRequest, {collectionPane: this.collectionPane});
                 topic.publish(appTopics.BulkUpdate);
             }
         });

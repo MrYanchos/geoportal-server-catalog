@@ -215,7 +215,7 @@ define(["dojo/_base/declare",
                     this.addOptions();
                     this.newCollection.value= '';
                 }
-
+                this.addCollectionBtn.toggleDropDown();
             },
 
             _removeCollection: function (C) {
@@ -275,7 +275,7 @@ define(["dojo/_base/declare",
             getExpJson: function () {
                 //exports selected collection
                 //var ColID = $('#gSvCollection').find(":selected").val();
-                var ColID = this.getSelectedCollectioValue();
+                var ColID = this.getSelectedCollectionValue();
 
                 var coLabel = "Collection,";
                 var colText = "COLLECTION, NAME, ID, DESCRIPTION\n";

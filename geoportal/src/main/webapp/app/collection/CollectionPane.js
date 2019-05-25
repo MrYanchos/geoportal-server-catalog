@@ -5,6 +5,7 @@ define(["dojo/_base/declare",
         "dojo/dom-class",
         "dojo/topic",
         "app/context/app-topics",
+        "app/collection/coll-topics",
         "dijit/registry",
         "dijit/_WidgetBase",
         "dijit/_TemplatedMixin",
@@ -17,7 +18,7 @@ define(["dojo/_base/declare",
         "app/collection/CollectionBase",
         "app/collection/CollectionRunInJupyter"
     ],
-    function (declare, lang, array, query, domClass, topic, appTopics, registry,
+    function (declare, lang, array, query, domClass, topic, appTopics, collTopics, registry,
               _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, template, i18n,
               dojoRequest, AppClient, ItemsPane, CollectionBase,
               CollectionRunInJupyter
@@ -153,7 +154,7 @@ define(["dojo/_base/declare",
                         }
                     })
                 );
-                this.own(topic.subscribe("app/collection/refresh", function () {
+                this.own(topic.subscribe(collTopics.collectionRefreshRequest, function (params) {
                     self.refreshResults();
                 }));
 
@@ -211,7 +212,7 @@ define(["dojo/_base/declare",
                // this.savedResults(this.lastCollectionsSearch, this.lastCollectionsQuery);
                 switch (this.displayResultType) {
                     case "search":
-                        this.savedSearches(this.lastSavedSearchObject, this.start);
+                        this.savedSearch(this.lastSavedSearchObject, this.start);
                         break;
                     case "collection":
                     default:

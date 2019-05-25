@@ -1,9 +1,10 @@
 define(["dojo/_base/lang",
         "dojo/_base/array",
         "dojo/topic",
+        "app/collection/coll-topics",
         "dojox/collections",
         "dojox/collections/Set"],
-    function (lang, array, topic, dojoccollections, Set) {
+    function (lang, array, topic, collTopics, dojoccollections, Set) {
 
         var oThisObject = {
 
@@ -140,7 +141,7 @@ define(["dojo/_base/lang",
                     var key = "mdRec-" + md.id;
                     localStorage.setItem(key, JSON.stringify(md));
                     //  refeshMdPanel(container);
-                    topic.publish("app/collection/refresh", true);
+                    topic.publish(collTopics.collectionRefreshRequest, {collectionPane: this.collectionPane});
                     return key;
                 }
                 return null;
@@ -150,7 +151,7 @@ define(["dojo/_base/lang",
                     var key = "mdRec-" + md.id;
                     localStorage.removeItem(key);
                     //  refeshMdPanel(container);
-                    topic.publish("app/collection/refresh", true);
+                    topic.publish(collTopics.collectionRefreshRequest, {collectionPane: this.collectionPane});
                 }
             },
             saveCollectionItem: function (ColItem) {

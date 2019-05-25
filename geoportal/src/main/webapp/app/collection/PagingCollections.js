@@ -27,7 +27,7 @@ define(["dojo/_base/declare",
         "dojo/i18n!app/nls/resources",
         "app/collection/CollectionComponent",
         "app/etc/util"],
-    function (declare, lang, on, domClass, djNumber, topic, InlineEditBox, Select, NumberTextBox, appTopics, colllTopics, template, i18n, CollectionComponent, util) {
+    function (declare, lang, on, domClass, djNumber, topic, InlineEditBox, Select, NumberTextBox, appTopics, collTopics, template, i18n, CollectionComponent, util) {
 
         var oThisClass = declare([CollectionComponent], {
 
@@ -89,21 +89,22 @@ define(["dojo/_base/declare",
                         self._renderPaging();
                     }
                 });
-                topic.subscribe(colllTopics.collectionRefreshRequest, function (params) {
-                    if (params.collectionPane && self.collectionPane === params.collectionPane) {
-                        self.start = self._start;
-                        switch (this.collectionPane.displayResultType) {
-                            case "search":
-                                self.savedSearches(self.collectionPane.lastSavedSearchObject, self.collectionPane.start);
-                                break;
-                            case "collection":
-                            default:
-                                self.savedResults(self.collectionPane.lastCollectionsSearch, self.collectionPane.lastCollectionsQuery, self.collectionPane.start);
-                        }
-                    }
-                });
+                // collTopics.collectionRefreshRequest handled by collectionPane subscribe
+                // topic.subscribe(collTopics.collectionRefreshRequest, function (params) {
+                //     if (params.collectionPane && self.collectionPane === params.collectionPane) {
+                //         self.start = self._start;
+                //         switch (this.collectionPane.displayResultType) {
+                //             case "search":
+                //                 self.savedSearches(self.collectionPane.lastSavedSearchObject, self.collectionPane.start);
+                //                 break;
+                //             case "collection":
+                //             default:
+                //                 self.savedResults(self.collectionPane.lastCollectionsSearch, self.collectionPane.lastCollectionsQuery, self.collectionPane.start);
+                //         }
+                //     }
+                // });
             },
-            _doPagedSearch (){
+            _doPagedSearch: function(){
                 switch (this.collectionPane.displayResultType) {
                     case "search":
                         this.savedSearches(this.collectionPane.lastSavedSearchObject, this.collectionPane.start);
@@ -165,7 +166,7 @@ define(["dojo/_base/declare",
                 var oldStart = this.start;
 
                 this.numPerPage = parseInt(this.numPerPageNode.value);
-
+                this.collectionPane.numPerPage = this.numPerPage;
                 var itemEnd = oldPerPage + (oldStart - 1);
                 var newStart = Math.floor(itemEnd / this.numPerPage);
                 if (newStart > 0) {
