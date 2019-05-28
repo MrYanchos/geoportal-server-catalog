@@ -357,6 +357,16 @@ define(["dojo/_base/declare",
             },
 
             getExpAll: function () {
+                if (ColID === "ALL") {
+                    var md = CollectionBase.findLocalItems("mdRec");
+                } else if (ColID == "default") {
+                    // var md =  CollectionBase.findLocalItems("mdRec");
+                    CollectionBase.getMdRecords('collections', "default");
+                } else {
+                    var md = CollectionBase.getMdRecords('collections', ColID);
+                }
+
+
                 //exports selected collection
                 // var ColID = $('#gSvCollection').find(":selected").val();
                 var ColID = this.getSelectedCollectionValue();
@@ -367,14 +377,15 @@ define(["dojo/_base/declare",
                 if (ColID == "default") {
                     colText = colText + coLabel + 'default,default,Records not in a Collection\n';
 
-                } else if (ColID == "all") {
+                } else if (ColID == "All") {
+                    colText = colText + coLabel + 'default,default,Records not in a Collection\n';
                     // alert("Select a collection ");
                     // return;
                     var sc = CollectionBase.findLocalItems("cItem");
                 } else {
                     // var sc = CollectionBase.findLocalItems("cItem-"+ColID);
                     var sc = CollectionBase.getCollections('id', ColID)
-
+                }
                     //var sc = findLocalItems("cItem-"+ColID);
 
                     if (Array.isArray(sc)) {
@@ -401,7 +412,7 @@ define(["dojo/_base/declare",
                     // }
                     //
                     // colText = colText+ CSV.serialize({fields:fields, records:sc});
-                }
+
 
 
                 var mdLabel = "Saved Record,";
@@ -449,9 +460,12 @@ define(["dojo/_base/declare",
                                 (typeof mDesc !== "undefined") ? mDesc = mDesc.replace(/,/g, '|') : mDesc = "";
                                 mDesc = mDesc.replace(/\r?\n/g, ' ');
                             }
-
-                            var xol = md[c].val.collections;
-                            var col = xol.join('|');
+                            if (ColID == "All") {
+                                var xol = md[c].val.collections;
+                                var col = xol.join('|');
+                            } else {
+                                col = CollId;
+                            }
 
                             if (ColID == "default") {
                                 if (xol.length == 1 && xol[0] == "default") {
