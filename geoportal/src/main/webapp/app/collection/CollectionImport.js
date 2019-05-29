@@ -17,6 +17,7 @@ define(["dojo/_base/declare",
         "dojo/_base/array",
         "dojo/query",
         "dojo/on",
+        "dijit/registry",
         "dojox/form/Uploader",
         "dojox/form/uploader/FileList",
         "app/common/Templated",
@@ -26,20 +27,21 @@ define(["dojo/_base/declare",
         "dojo/topic",
         "app/context/app-topics",
         "app/collection/coll-topics",
+        "dojox/widget/Toaster",
         "app/search/DropPane",
         "dijit/form/RadioButton",
         "dijit/form/Button"
 
-
     ],
-    function (declare, lang, array, query, on, Uploader, UploadFiles, Templated, template, i18n, CollectionBase, topic, appTopics, collTopics) {
+    function (declare, lang, array, query, on,registry, Uploader, UploadFiles, Templated, template, i18n, CollectionBase,
+              topic, appTopics, collTopics, Toaster) {
 
         var oThisClass = declare([Templated], {
 
             i18n: i18n,
             templateString: template,
             label: "Collection Import",
-            open: false,
+            open: true,
             data: null,
 
             //     $("#import-all-file").change(function(e){
@@ -60,8 +62,21 @@ define(["dojo/_base/declare",
                     changeDataFromUpload(file);
                 }))
             },
-            importAll: function (o) {
-                $("#import-all-file").trigger("click");
+
+            toggleMergeMetadataBtn: function(val){
+                if (val){
+                    this.overwriteMd.set('label',"Overwrite");
+                } else {
+                    this.overwriteMd.set('label',"Merge");
+                }
+
+            },
+            toggleMergeCollectionBtn: function(val){
+                if (val){
+                    this.overwriteCollectionMD.set('label',"Overwrite");
+                } else {
+                    this.overwriteCollectionMD.set('label',"Merge");
+                }
 
             },
 
@@ -146,29 +161,34 @@ define(["dojo/_base/declare",
                 var countCollectionsRecords = 0;
                 //var ovi = $('input[name=uniqName_9_2_radio]:checked').val();
                 //  var ovi = query('input[name=importFormat]:checked').val();
-                var ovi = query('input[name=importFormat]:checked');
-                if (ovi !== undefined && (ovi instanceof Array)) {
-                    ovi = ovi[0];
-                }
-                if (ovi !== undefined && ovi.value === 'Overwrite') {
-                    if (confirm("Are you sure you want to overwrite your current collection records ? ")) {
-                        ovi = 'Overwrite';
-                        // clear out records here;
-                        /*
-                        var ca =[];
-                        for (var i = 0; i < localStorage.length; i++){
-                            if (localStorage.key(i) !== 'saveSearch') {
-                                ca.push(localStorage.key(i));
+               // var ovi = this.overwriteMd.value;
+              //  var oviMD = this.overwriteMd.checked;
+                var oviCollMD = this.overwriteCollectionMD.checked;
+               // var oviCollMD = false;
+                // if (ovi !== undefined && (ovi instanceof Array)) {
+                //     ovi = ovi[0];
+                // }
+                //if (ovi !== undefined && ovi.value === 'Overwrite') {
+                    if (oviCollMD ) {
+                        if (confirm("Are you sure you want to overwrite  collection records listed in file? ")) {
+                            //ovi = 'Overwrite';
+                            // clear out records here;
+                            /*
+                            var ca =[];
+                            for (var i = 0; i < localStorage.length; i++){
+                                if (localStorage.key(i) !== 'saveSearch') {
+                                    ca.push(localStorage.key(i));
+                                }
                             }
+                            for (var z = 0; z < ca.length; z++ ) {
+                                localStorage.removeItem(ca[z]);
+                            }
+                            */
+                        } else {
+                            oviCollMD = false;
                         }
-                        for (var z = 0; z < ca.length; z++ ) {
-                            localStorage.removeItem(ca[z]);
-                        }
-                        */
-                    } else {
-                        ovi = 'not-over';
                     }
-                }
+
                 var defaultLoad = false;
                 var oneCID = "default";
 
@@ -182,20 +202,29 @@ define(["dojo/_base/declare",
                                 countCollectionsRecords++;
                                 var cname = rowA[1];
                                 var cid = rowA[2];
+                                var cDesc = rowA[3];
                                 oneCID = cid;
                                 if (cname == "Default") {
                                     defaultLoad = true;
                                 }
                                 var cx = CollectionBase.getCollections("id", cid);
-                                if (cx.length && ovi == 'Overwrite') {
+                               // if (cx.length && ovi == 'Overwrite') {
+                                    if (cx.length) {
                                     // already there
-                                    var cItem = CollectionBase.collectionItem(rowA[2], rowA[1]);
-                                    CollectionBase.saveCollectionItem(cItem);
-                                    var nop = "";
+                                    if (oviCollMD) {
+                                        var cItem = CollectionBase.collectionItem(cid, cname, cDesc);
+                                        CollectionBase.saveCollectionItem(cItem);
+                                        var nop = "";
+                                    } else {
+                                        var cItem = cx[0].val;
+                                        cItem.collName = cItem.collName ? cItem.collName: cname;
+                                        cItem.colDesc = cItem.colDesc? cItem.colDesc: cDesc;
+                                        CollectionBase.saveCollectionItem(cItem);
+                                    }
 
                                 } else {
                                     if (cid !== 'default') {
-                                        var cItem = CollectionBase.collectionItem(rowA[2], rowA[1]);
+                                        var cItem = CollectionBase.collectionItem(cid, cname, cDesc);
                                         CollectionBase.saveCollectionItem(cItem);
                                     }
                                 }
@@ -283,9 +312,13 @@ define(["dojo/_base/declare",
                     }
                 }
 
-                console.log('import completed countRecs:{0} countLoaded {1} countUpdated {2}', countRec, countLoaded, countMatched);
                 topic.publish(collTopics.collectionRefreshRequest, {collectionPane: this.collectionPane});
                 topic.publish(appTopics.BulkUpdate);
+                var importedNote = `import completed MDRecords:${countRec} Loaded ${countLoaded} Updated ${countMatched}`; //backticks. ES6 template literal
+                console.log(importedNote);
+                registry.byId('notice_toaster').setContent(importedNote, 'info');
+                registry.byId('notice_toaster').show();
+
             }
         });
 

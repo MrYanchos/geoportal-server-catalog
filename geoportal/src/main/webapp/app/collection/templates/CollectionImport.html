@@ -1,19 +1,30 @@
 <div>
+
     <div class="g-drop-pane" data-dojo-type="app/search/DropPane"
          data-dojo-attach-point="dropPane"
-         data-dojo-props="title:'${label}',open:${open}" >
+         data-dojo-props="title:'${label}',open:${open}"
+         id="importDropPane">
 
         <fieldset  >
 
-            <input type="radio" data-dojo-type="dijit/form/RadioButton"
-                   name="importFormat" id="radioMerge" checked value="Merge"/>
-            <label for="radioMerge">Merge</label> <br />
-            <input type="radio" data-dojo-type="dijit/form/RadioButton"
-                   name="importFormat" id="radioOverwrite" value="Overwrite"/>
-            <label for="radioOverwrite">Overwrite</label>
 
-
-
+<div>
+            <label for="overwriteCollectionMD">Collection Info (Merge or Overwrite)</label>
+            <button data-dojo-type="dijit/form/ToggleButton"
+                    id="overwriteCollectionMD" data-dojo-props="checked: false"
+                    data-dojo-attach-point="overwriteCollectionMD"
+                    data-dojo-attach-event="onChange: toggleMergeCollectionBtn">
+                Merge
+            </button>
+    </div>
+            <!--<div>          <label for="overwriteMd">Metadata Records</label>-->
+            <!--<button data-dojo-type="dijit/form/ToggleButton"-->
+                    <!--id="overwriteMd" data-dojo-props="checked: false"-->
+                    <!--data-dojo-attach-point="overwriteMd"-->
+                    <!--data-dojo-attach-event="onChange: toggleMergeMetadataBtn">-->
+                <!--Merge-->
+            <!--</button>-->
+    <!--</div>-->
         </fieldset>
           <fieldset>
 
@@ -38,7 +49,8 @@ title="Choose File"
 
                   </div>
               <button type="button" data-dojo-type="dijit/form/Button" class="btn btn-primary"
-                      data-dojo-attach-event="onClick: clickUpload" >Import File
+                      data-dojo-attach-event="onClick: clickUpload"
+              id="importFile">Import File
 
               </button>
 

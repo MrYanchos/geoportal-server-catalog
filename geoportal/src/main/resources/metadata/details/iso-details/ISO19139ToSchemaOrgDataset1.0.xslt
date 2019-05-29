@@ -5,10 +5,8 @@
     xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gco="http://www.isotc211.org/2005/gco"
     xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx"
     xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
-
     xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink"
-    exclude-result-prefixes="xs xsi gmi gmd srv gml gco gmx csw" version="1.2">
-
+    exclude-result-prefixes="xs xsi gmi gmd srv gml gco gmx csw" version="1.0">
 
     <!-- 
   Template to build xsl transform to map content from standard ISO19139 xml metadata format to 
@@ -34,6 +32,7 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
     transform, comment out template definition with name and uncomment template definition with 
     match (lines 50,51).	
 2018-12-13 updates to identify current version
+2019-05-29 add CharacterSTring template to remove control characters; apply to abstract
  -->
 
     <xsl:output method="text" indent="yes" encoding="UTF-8"/>
@@ -47,10 +46,9 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
 
     <xsl:variable name="authorRoles" select="'editor,coAuthor,author,orginator'"/>
 
- <!--   <xsl:template match="//gmd:MD_Metadata | gmi:MI_Metadata">-->
+<!--    <xsl:template match="//gmd:MD_Metadata | gmi:MI_Metadata">-->
         <xsl:template name="iso2sdo">
         <xsl:param name="isopath"/>
-
         <!-- Define variables for content elements -->
         <xsl:variable name="additionalContexts">
             <xsl:text>"datacite": "http://purl.org/spar/datacite/",&#10;
@@ -283,15 +281,21 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
             </xsl:if>
             <xsl:text>]</xsl:text>
         </xsl:variable>
-        <xsl:variable name="name"
-            select="//gmd:MD_DataIdentification[1]/gmd:citation//gmd:title/gco:CharacterString"/>
+        <xsl:variable name="name">
+            <!--select="//gmd:MD_DataIdentification[1]/gmd:citation//gmd:title/gco:CharacterString"-->
+            <xsl:for-each select="//gmd:MD_DataIdentification[1]/gmd:citation//gmd:title">
+                <xsl:call-template name="CharacterString"/>
+            </xsl:for-each>
+        </xsl:variable>
+
         <xsl:variable name="alternateName">
             <xsl:if test="count(//gmd:citation//gmd:alternateTitle) > 1">
                 <xsl:text>[&#10;</xsl:text>
             </xsl:if>
             <xsl:for-each select="//gmd:citation//gmd:alternateTitle">
                 <xsl:text>"</xsl:text>
-                <xsl:value-of select="normalize-space(gco:CharacterString)"/>
+                <!--<xsl:value-of select="normalize-space(gco:CharacterString)"/>-->
+                <xsl:call-template name="CharacterString"/>
                 <xsl:text>"</xsl:text>
                 <xsl:if test="following-sibling::gmd:alternateTitle">
                     <xsl:text>,&#10;</xsl:text>
@@ -371,8 +375,9 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
                 </xsl:choose>
                 <xsl:text>), </xsl:text>
                 <!-- will potentially have problems here if there are multiple titles; this just takes the first one -->
-                <xsl:value-of disable-output-escaping="yes"
-                    select="normalize-space(//gmd:citation//gmd:title/gco:CharacterString)"/>
+<!--                <xsl:value-of disable-output-escaping="yes"
+                    select="normalize-space(//gmd:citation//gmd:title/gco:CharacterString)"/>-->
+                <xsl:value-of select="$name"/>
 
                 <!-- get the publisher -->
                 <xsl:if
@@ -429,7 +434,10 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
                     <xsl:value-of select="'no abstract provided'"/>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:value-of   select="normalize-space(//gmd:abstract[1]/gco:CharacterString)"/>
+<!--                    <xsl:value-of select="normalize-space(//gmd:abstract[1]/gco:CharacterString)"/>-->
+                        <xsl:for-each select="//gmd:abstract[1]">
+                            <xsl:call-template name="CharacterString"/>
+                        </xsl:for-each>
                 </xsl:otherwise>
             </xsl:choose>        
         </xsl:variable>
@@ -572,8 +580,9 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
                             <xsl:variable name="thetext">
                                 <xsl:call-template name="string-replace-all">
                                     <xsl:with-param name="text" select="normalize-space(gco:CharacterString)"/>
+                                    
                                     <xsl:with-param name="replace" select="string('&#34;')"/>
-                                    <xsl:with-param name="by" select="string('\&#34;')"/>
+                                    <xsl:with-param name="by" select='string("\&apos;")'/>
                                 </xsl:call-template>
                             </xsl:variable>
                             <xsl:value-of select="concat($thetext, '.   ')"/>
@@ -593,8 +602,8 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
 
         <!-- default values to use in lieu of extracted provider; customize
       logic in format/profile-specific implementations to decide which to use-->
-        <xsl:variable name="providerDefault" select="'default provider'"/>
-        <xsl:variable name="publisherDefault" select="'default publisher'"/>
+        <xsl:variable name="providerDefault" select="'provider not specified'"/>
+        <xsl:variable name="publisherDefault" select="'publisher not specified'"/>
         <xsl:variable name="publishingPrinciplesDefault" select="'not defined yet'"/>
         <xsl:variable name="provider" select="''"/>
         <!-- use distributor contact information for providers -->
@@ -641,11 +650,11 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
         </xsl:if>
 
         <xsl:text>  "citation": "</xsl:text>
-        <!-- escape (with '\') any double quotes (&#34;) that show up in  the citation string -->
+            <!-- escape (with '\') any double quotes (&#34;) to single quote (&apos;) that show up in  the citation string -->
         <xsl:call-template name="string-replace-all">
             <xsl:with-param name="text" select="normalize-space($citation)"/>
             <xsl:with-param name="replace" select="string('&#34;')"/>
-            <xsl:with-param name="by" select="string('\&#34;')"/>
+            <xsl:with-param name="by" select='string("\&apos;")'/>
         </xsl:call-template>
         <xsl:text>",&#10;</xsl:text>
 
@@ -676,7 +685,7 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
         <xsl:call-template name="string-replace-all">
             <xsl:with-param name="text" select="normalize-space($description)"/>
             <xsl:with-param name="replace" select="string('&#34;')"/>
-            <xsl:with-param name="by" select="string('\&#34;')"/>
+            <xsl:with-param name="by" select='string("\&apos;")'/>
         </xsl:call-template>
         <xsl:text>",&#10;</xsl:text>
 
@@ -757,19 +766,12 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
                 <xsl:with-param name="pfor" select="$format"/>
                 <xsl:with-param name="prp" select="$distributorContact"/>
             </xsl:call-template>
-            <!-- this test below is causing an issue with the standard java XSLT -->
-         <!--   <xsl:if
-                test="following::gmd:distributorTransferOptions//gmd:onLine or parent::node()/following-sibling::gmd:onLine">          
-                <xsl:text>,&#10;</xsl:text>              
-            </xsl:if>
-           --> 
             <xsl:if
-                test="not(position() = last())">          
-                <xsl:text>,&#10;</xsl:text>              
+                test="following::gmd:distributorTransferOptions//gmd:onLine or parent::node()/following-sibling::gmd:onLine">
+                <xsl:text>,&#10;</xsl:text>
             </xsl:if>
         </xsl:for-each>
-
-        <xsl:text> ],&#10;</xsl:text>
+        <xsl:text>  ],&#10;</xsl:text>
 
         <xsl:if test="string-length(string($datasetIdentifiers)) > 0">
             <xsl:text>  "identifier": &#10;</xsl:text>
@@ -1199,25 +1201,15 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
                         select="concat(' amendment:', normalize-space(following-sibling::gmd:amendmentNumber/child::node()/text()))"
                     />
                 </xsl:if>
-                
                 <xsl:text>"</xsl:text>
 
                 <!-- comma if there are more formats -->
-                <!-- in default java transformer, child::gmd:MD_Format/gmd:name produces a comma when it should not... but not always -->
-               <xsl:if
+                <xsl:if
                     test="parent::node()/parent::node()/following-sibling::node()/child::gmd:MD_Format/gmd:name"
-                    ><xsl:text>, </xsl:text></xsl:if>
-                 
-      <!--           <xsl:if
-                    test="parent::node()/parent::node()/following-sibling::node()/child::*[local-name()='MD_Format']/gmd:name"
-                    >
-
-                   <xsl:text>,</xsl:text>
-                </xsl:if>
-      -->  
+                    >, </xsl:if>
             </xsl:for-each>
 
-            <xsl:if test="count($pfor/gmd:name) > 1">  
+            <xsl:if test="count($pfor/gmd:name) > 1">
                 <xsl:text>]</xsl:text>
             </xsl:if>
         </xsl:variable>
@@ -1326,7 +1318,7 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
             <xsl:text>,&#10;      "provider": </xsl:text>
             <xsl:value-of select="$distProvider"/>
         </xsl:if>
-        <xsl:if test="string-length(normalize-space($distFormat)) > 0">
+        <xsl:if test="string-length($distFormat) > 0">
             <xsl:text>,&#10;      "fileFormat": </xsl:text>
             <xsl:value-of select="$distFormat"/>
         </xsl:if>
@@ -1336,7 +1328,7 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
             <xsl:text>"</xsl:text>
         </xsl:if>
 
-        <xsl:if test="string-length(normalize-space($distPublishDate)) > 0">
+        <xsl:if test="string-length($distPublishDate) > 0">
             <xsl:text>,&#10;      "datePublished": "</xsl:text>
             <xsl:value-of select="$distPublishDate"/>
             <xsl:text>"</xsl:text>
@@ -1408,29 +1400,90 @@ ISO The template includes root element xpath for ISO19139 and ISO19139-1 (see li
     <!--## Template to replace strings                           ##-->
     <!--############################################################-->
     <!-- template from https://stackoverflow.com/questions/3067113/xslt-string-replace/3067130 -->
+    <!-- SMR 2019-05-29 modify to remove any non-ascii characters after doing the replace -->
     <xsl:template name="string-replace-all">
         <xsl:param name="text"/>
         <xsl:param name="replace"/>
         <xsl:param name="by"/>
-        <xsl:choose>
-            <xsl:when test="$text = '' or $replace = '' or not($replace)">
-                <!-- Prevent this routine from hanging -->
-                <xsl:value-of select="$text"/>
-            </xsl:when>
-            <xsl:when test="contains($text, $replace)">
-                <xsl:value-of select="substring-before($text, $replace)"/>
-                <xsl:value-of select="$by"/>
-                <xsl:call-template name="string-replace-all">
-                    <xsl:with-param name="text" select="substring-after($text, $replace)"/>
-                    <xsl:with-param name="replace" select="$replace"/>
-                    <xsl:with-param name="by" select="$by"/>
-                </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="$text"/>
-            </xsl:otherwise>
-        </xsl:choose>
+        <xsl:variable name="ascii">!"#$%&amp;'()*+,-./0123456789:;=>&#60;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~</xsl:variable>
+        <!-- just a bunch of spaces, need one for each special character -->
+        <xsl:variable name="spaces" select="'                                                                                             '" />
+        
+        <xsl:variable name="firststring">
+            <xsl:choose>
+                <xsl:when test="$text = '' or $replace = '' or not($replace)">
+                    <!-- Prevent this routine from hanging -->
+                    <xsl:value-of select="$text"/>
+                </xsl:when>
+                <xsl:when test="contains($text, $replace)">
+                    <xsl:value-of select="substring-before($text, $replace)"/>
+                    <xsl:value-of select="$by"/>
+                    <xsl:call-template name="string-replace-all">
+                        <xsl:with-param name="text" select="substring-after($text, $replace)"/>
+                        <xsl:with-param name="replace" select="$replace"/>
+                        <xsl:with-param name="by" select="$by"/>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="$text"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <!-- use same trick as in next template -->
+        <xsl:value-of select="normalize-space(translate($firststring, translate($firststring, $ascii, ''), $spaces))"/>
     </xsl:template>
 
+    <!--############################################################-->
+    <!--## Template to replace non-printing characters                           ##-->
+    <!--############################################################-->
+    <!-- works for gco:CharacterString , PT_FreeText, gmx:Anchor -->
+    <xsl:template name="CharacterString">
+        
+        <!-- from https://stackoverflow.com/questions/34932344/xslt-to-remove-non-ascii 
+		This is a bit of a hack: it will work for as long as there are enough spaces in the $spaces variable to 
+		accommodate all the non-ascii characters found in the input. If you don't want to rely on such assumption, 
+		you will have to use the recursive template in 39432344 to replace them one-by-one 
+		the xsl:copy in the for-each below are from the template -->
+        <!-- SMR 2019-05-29 add escape sequence for '<' (&#60;) -->
+        <xsl:variable name="ascii">!"#$%&amp;'()*+,-./0123456789:;=>&#60;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~</xsl:variable>
+        <xsl:variable name="spaces" select="'                                                                                             '" />
+        <!--
+		<xsl:template match="input">
+			<xsl:copy>
+				<xsl:value-of select="translate(., translate(., $ascii, ''), $spaces)"/>
+			</xsl:copy>
+		</xsl:template>
+		-->
+        
+        <xsl:for-each select="*">
+            <xsl:choose>
+                <xsl:when test="local-name(.) = 'CharacterString'">
+                    <xsl:value-of select="normalize-space(translate(., translate(., $ascii, ''), $spaces))"/>
+                </xsl:when>
+                <xsl:when test="local-name(.) = 'PT_FreeText'">
+                    <!-- <b><xsl:value-of select="name(ancestor-or-self::*[2])" /></b> -->
+                    <dl>
+                        <dd>
+                            <b>
+                                <xsl:value-of select="gmd:textGroup/gmd:LocalisedCharacterString/@locale"/>
+                            </b>&#x2002;<xsl:value-of select="gmd:textGroup/gmd:LocalisedCharacterString"/>
+                        </dd>
+                    </dl>
+                </xsl:when>
+                <xsl:when test="local-name(.) = 'Anchor'">
+                    <a>
+                        <xsl:attribute name="href">
+                            <xsl:value-of select="@xlink:href"/>
+                        </xsl:attribute>
+                        <xsl:value-of select="normalize-space(translate(., translate(., $ascii, ''), $spaces))"/>
+                    </a>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="normalize-space(translate(., translate(., $ascii, ''), $spaces))"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:for-each>
+    </xsl:template>
+    
 
 </xsl:stylesheet>

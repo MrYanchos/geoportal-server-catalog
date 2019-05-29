@@ -16,7 +16,8 @@ define(["dojo/_base/declare",
         "app/context/AppClient",
         "app/collection/ItemsPane",
         "app/collection/CollectionBase",
-        "app/collection/CollectionRunInJupyter"
+        "app/collection/CollectionRunInJupyter",
+
     ],
     function (declare, lang, array, query, domClass, topic, appTopics, collTopics, registry,
               _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, template, i18n,
@@ -318,6 +319,7 @@ define(["dojo/_base/declare",
                 }
 
             },
+
         });
 
         return oThisClass;

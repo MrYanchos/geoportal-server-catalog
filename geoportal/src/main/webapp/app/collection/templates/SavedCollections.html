@@ -1,7 +1,8 @@
 <div>
     <div class="g-drop-pane" data-dojo-type="app/search/DropPane"
          data-dojo-attach-point="dropPane"
-         data-dojo-props="title:'${label}',open:${open}">
+         data-dojo-props="title:'${label}',open:${open}"
+    id="collectionDropPane">
         <div class="form-horizontal">
             <div class="form-group">
                 <select size="5"
@@ -9,11 +10,12 @@
                         data-dojo-attach-point="menuNode"
                         id="collectionMenuNode" class="selectpicker col-md-9">
                     <option value="default"><i>Unnassigned Results</i></option>
-                    <option value="All" selected ><i>Show All</i></option>
+                    <option value="All" selected><i>Show All</i></option>
                 </select>
                 <button data-dojo-attach-point="viewBtn" data-dojo-type="dijit/form/Button"
                         data-dojo-attach-event="onClick:_selCollection"
-                        type="button" class="btn btn-primary col-md-3">View
+                        type="button" class="btn btn-primary col-md-3"
+                        id="viewBtn">View
 
                 </button>
                 <button data-dojo-attach-point="removeBtn"
@@ -28,9 +30,12 @@
                 <!--Show Unassigned</button>-->
                 <!--</div>-->
             </div>
+        </div>
+        <div class="form-inline">
             <div class="form-group">
                 <div data-dojo-type="dijit/form/DropDownButton" class="btn btn-primary"
-                     data-dojo-attach-point="addCollectionBtn">
+                     data-dojo-attach-point="addCollectionBtn"
+                id="addCollectionBtn">
                     <span>New Collection</span>
                     <div data-dojo-type="dijit/TooltipDialog">
                         <input type="text" id="newCollection" value=""
@@ -50,7 +55,8 @@
 
             <div class="form-group">
 
-                <a data-dojo-attach-point="exportBtn" download="exportCollection.csv" class="btn btn-primary btn-sm"
+                <a id="exportBtn" data-dojo-attach-point="exportBtn" download="exportCollection.csv"
+                   class="btn btn-primary btn-sm"
                    data-dojo-attach-event="onClick:expAll2">Export Collection
 
                 </a>

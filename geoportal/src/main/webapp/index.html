@@ -15,16 +15,17 @@
 
 <link rel="shortcut icon" type="image/x-icon" href="images/favicon_dds.ico" />
 <link rel="stylesheet" href="./lib/calcite-bootstrap/css/calcite-bootstrap.css">
-
+	<link href="./lib/bootstrap-tour.min.css" rel="stylesheet">
 <link rel="stylesheet" href="//js.arcgis.com/3.22/esri/themes/calcite/dijit/calcite.css">
 <link rel="stylesheet" href="//js.arcgis.com/3.22/esri/themes/calcite/esri/esri.css">
 <link rel="stylesheet" href="//js.arcgis.com/3.22/esri/dijit/metadata/css/gxe.css"/>
 <link rel="stylesheet" href="//js.arcgis.com/3.22/esri/dijit/metadata/css/gxe-calcite.css"/>
 <link rel="stylesheet" href="./app/style/main.css">
+	<link rel="stylesheet" type="text/css" href="//js.arcgis.com/3.22/dojox/widget/Toaster/Toaster.css" >
 <!-- <link rel="stylesheet" href="./lib/typeahead.css"> -->
 <link rel="stylesheet" href="./custom/sb-typeahead.css">
 <link rel="stylesheet" href="./custom/custom.css">
-
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.9.3/introjs.css" />
 <body class="calcite">
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KQ8FPVT"
@@ -37,6 +38,9 @@
 	  <div class="progress-bar progress-bar-striped active" 
 	    role="progressbar" style="width:100%">Data Discovery Studio...</div>
 	</div>
+</div>
+<div data-dojo-type="dojox/widget/Toaster" data-dojo-props="positionDirection:'br-right'"
+	 id="notice_toaster">
 </div>
 <script type="text/javascript">
   var dojoConfig = {
@@ -57,10 +61,12 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.js"></script>
 <script src="./lib/jquery-3.2.1.min.js"></script>
 <script src="./lib/bootstrap-3.3.7.min.js"></script>
+<script src="./lib/bootstrap-tour.js"></script>
 <script src="./lib/typeahead.js"></script>
 
 <script src="//js.arcgis.com/3.22/"></script>
-<!-- <script src="./custom/custom.js"></script> -->
+
+<script src="./custom/custom.js"></script>
 <script>
 require(["app"],function() {
   require(["dojo/ready","app/context/AppContext","app/context/AppStarter"],

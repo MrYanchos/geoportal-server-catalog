@@ -1,7 +1,8 @@
 <div>
     <div class="g-drop-pane" data-dojo-type="app/search/DropPane"
          data-dojo-attach-point="dropPane"
-         data-dojo-props="title:'${label}',open:${open}">
+         data-dojo-props="title:'${label}',open:${open}"
+    id="searchDropPane">
         <div class="form-horizontal">
             <div class="form-group ">
                 <select size="5" data-dojo-attach-point="menuNode"
@@ -23,7 +24,8 @@
             <div class="form-group">
                 <div data-dojo-type="dijit/form/DropDownButton" class="btn btn-primary"
                      data-dojo-attach-event="onClick: createSearchName"
-                data-dojo-attach-point="newSearchBtn">
+                data-dojo-attach-point="newSearchBtn"
+                id="newSearchBtn">
                     <span>Save Search </span>
                     <div data-dojo-type="dijit/TooltipDialog" data-dojo-attach-point="newSearchDialog">
                         <input type="text" id="newSearchName" value=""
