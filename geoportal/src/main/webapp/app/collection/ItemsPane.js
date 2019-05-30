@@ -100,7 +100,8 @@ define(["dojo/_base/declare",
                     array.forEach(records, function (md) {
                         var itemCard = new SavedItemCard({
                             itemsNode: self.itemsNode,
-                            itemsPane: self.itemsPane
+                            itemsPane: self.itemsPane,
+                            mdRecord: md
                         });
                         itemCard.render(md.val);
                         itemCard.placeAt(self.itemsNode);
@@ -109,7 +110,8 @@ define(["dojo/_base/declare",
                 } else {
                     var itemCard = new SavedItemCard({
                         itemsNode: self.itemsNode,
-                        itemsPane: self.itemsPane
+                        itemsPane: self.itemsPane,
+                        mdRecord: md
                     });
                     itemCard.render(item.val);
                     itemCard.placeAt(self.itemsNode);
@@ -121,7 +123,10 @@ define(["dojo/_base/declare",
                 this.noMatchNode.innerHTML = "";
                 var rm = [];
                 array.forEach(this.dropPane.getChildren(), function (child) {
-                    if (child.isItemCard) rm.push(child);
+                    if (child.isItemCard){
+                        child.mdRecord = null;
+                        rm.push(child);
+                    }
                 });
                 array.forEach(rm, function (child) {
                     this.dropPane.removeChild(child);

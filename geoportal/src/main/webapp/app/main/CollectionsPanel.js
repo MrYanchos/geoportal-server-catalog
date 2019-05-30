@@ -52,14 +52,14 @@
                             placement:"bottom",
                             orphan: true,
                             title: "DD Studio Collections Interface",
-                            content: "This tab allows you to organiza saved metadata records into collections" +
+                            content: "This tab allows you to organize saved metadata records into collections " +
                                 "which can be sent to a JupyterHub, or saved as a CSV file for use in processing."
                         },
                         {
                             element: "#collectionDropPane",
                             backdrop: true,
                             title: "Show Saved Results",
-                            content: "Click <b>Save</b> for an item from the search page and the metadata will appear here. " +
+                            content: "From the search page Click <b>Save</b> in an item  and the metadata will appear here. " +
                                 "At present, results are " +
                                 "stored on your computer"
                         },
@@ -94,7 +94,7 @@
                             element: "#searchDropPane",
                             backdrop: true,
                             title: "Show search results",
-                            content: "Save searches are shown here."
+                            content: "Saved searches are shown here."
                         }
                         ,
                         {

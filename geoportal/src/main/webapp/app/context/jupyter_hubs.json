@@ -1,32 +1,74 @@
-{ "documentation":"docId will be filled in by geoportal.  ",
+{
+  "documentation": [
+    "params will be filled in by geoportal.  username == set in dialog ",
+    " if uri_template contains a ? an ampersand will be used to add parameter",
+    " otherwise, a ? will be added. This is to allow username as a parameter"
+  ],
+  "hubs": [
+    {
+      "title": "MyBinder-Production",
+      "uri_template": "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/stable?urlpath=%2Fnotebooks%2FCinergiDispatch.ipynb",
+      "url_encode_options": true,
+      "params": {
 
-  "hubs":[
+          "documentId": "documentId={documentId}"
+        ,
 
-  {
-    "title": "MyBinder-{branch}",
-    "uri_template": "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/{branch}?urlpath=%2Fnotebooks%2FCinergiDispatch.ipynb?documentId={docId}",
-    "branches": [
-    {"branch":"stable",
-      "title":"Production"},
-    {"branch":"master",
-      "title":"Development"}
+          "collection": "collection={collectionPackage}"
+        }
 
-  ]
-  }, {
+    },
+    {
+      "title": "MyBinder-Development",
+      "uri_template": "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/master?urlpath=%2Fnotebooks%2FCinergiDispatch.ipynb",
+      "url_encode_options": true,
+      "params": {
+
+        "documentId": "documentId={documentId}"
+      ,
+
+        "collection": "collection={collectionPackage}"
+      }
+    },
+    {
       "title": "UCSD Data Science Hub (UCSD)",
-      "uri_template": "https://datahub.ucsd.edu/hub/user-redirect/notebooks/jupyter-cinergi/CinergiDispatch.ipynb?documentId={docId}"
+      "uri_template": "https://datahub.ucsd.edu/hub/user-redirect/notebooks/jupyter-cinergi/CinergiDispatch.ipynb",
+      "url_encode_options": false,
+      "params": {
+
+        "documentId": "documentId={documentId}"
+      ,
+
+        "collection": "collection={collectionPackage}"
+      }
     },
     {
       "title": "suave-jupyterhub.com (local authentication required)",
-      "uri_template": "http://suave-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb?documentId={docId}"
+      "uri_template": "http://suave-jupyterhub.com/user/zeppelin-v/notebooks/CinergiDispatch.ipynb",
+      "url_encode_options": false,
+      "params": {
+
+        "documentId": "documentId={documentId}"
+      ,
+
+        "collection": "collection={collectionPackage}"
+      }
     },
-  {
-    "disabled": false,
-    "login": "Gmail",
-    "title": "Optiputer (google authentication required)",
-    "uri_template": "https://suave-jupyter.nautilus.optiputer.net/user/{username}/lab/notebooks/CinergiDispatch.ipynb?documentId={docId}"
-  }
-]
+    {
+      "disabled": false,
+      "login": "Gmail",
+      "title": "Optiputer (google authentication required)",
+      "uri_template": "https://suave-jupyter.nautilus.optiputer.net/user/{username}/lab/notebooks/CinergiDispatch.ipynb",
+      "url_encode_options": false,
+      "params": {
+
+        "documentId": "documentId={documentId}"
+      ,
+
+        "collection": "collection={collectionPackage}"
+      }
+    }
+  ]
 }
 
 

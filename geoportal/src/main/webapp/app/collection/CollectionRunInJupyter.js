@@ -18,8 +18,12 @@ define(["dojo/_base/declare",
             records: [],
             encodedRecords: null,
 
-
-            recordPackage: function (id, collectionId, title, recordIds, packageType, link) {
+/* packageType:
+standalone: all records included, link null
+link: link to endpoint which will serve a standalone json package.
+service: known service. Link points to service endpoint, use id or collectionId in service
+            */
+            recordPackage: function (id, collectionId, title, recordIds,  packageType="standalone",link, ) {
                 var self = this;
                 var recPack = {
                     "id": id,
@@ -33,6 +37,10 @@ define(["dojo/_base/declare",
                 };
                 return recPack;
             },
+
+            /*
+            recordLink provides (xml/json) need to fully decide.
+            */
             recordId: function (id, link) {
                 var self = this;
                 var recIds = {
@@ -57,7 +65,7 @@ define(["dojo/_base/declare",
                     this.sendSavedCollection.set({"display": "hidden", disabled: true});
                 }
                 this.records = this.createRecordIds(records);
-                var package = this.createRecordPackage("included", "");
+                var package = this.createRecordPackage("standalone", "");
                 this.encodedRecords = JSON.stringify(package);
 
 
@@ -86,7 +94,7 @@ define(["dojo/_base/declare",
             click_sendSavedPage: function (evt) {
 
                 var dialog = new JupyterDialog();
-                dialog.show(this.encodedRecords);
+                dialog.show(this.encodedRecords, "collection");
 
             },
             click_sendSavedCollection: function (evt) {

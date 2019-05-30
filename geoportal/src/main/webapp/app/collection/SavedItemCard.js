@@ -90,7 +90,11 @@ define(["dojo/_base/declare",
 
             render: function (mdRecord) {
                 this.mdRecord = mdRecord;
-
+                this.itemIsSaved = CollectionBase.isSavedItem(mdRecord.id).isSaved;
+                if(this.itemIsSaved){
+                    var rec = CollectionBase.getMdRecords("id",mdRecord.id);
+                    this.mdRecord = mdRecord = rec[0].val;
+                }
                 this._renderTitle(mdRecord);
 
                 this._renderDescription(mdRecord);
@@ -110,6 +114,9 @@ define(["dojo/_base/declare",
              //   var collTxtBox = registry.byId("collectionMenuNode");
                 var coll = this.getSelectedCollectionValue();
                 CollectionBase._addCollectionMdRecord(this.mdRecord, coll);
+                if (! this.itemIsSaved){
+                    CollectionBase.saveMdRecord(this.mdRecord);
+                }
                 this._renderCollections(this.mdRecord)
                 this._renderActionStatus(this.mdRecord);
                 // this.myTempDialog.show();
@@ -123,8 +130,10 @@ define(["dojo/_base/declare",
                 // this.myTempDialog.show();
             },
             onRemoveMDRecordClicked: function (evt) {
+                if (this.itemIsSaved) {
 
-                CollectionBase.removeMdRecord(this.mdRecord);
+                  CollectionBase.removeMdRecord(this.mdRecord);
+                 }
                 this.mdRecord.title = 'deleted';
                 this._renderTitle(this.mdRecord)
             },
@@ -187,7 +196,7 @@ define(["dojo/_base/declare",
                 var add = this.addButton;
                 var rmColl = this.rmCollectionButton;
                 var rmMd = this.rmMdRecordButton;
-                var recSaved = CollectionBase.isSavedItem(mdRecord.id);
+                var recSaved = this.itemIsSaved;
 
               //  var collTxtBox = registry.byId("collectionMenuNode");
               //  var coll = collTxtBox.value;
@@ -213,17 +222,17 @@ define(["dojo/_base/declare",
                         rmColl.title = "Select a collection";
                         break;
                 }
-                if (recSaved.isSaved) {
+                if (recSaved) {
                     rmMd.disabled = false;
                     rmMd.visibility = "visible";
                 } else {
                     rmMd.disabled = true;
                     rmMd.visibility = "hidden";
-                    rmMd.title = "Search Items cannot be saved, at present";
-                    add.disabled = true;
-                    add.title = "Search Items cannot be saved, at present";
-                    rmColl.disabled = true;
-                    rmColl.title = "Search Items cannot be saved, at present";
+                    // rmMd.title = "Search Items cannot be saved, at present";
+                    // add.disabled = false;
+                    // add.title = "Search Items cannot be saved, at present";
+                    // rmColl.disabled = true;
+                    // rmColl.title = "Search Items cannot be saved, at present";
                 }
 
 
