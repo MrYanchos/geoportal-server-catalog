@@ -52,22 +52,31 @@
                             placement:"bottom",
                             orphan: true,
                             title: "DD Studio Collections Interface",
-                            content: "This tab allows you to organize saved metadata records into collections " +
-                                "which can be sent to a JupyterHub, or saved as a CSV file for use in processing."
+                            content: "The Collection tab allows you to organize saved metadata records into collections" +
+                                " which can be sent to a JupyterHub, or saved as a CSV file to share or use in processing. "
+                        },
+                        {
+                            element:"#collectionPanel",
+                            placement:"bottom",
+                            orphan: true,
+                            title: "Collections vs Saved Search",
+                            content: "A <i>collection</i> is a set of saved metadata records. Records are saved from the results list in " +
+                                "the <b>Search</b> tab, can can be organized in the <b>Collection</b> tab. " +
+                                " A <i>saved search</i> is a query based on the facets of a search. Only the query is saved; the individual records are not " +
+                                "saved. From a saved search, you can save individual records. "
                         },
                         {
                             element: "#collectionDropPane",
                             backdrop: true,
                             title: "Show Saved Results",
-                            content: "From the search page Click <b>Save</b> in an item  and the metadata will appear here. " +
-                                "At present, results are " +
-                                "stored on your computer"
+                            content: "Click <b>Save</b> for an item from the search page and the metadata will appear here." +
+                                " At present, results are stored on your computer"
                         },
                         {
                             element: "#collectionMenuNode",
                             backdrop: true,
                             title: "Select a collection",
-                            content: "Click on a collection from list and click <i>View</i>. "
+                            content: "Click on a collection from list and click <b>View</b>. "
 
                         },
                         {
@@ -75,55 +84,73 @@
                             placement:"left",
                             backdrop: true,
                             title: "Collection Items",
-                            content: "Select a collection, then click <i>Add to Collection</i> to add record to collection"
+                            content: "Select a collection, then click <b>Add to Collection</b> to add record to collection."
                         },
                         {
                             element: "#viewBtn",
                             placement:"left",
                             backdrop: true,
                             title: "View",
-                            content: "To see items in a collection, click  <i>View</i>"
-                        },
-                        {
-                            element: "#exportBtn",
-                            backdrop: true,
-                            title: "Export Results",
-                            content: "Export results as a CSV for use in your applications, or to transfer to another computer."
+                            content: "To see items in a collection, click <b>View</b>"
                         },
                         {
                             element: "#searchDropPane",
                             backdrop: true,
                             title: "Show search results",
-                            content: "Saved searches are shown here."
+                            content: "Save searches are shown here."
                         }
                         ,
                         {
                             element: "#newSearchBtn",
                             backdrop: true,
                             title: "Save a search",
-                            content: "When you have a search you would like to save, click to Save a new Search."
-                        }
-                        ,
+                            content: " When you have a search you would like to save, click <b>Save</b> to create a new Search. "
+                        },
+                        {
+                            element:"#collectionPanel",
+                            placement:"bottom",
+                            orphan: true,
+                            title: "Sharing collections: Export and Import",
+                            content: "You can export your saved records as a collection to a CSV file. " +
+                                "You can import these files into another browser," +
+                                "or use them as a basis for processing the data referred to in the collection."
+                        },
+                        {
+                        element:"#collectionPanel",
+                        placement:"bottom",
+                        orphan: true,
+                        title: "Collections CSV files",
+                        content: "The exported CSV files contain a description of the collection (id, title, description)" +
+                            " and a summary of metadata record. The summary record includes the id, title, description and" +
+                            "a link to the DDStudio where you can retrieve the record."
+                },
+                        {
+                            element: "#exportBtn",
+                            backdrop: true,
+                            title: "Export Results",
+                            content: "Export results as a CSV for use in your applications, or to transfer to another computer."
+                        },
+
                         {
                             element: "#importDropPane",
                             backdrop: true,
                             title: "Import a saved search",
-                            content: "You can modify your CSV file, and add descriptions to collections, and" +
-                                "import. This allows you to transfer collections beteween browsers"
+                            content: "You can modify your CSV file, and add descriptions to collections, and import." +
+                                " This allows you to transfer collections beteween browsers or share with others"
                         }
                         ,
                         {
                             element: "#overwriteCollectionMD",
                             backdrop: true,
                             title: "Merge or Overwirte",
-                            content: "You can overwrite the details of a collection, such a name, and add a description " +
-                                "by editing the CSV file"
+                            content: "You can toggle to <b>overwrite</b> the details of a collection, such as collection name," +
+                                " or merge to add new records to an older collection"
                         },
                         {
                             element: "#importFile",
                             backdrop: true,
                             title: "Import file",
-                            content: "Select a file, and click import to import records."
+                            content: "Select a file, and click <b>Import File</b> to import records"
                         }
                     ]});
 

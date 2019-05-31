@@ -223,14 +223,12 @@ define(["dojo/_base/declare",
                 var ColID = this.getSelectedCollectionValue();
 
                 if (ColID !== "default" && ColID !== "All") {
-
+                    var mda = CollectionBase.getMdRecords("collections",ColID);
+                    ArrayUtil.forEach(mda, function(md){
+                        CollectionBase._removeCollectionMdRecord(md.val,ColID);
+                    });
                     var coll = CollectionBase.getCollectionById(ColID);
-
-
                             localStorage.removeItem("cItem-" +coll.key);
-
-
-
                     }
 
                    // localStorage.removeItem("cItem-" + ColID);
@@ -242,7 +240,7 @@ define(["dojo/_base/declare",
 
                     //this.menuNode.removeOption(ColID);
 
-
+                this._selCollection ("All");
 
 
 
