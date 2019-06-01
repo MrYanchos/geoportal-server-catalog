@@ -49,15 +49,15 @@
                     steps: [
                         {
                             element:"#collectionPanel",
-                            placement:"bottom",
+                            placement:"left",
                             orphan: true,
                             title: "DD Studio Collections Interface",
                             content: "The Collection tab allows you to organize saved metadata records into collections" +
                                 " which can be sent to a JupyterHub, or saved as a CSV file to share or use in processing. "
                         },
                         {
-                            element:"#collectionPanel",
-                            placement:"bottom",
+                            element:"#collectionPanelLeft",
+                            placement:"right",
                             orphan: true,
                             title: "Collections vs Saved Search",
                             content: "A <i>collection</i> is a set of saved metadata records. Records are saved from the results list in " +
@@ -88,7 +88,7 @@
                         },
                         {
                             element: "#viewBtn",
-                            placement:"left",
+                            placement:"right",
                             backdrop: true,
                             title: "View",
                             content: "To see items in a collection, click <b>View</b>"
@@ -107,8 +107,8 @@
                             content: " When you have a search you would like to save, click <b>Save</b> to create a new Search. "
                         },
                         {
-                            element:"#collectionPanel",
-                            placement:"bottom",
+                            element:"#importDropPane",
+                            placement:"right",
                             orphan: true,
                             title: "Sharing collections: Export and Import",
                             content: "You can export your saved records as a collection to a CSV file. " +
@@ -116,8 +116,8 @@
                                 "or use them as a basis for processing the data referred to in the collection."
                         },
                         {
-                        element:"#collectionPanel",
-                        placement:"bottom",
+                        element:"#importDropPane",
+                        placement:"right",
                         orphan: true,
                         title: "Collections CSV files",
                         content: "The exported CSV files contain a description of the collection (id, title, description)" +
