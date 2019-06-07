@@ -2,6 +2,7 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/_base/array",
         "dojo/query",
+        "dojo/dom",
         "dojo/dom-class",
         "dojo/topic",
         "app/context/app-topics",
@@ -17,12 +18,13 @@ define(["dojo/_base/declare",
         "app/collection/ItemsPane",
         "app/collection/CollectionBase",
         "app/collection/CollectionRunInJupyter",
-
+        "dijit/form/DropDownButton", "dijit/DropDownMenu", "dijit/MenuItem",
     ],
-    function (declare, lang, array, query, domClass, topic, appTopics, collTopics, registry,
+    function (declare, lang, array, query, dom, domClass, topic, appTopics, collTopics, registry,
               _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, template, i18n,
               dojoRequest, AppClient, ItemsPane, CollectionBase,
-              CollectionRunInJupyter
+              CollectionRunInJupyter,
+              DropDownButton, DropDownMenu, MenuItem
     ) {
 
         var oThisClass = declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
@@ -51,6 +53,8 @@ define(["dojo/_base/declare",
             start: 1,
 
             _dfd: null,
+            tourMenu:null,
+
 
             postCreate: function () {
                 this.inherited(arguments);
@@ -58,6 +62,24 @@ define(["dojo/_base/declare",
                     this.defaultSort = AppContext.appConfig.searchResults.defaultSort;
                 }
                 var self = this;
+
+                var menu = new DropDownMenu({ style: "display: none;"});
+                var menuItem1 = new MenuItem({
+                    label: "Collection Introduction",
+                    onClick:  self.startCollectionTour
+                });
+                menu.addChild(menuItem1);
+                menu.startup();
+
+                 this.tourMenu = new DropDownButton({
+                    label: "Tour",
+                    name: "programmatic2",
+                    dropDown: menu,
+                    id: "tourButton",
+
+                });
+                this.tourMenu.startup();
+
                 this.own(topic.subscribe(appTopics.itemSave, function (params) {
                         /* need to handle:
                         exists
@@ -159,14 +181,27 @@ define(["dojo/_base/declare",
                     self.refreshResults();
                 }));
 
+
             },
 
             startup: function () {
                 if (this._started) {
                     return;
                 }
-                this.inherited(arguments);
                 var self = this;
+                $("a[href='#collectionPanel']").on("shown.bs.tab",function(e) {
+
+                   var tour=  dom.byId("tourDropDownButtonContainer");
+                    tour.appendChild(self.tourMenu.domNode);
+                });
+                $("a[href='#collectionPanel']").on("hide.bs.tab",function(e) {
+
+                    var tour=  dom.byId("tourDropDownButtonContainer");
+                    tour.innerHTML = "";
+                });
+
+                this.inherited(arguments);
+
                 if (this.showItemsOnStart) {
                     // wait a bit for the map
                     setTimeout(function () {
@@ -318,7 +353,172 @@ define(["dojo/_base/declare",
                     console.warn("search-error");
                 }
 
-            },
+            },startCollectionTour: function(){
+                var tour = new Tour({
+                    name:"collectionTour",
+                    steps: [
+                        {
+                            element:"#collectionTab",
+                            placement:"right",
+                            orphan: true,
+                            title: "DDStudio Collections Interface",
+                            content: "The Collection page allows you to save search records into collections, " +
+                                "which can be sent to a JupyterHub, or saved as a CSV file to share or use in processing."  +
+                                "<br/>Works best in Chrome."
+                        },
+                        // {
+                        //     element:"#collectionPanelLeft",
+                        //     placement:"right",
+                        //     orphan: true,
+                        //     title: "Collections vs Saved Search",
+                        //     content: "A <i>collection</i> is a set of saved metadata records. Records are saved from the results list in " +
+                        //         "the <b>Search</b> tab, can can be organized in the <b>Collection</b> tab. " +
+                        //         " A <i>saved search</i> is a query based on the facets of a search. Only the query is saved; the individual records are not " +
+                        //         "saved. From a saved search, you can save individual records. "
+                        // },
+                        {
+                            element: "#collectionDropPane",
+                            backdrop: true,
+                            title: "Show Saved Results ",
+                            content: "Records saved on the Search page show up on the Collection page, " +
+                                "temporarily stored in your browser storage until put into a Collection and Exported." +
+                                " View initially under <i>Show All</i> & <i>Unassigned Results</i>"
+                        },
+                        {
+                            element: "#addCollectionBtn",
+                            placement:"right",
+                            backdrop: true,
+                            title: "Create New Collection ",
+                            content: "Make a container for your records: click <b>New Collection</b> and supply a name –" +
+                                " this will become part of a filename. New collection name appears under Saved Collections."
+                        }
+                        ,
+                        {
+                            element: "#saveSelectGroup",
+                            placement:"right",
+                            backdrop: true,
+                            title: "View Items in a Collection",
+                            content: "<i>Click</i> on a collection from list and click <b>View</b>."
+                        },
+                        {
+                            element: "#itemDropPane",
+                            placement:"left",
+                            backdrop: true,
+                            title: "Collection Items",
+                            content: "These are collection items for the selected collection."
+                        },
+                        {
+                            element: "#exportBtn",
+                            backdrop: true,
+                            title: "Export Collection ",
+                            content: "Save results to a CSV file with <b>Export Collection</b> – call them up later," +
+                                " use in applications, or transfer to another computer or person."
+                        },
+
+
+                        {
+                            element: "#importDropPane",
+                            backdrop: true,
+                            title: "Import collection ",
+                            content: "Click <b>Choose Files</b>, select a stored collection file (CSV), " +
+                                "then click <b>Import File</b>. Now <i>Refresh</i> (circular arrow) your browser. " +
+                                "The imported collection will appear under Saved Collections," +
+                                " and its items can be Viewed under both <i>Show All</i> and the <i>collection</i> name." +
+                                " You can now add or remove items in this collection and Export again," +
+                                " or create a New Collection and add results to more than one collection."
+                        }
+                        ,
+                        {
+                            element: "#collectionTab",
+                            orphan: true,
+                            title: " ",
+                            content: "That’s enough to get started with. Now try creating a New Collection with your" +
+                                " search results! If you find bugs, please email us at DataDiscoveryStudio@gmail.com" +
+                                " – we’re always improving."
+                        },
+                        //         ,
+                        //         {
+                        //             element: "#collectionMenuNode",
+                        //             backdrop: true,
+                        //             title: "Select a collection",
+                        //             content: "<i>Click</i>i on a collection from list and click <b>View</b>. "
+                        //
+                        //         }
+                        //         ,
+                        //
+                        //         {
+                        //             element: "#viewBtn",
+                        //             placement:"right",
+                        //             backdrop: true,
+                        //             title: "View",
+                        //             content: "To see items in a collection, click <b>View</b>. "
+                        //         },
+                        //         // {
+                        //         //     element: "#searchDropPane",
+                        //         //     backdrop: true,
+                        //         //     title: "Show search results",
+                        //         //     content: "Save searches are shown here."
+                        //         // }
+                        //         // ,
+                        //         // {
+                        //         //     element: "#newSearchBtn",
+                        //         //     backdrop: true,
+                        //         //     title: "Save a search",
+                        //         //     content: " When you have a search you would like to save, click <b>Save</b> to create a new Search. "
+                        //         // },
+                        //         {
+                        //             element:"#collectionPanelLeft",
+                        //             placement:"right",
+                        //             //orphan: true,
+                        //             backdrop: true,
+                        //             title: "Sharing collections: Export and Import",
+                        //             content: "You can export your saved records as a collection to a CSV file. " +
+                        //                 "You can import these files into another browser," +
+                        //                 "or use them as a basis for processing the data referred to in the collection."
+                        //         },
+                        //         {
+                        //         element:"#importDropPane",
+                        //         placement:"right",
+                        //        // orphan: true,
+                        //             backdrop: true,
+                        //         title: "Collections CSV files",
+                        //         content: "The exported CSV files contain a description of the collection (id, title, description)" +
+                        //             " and a summary of metadata record. The summary record includes the id, title, description and " +
+                        //             "a link to the DDStudio where you can retrieve the record."
+                        // },
+                        //
+                        //
+                        //         {
+                        //             element: "#importDropPane",
+                        //             backdrop: true,
+                        //             title: "Import a saved search",
+                        //             content: "You can modify your CSV file, and add descriptions to collections, and import." +
+                        //                 " This allows you to transfer collections beteween browsers or share with others."
+                        //         }
+                        //         ,
+                        //         {
+                        //             element: "#overwriteCollectionMD",
+                        //             backdrop: true,
+                        //             title: "Merge or Overwirte",
+                        //             content: "You can toggle to <b>overwrite</b> the details of a collection, such as collection name," +
+                        //                 " or merge to add new records to an older collection."
+                        //         },
+                        //         {
+                        //             element: "#importFile",
+                        //             backdrop: true,
+                        //             title: "Import file",
+                        //             content: "Select a file, and click <b>Import File</b> to import records."
+                        //         }
+                    ]});
+
+// Initialize the tour
+                tour.init();
+
+// Start the tour
+
+                tour.restart();
+                // tour.start();
+            }
 
         });
 

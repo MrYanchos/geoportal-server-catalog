@@ -4,12 +4,12 @@
          data-dojo-props="title:'${label}',open:${open}"
     id="collectionDropPane">
         <div class="form-horizontal">
-            <div class="form-group">
+            <div class="form-group" id="saveSelectGroup">
                 <select size="5"
                         onChange=" dojo.publish('app/collection/selectCollection',this.options[this.selectedIndex].value)"
                         data-dojo-attach-point="menuNode"
                         id="collectionMenuNode" class="selectpicker col-md-9">
-                    <option value="default"><i>Unnassigned Results</i></option>
+                    <option value="default"><i>Unassigned Results</i></option>
                     <option value="All" selected><i>Show All</i></option>
                 </select>
                 <button data-dojo-attach-point="viewBtn" data-dojo-type="dijit/form/Button"

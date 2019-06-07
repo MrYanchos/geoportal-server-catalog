@@ -213,7 +213,7 @@ define(["dojo/_base/declare",
                     //this.menuNode.set("value", ncID);
                     this.menuNode.option =[];
                     this.addOptions();
-                    this.newCollection.value= '';
+                    this.menuNode.value= ncID;
                 }
                 this.addCollectionBtn.toggleDropDown();
             },
@@ -462,18 +462,18 @@ define(["dojo/_base/declare",
                                 var xol = md[c].val.collections;
                                 var col = xol.join('|');
                             } else {
-                                col = CollId;
+                               var col = [ColID];
                             }
 
-                            if (ColID == "default") {
-                                if (xol.length == 1 && xol[0] == "default") {
-                                    mdText = mdText + mdLabel + mName + ',' + mLink + ',' + mId + ',' + fId + ',' + col + ', ' + mDesc + '\n';
-                                }
-
-                            } else {
-                                mdText = mdText + mdLabel + mName + ',' + mLink + ',' + mId + ',' + fId + ',' + col + ', ' + mDesc + '\n';
-                            }
-
+                            // if (ColID == "default") {
+                            //     if (xol.length == 1 && xol[0] == "default") {
+                            //         mdText = mdText + mdLabel + mName + ',' + mLink + ',' + mId + ',' + fId + ',' + col + ', ' + mDesc + '\n';
+                            //     }
+                            //
+                            // } else {
+                            //     mdText = mdText + mdLabel + mName + ',' + mLink + ',' + mId + ',' + fId + ',' + col + ', ' + mDesc + '\n';
+                            // }
+                            mdText = mdText + mdLabel + mName + ',' + mLink + ',' + mId + ',' + fId + ',' + col + ', ' + mDesc + '\n';
                         } catch (error) {
                             console.warn("did not convert record")
                         }

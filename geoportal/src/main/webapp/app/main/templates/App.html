@@ -21,22 +21,22 @@
                 <a class="nav-link" href="#contributePanel" data-toggle="tab">Contribute</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#collectionPanel" data-toggle="tab">Collection</a>
+                <a class="nav-link" href="#collectionPanel" data-toggle="tab" id="collectionTab">Collection</a>
             </li>
 
             <li class="nav-item">
                 <a class="nav-link" href="#aboutPanel" data-toggle="tab">${i18n.nav.about}</a>
             </li>
         </ul>
-
+        <div class="nav navbar-nav navbar-left">
+            <div class="btn btn-link nav-link " id="tourDropDownButtonContainer"></div>
+        </div>
         <div class="g-tools pull-right">
-            <a class="navbar-text g-help" href="https://bit.ly/ddscompete" target="_blank"
 
-            >Competition!</a>
-            <a class="navbar-text g-help" href="help/" target="_blank"
+            <span><a class="navbar-text g-help" href="help/" target="_blank"
                rel="help"
-            >Help</a>
-            <span class="g-username" data-dojo-attach-point="usernameNode"></span>
+            >Help</a></span>
+            <span class="navbar-link g-username" data-dojo-attach-point="usernameNode"></span>
             <!--	    <a class="g-signin" href="#"
                       data-dojo-attach-point="signInNode"
                       data-dojo-attach-event="onclick: signInClicked"
