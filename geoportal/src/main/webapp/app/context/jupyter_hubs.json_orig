@@ -81,6 +81,20 @@
 
         "collection": "collection={collectionPackage}"
       }
+    },
+    {
+      "disabled": false,
+      "login": "Gmail",
+      "title": "Optiputer (google authentication required)",
+      "uri_template": "https://suave-jupyter.nautilus.optiputer.net/user/{username}/lab/notebooks/CinergiDispatch.ipynb",
+      "url_encode_options": false,
+      "params": {
+
+        "documentId": "documentId={documentId}"
+      ,
+
+        "collection": "collection={collectionPackage}"
+      }
     }
   ]
 }

@@ -174,7 +174,13 @@
     font-family: "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 }
 
-#tourButton_label  {
+#tourButton  {
     color: white !important;
+
+
+}
+#tourButton_label  {
+
     font-size: 16px;
+
 }
