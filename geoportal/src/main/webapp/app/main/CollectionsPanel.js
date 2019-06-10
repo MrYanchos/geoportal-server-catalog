@@ -43,7 +43,9 @@
                     this.inherited(arguments);
                 }
 
-
+                ,startCollectionTour: function(){
+                  CollectionPane.startCollectionTour();
+                }
 
 
 

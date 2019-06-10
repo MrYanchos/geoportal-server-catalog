@@ -9,8 +9,8 @@
                         onChange=" dojo.publish('app/collection/selectCollection',this.options[this.selectedIndex].value)"
                         data-dojo-attach-point="menuNode"
                         id="collectionMenuNode" class="selectpicker col-md-9">
-                    <option value="default"><i>Unassigned Results</i></option>
-                    <option value="All" selected><i>Show All</i></option>
+                    <option style="font-style: italic;" value="default" label="Unassigned Results">Unassigned Results</option>
+                    <option style="font-style: italic;" value="All" selected label="Show All">Show All</option>
                 </select>
                 <button data-dojo-attach-point="viewBtn" data-dojo-type="dijit/form/Button"
                         data-dojo-attach-event="onClick:_selCollection"

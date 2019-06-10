@@ -393,19 +393,20 @@ define(["dojo/_base/declare",
                                 " this will become part of a filename. New collection name appears under Saved Collections."
                         }
                         ,
-                        {
-                            element: "#saveSelectGroup",
-                            placement:"right",
-                            backdrop: true,
-                            title: "View Items in a Collection",
-                            content: "<i>Click</i> on a collection from list and click <b>View</b>."
-                        },
+                        // {
+                        //     element: "#saveSelectGroup",
+                        //     placement:"right",
+                        //     backdrop: true,
+                        //     title: "View Items in a Collection",
+                        //     content: "<i>Click</i> on a collection from list and click <b>View</b>."
+                        // },
                         {
                             element: "#itemDropPane",
                             placement:"left",
                             backdrop: true,
                             title: "Collection Items",
-                            content: "These are collection items for the selected collection."
+                            content: "<i>Click</i> to select a Saved Collection, " +
+                                "then click <b>Add to Collection</b> to add records to that collection."
                         },
                         {
                             element: "#exportBtn",
@@ -420,7 +421,7 @@ define(["dojo/_base/declare",
                             element: "#importDropPane",
                             backdrop: true,
                             title: "Import collection ",
-                            content: "Click <b>Choose Files</b>, select a stored collection file (CSV), " +
+                            content: "Click <b>Select a CSV file</b>, select a stored collection file (CSV), " +
                                 "then click <b>Import File</b>. Now <i>Refresh</i> (circular arrow) your browser. " +
                                 "The imported collection will appear under Saved Collections," +
                                 " and its items can be Viewed under both <i>Show All</i> and the <i>collection</i> name." +

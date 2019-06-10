@@ -33,22 +33,23 @@
                data-dojo-attach-event="onComplete: changeDataFromUpload"
                 data-dojo-type="dojox/form/Uploader"
               -->
-              <label class="custom-file-label" for="uploader">Select a CSV File:</label>
-                  <div class="custom-file">
-                      <input name="uploadedfile" class="custom-file-input"
+              <!--<label class="custom-file-label" for="uploader">Select a CSV File:</label>-->
+                  <div >
+                      <label class="btn btn-default btn-sm" for="uploader">Select a CSV File
+                      <input  name="uploadedfile" style="display: none;"
                    multiple=false type="file" id="uploader"
                    accept=".csv"
-title="Choose File"
                    data-dojo-attach-point="uploader"
                    data-dojo-attach-event="onChange: changeDataFromUpload"
                    data-dojo-props="label: 'Select a CSV File',
                   multiple:false,
                   uploadOnSelect: false,"
 
-            />
-
+            >
+                      </label>
                   </div>
-              <button type="button" data-dojo-type="dijit/form/Button" class="btn btn-primary"
+              <button type="button" data-dojo-type="dijit/form/Button"
+                      class="btn btn-primary"
                       data-dojo-attach-event="onClick: clickUpload"
               id="importFile">Import File
 

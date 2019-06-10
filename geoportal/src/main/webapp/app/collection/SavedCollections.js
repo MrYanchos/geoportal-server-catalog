@@ -79,10 +79,15 @@ define(["dojo/_base/declare",
                 {
                     this.menuNode.remove(i);
                 }
+
                 for (var k in col) {
-                    var colk = col[k].val
+                    var colk = col[k].val;
+                    var label = colk.colName;
+                    // if (label === 'default'|| label ==="All"){
+                    //     label = '<i>'+ label + '</i>'
+                    // }
                     var option = domConstruct.create("option", {value: colk.id, label: colk.colName}, this.menuNode);
-                    option.innerHTML=colk.colName;
+                    option.innerHTML=label;
                     // option.value= colk.id;
                     // option.label= colk.colName;
                     // this.menuNode.appendChild(option);
