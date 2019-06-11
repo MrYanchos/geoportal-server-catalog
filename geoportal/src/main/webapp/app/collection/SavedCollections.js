@@ -218,9 +218,11 @@ define(["dojo/_base/declare",
                     //this.menuNode.set("value", ncID);
                     this.menuNode.option =[];
                     this.addOptions();
-                    this.menuNode.value= ncID;
+                   this.menuNode.value= ncID;
+                    topic.publish("app/collection/selectCollection", ncID);
                 }
                 this.addCollectionBtn.toggleDropDown();
+
             },
 
             _removeCollection: function (C) {

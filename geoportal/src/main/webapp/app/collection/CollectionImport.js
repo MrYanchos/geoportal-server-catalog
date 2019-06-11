@@ -33,7 +33,7 @@ define(["dojo/_base/declare",
         "dijit/form/Button"
 
     ],
-    function (declare, lang, array, query, on,registry, Uploader, UploadFiles, Templated, template, i18n, CollectionBase,
+    function (declare, lang, array, query, on, registry, Uploader, UploadFiles, Templated, template, i18n, CollectionBase,
               topic, appTopics, collTopics, Toaster) {
 
         var oThisClass = declare([Templated], {
@@ -63,30 +63,31 @@ define(["dojo/_base/declare",
                 }))
             },
 
-            toggleMergeMetadataBtn: function(val){
-                if (val){
-                    this.overwriteMd.set('label',"Overwrite");
+            toggleMergeMetadataBtn: function (val) {
+                if (val) {
+                    this.overwriteMd.set('label', "Overwrite");
                 } else {
-                    this.overwriteMd.set('label',"Merge");
+                    this.overwriteMd.set('label', "Merge");
                 }
 
             },
-            toggleMergeCollectionBtn: function(val){
-                if (val){
-                    this.overwriteCollectionMD.set('label',"Overwrite");
+            toggleMergeCollectionBtn: function (val) {
+                if (val) {
+                    this.overwriteCollectionMD.set('label', "Overwrite");
                 } else {
-                    this.overwriteCollectionMD.set('label',"Merge");
+                    this.overwriteCollectionMD.set('label', "Merge");
                 }
 
             },
 
 
             clickUpload: function (evt, cb) {
-            var self = this;
+                var self = this;
 
-                        self.parseImport(self.data);
+                self.parseImport(self.data);
+                topic.publish(collTopics.collectionRefreshRequest);
 
-        },
+            },
             changeDataFromUpload: function (evt, cb) {
                 var self = this;
                 if (!this.browserSupportFileUpload()) {
@@ -103,7 +104,7 @@ define(["dojo/_base/declare",
                         var reader = new FileReader();
 
                         reader.onload = function (event) {
-                           // var csvData = event.target.result;
+                            // var csvData = event.target.result;
                             self.data = event.target.result;
                             //self.parseImport(csvData);
                         };
@@ -161,33 +162,33 @@ define(["dojo/_base/declare",
                 var countCollectionsRecords = 0;
                 //var ovi = $('input[name=uniqName_9_2_radio]:checked').val();
                 //  var ovi = query('input[name=importFormat]:checked').val();
-               // var ovi = this.overwriteMd.value;
-              //  var oviMD = this.overwriteMd.checked;
+                // var ovi = this.overwriteMd.value;
+                //  var oviMD = this.overwriteMd.checked;
                 var oviCollMD = this.overwriteCollectionMD.checked;
-               // var oviCollMD = false;
+                // var oviCollMD = false;
                 // if (ovi !== undefined && (ovi instanceof Array)) {
                 //     ovi = ovi[0];
                 // }
                 //if (ovi !== undefined && ovi.value === 'Overwrite') {
-                    if (oviCollMD ) {
-                        if (confirm("Are you sure you want to overwrite  collection records listed in file? ")) {
-                            //ovi = 'Overwrite';
-                            // clear out records here;
-                            /*
-                            var ca =[];
-                            for (var i = 0; i < localStorage.length; i++){
-                                if (localStorage.key(i) !== 'saveSearch') {
-                                    ca.push(localStorage.key(i));
-                                }
+                if (oviCollMD) {
+                    if (confirm("Are you sure you want to overwrite  collection records listed in file? ")) {
+                        //ovi = 'Overwrite';
+                        // clear out records here;
+                        /*
+                        var ca =[];
+                        for (var i = 0; i < localStorage.length; i++){
+                            if (localStorage.key(i) !== 'saveSearch') {
+                                ca.push(localStorage.key(i));
                             }
-                            for (var z = 0; z < ca.length; z++ ) {
-                                localStorage.removeItem(ca[z]);
-                            }
-                            */
-                        } else {
-                            oviCollMD = false;
                         }
+                        for (var z = 0; z < ca.length; z++ ) {
+                            localStorage.removeItem(ca[z]);
+                        }
+                        */
+                    } else {
+                        oviCollMD = false;
                     }
+                }
 
                 var defaultLoad = false;
                 var oneCID = "default";
@@ -208,8 +209,8 @@ define(["dojo/_base/declare",
                                     defaultLoad = true;
                                 }
                                 var cx = CollectionBase.getCollections("id", cid);
-                               // if (cx.length && ovi == 'Overwrite') {
-                                    if (cx.length) {
+                                // if (cx.length && ovi == 'Overwrite') {
+                                if (cx.length) {
                                     // already there
                                     if (oviCollMD) {
                                         var cItem = CollectionBase.collectionItem(cid, cname, cDesc);
@@ -217,8 +218,8 @@ define(["dojo/_base/declare",
                                         var nop = "";
                                     } else {
                                         var cItem = cx[0].val;
-                                        cItem.collName = cItem.collName ? cItem.collName: cname;
-                                        cItem.colDesc = cItem.colDesc? cItem.colDesc: cDesc;
+                                        cItem.collName = cItem.collName ? cItem.collName : cname;
+                                        cItem.colDesc = cItem.colDesc ? cItem.colDesc : cDesc;
                                         CollectionBase.saveCollectionItem(cItem);
                                     }
 
@@ -267,14 +268,14 @@ define(["dojo/_base/declare",
                                         if (rec.collections instanceof Array) {
 
                                             // array.forEach(collections, function (col) {
-                                                CollectionBase._addCollectionMdRecord(rec, collections);
+                                            CollectionBase._addCollectionMdRecord(rec, collections);
                                             // })
 
                                         } else {
                                             rec.collections = ['default'];
-                                           // array.forEach(collections, function (col) {
-                                                CollectionBase._addCollectionMdRecord(rec, collections);
-                                           // })
+                                            // array.forEach(collections, function (col) {
+                                            CollectionBase._addCollectionMdRecord(rec, collections);
+                                            // })
                                         }
                                         var rtitle = rowA[1];
                                         var rUrl = rowA[2];

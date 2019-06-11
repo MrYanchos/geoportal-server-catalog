@@ -269,7 +269,7 @@ G.evaluators.cinergi = {
                 if (kwds[i].hierarchy.getString().contains("Unassigned")) {
                     continue;
                 }
-                G.writeMultiProp(task.item, "hierarchies", "Category > " + kwds[i].hierarchy.getString());
+                G.writeMultiProp(task.item, "hierarchies_cat", "Category > " + kwds[i].hierarchy.getString());
                 //print (task.item.hierarchies_cat);
             }
 

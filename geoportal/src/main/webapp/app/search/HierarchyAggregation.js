@@ -41,6 +41,8 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
     props: null,
     treeData: [],
     rootTerm: '',
+      addRoot: false,
+      separator:">",
     selectedTerm:null,
       stopTerms: {
           "water body": "body of water"
@@ -65,6 +67,40 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
           , "Category > Realm (Other)"
           ,"Science Domain > Science Domain (Other)"
           ,"Category > Science Domain (Other)"
+          ,"Category > Geologic Time > Phanerozoic Eon",
+          ,"Category > Equipment > platform"
+          ,"Category > Feature > glacial feature"
+          ,"Category > Realm > marine"
+          ,"Category > Property > Measure > physical quality"
+          ,"Category > Physiographic Feature > slope"
+          ,"Category > glacial feature",
+          ,"Category > Material > Rock Material > sand"
+          ,"Category > Material > Biological Material > biological role"
+          ,"Category > Feature > Hydrologic Feature > water body"
+          ,"Category > Material > Chemical > molecular entity "
+          ,"Category > Material > Environmental Material > water"
+          ,"Category > Method > information processing"
+          ,"Category > Material > Rock Material > sedimentary rock"
+          ,"Category > Feature > Hydrologic Feature > island"
+          ,"Category > Activity > experimental process"
+          ,"Category > Realm > Geosphere > land mass"
+          ,"Category > Material > Environmental Material > mineral"
+          ,"Category > Material > Environmental Material > clay"
+          ,"Category > Feature > Physiographic Feature > depression"
+          ,"Category > Feature > Physiographic Feature > elevation"
+          ,"Category > Feature > Physiographic Feature > mineral deposit"
+          ,"Category > Feature > Physiographic Feature > mount"
+          ,"Category > Feature > Physiographic Feature > slope"
+          ,"Category > Activity > experimental process"
+              ,"Category > Feature > Marine Feature > marine water body"
+          ,"Category > Feature > Physiographic Feature > plain"
+          ,"Category > Feature > Physiographic Feature > peninsula"
+          ,"Category > Feature > Physiographic Feature > volcanic feature"
+
+
+
+
+
       ],
       stopFullMatch: [
           "Category > Organization > Tectonics and Structural Geology, Department of Earth and Ocean Sciences, University of South Carolina > Lamont Doherty Earth Observatory"
@@ -151,7 +187,11 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
       var key = this.getAggregationKey();
       var clause = this.rootTerm ;
       if (this.selectedTerm != null ) clause = this.selectedTerm;
-      var props = {"field":this.field,"include" : clause+".*", };
+      if (this.addRoot) {
+          var props = {"field": this.field,};
+      } else {
+          var props = {"field": this.field, "include": clause + ".*",};
+      }
       if (typeof this.props !== "undefined" && this.props !== null) {
         delete this.props.field; // TODO ??
         lang.mixin(props,this.props);
@@ -180,6 +220,20 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
                     v = lang.trim(this.props.missing);
                     if (v.length > 0) missingVal = v;
                 }
+                if (this.addRoot && this.rootTerm !=='') {
+                    var item = {
+                        id: this.rootTerm,
+                        parent: null,
+                        name: this.rootTerm,
+                        term: this.rootTerm,
+                        key: this.rootTerm,
+                        type: 'cat',
+                        count: 0,
+                        count_children: 0
+                    };
+                    //catStore.put(item);
+                    this.treeData.push(item);
+                }
                 array.forEach(data.buckets, function (entry) {
                         // this.addEntry(entry.key,entry.doc_count,missingVal);
                         var stop = array.filter(this.stopTreeMatch, function(item){
@@ -203,9 +257,26 @@ function(declare, lang, array, domConstruct, template, i18n, SearchComponent,
                             term = entry.key.substring(split + 1).trim()
                         }
                         if (!this.stopTerms[term]) {
+
+                            if (this.addRoot && this.rootTerm !=='') {
+                                if (this.showRoot) {
+                                     term = this.rootTerm + ' ' + this.separator + ' ' + term;
+                                }
+                                var entryId = this.rootTerm + ' ' + this.separator + ' ' + entry.key.trim();
+                                if (parent !== null) {
+
+                                    parent = this.rootTerm + ' ' + this.separator + ' ' + parent;
+                                 }  else {
+                                    parent = this.rootTerm ;
+                                }
+
+                            } else {
+                                var entryId =  entry.key.trim();
+                            }
                             var v = term + " (" + entry.doc_count + ")";
+
                             var item = {
-                                id: entry.key.trim(),
+                                id: entryId,
                                 parent: parent,
                                 name: v,
                                 term: term,
