@@ -27,12 +27,16 @@ define(["dojo/_base/declare",
         "dojo/text!./templates/SavedItemCard.html",
         "dojo/i18n!app/nls/resources",
         "app/etc/util",
+        "dojox/collections",
+        "dijit/form/DropDownButton",
+        "dijit/DropDownMenu",
+        "dijit/MenuItem"
 
     ],
     function (declare, lang, array, string, topic, xhr, request, on, appTopics, dom, domClass, domConstruct, registry,
               _WidgetBase, _AttachMixin, _TemplatedMixin, _WidgetsInTemplateMixin, Tooltip, TooltipDialog, popup,
               CollectionBase, SavedCollections,SavedSearches,
-              template, i18n,  util) {
+              template, i18n,  util, dojoCollections, DropDownButton, DropDownMenu, MenuItem ) {
 
         var oThisClass = declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
 
@@ -52,6 +56,7 @@ define(["dojo/_base/declare",
                 this.own(topic.subscribe("app/collection/selectCollection", function (params) {
                     self._renderActionStatus(self.mdRecord);
                 }));
+
                 // this.own(topic.subscribe(appTopics.ItemOwnerChanged,function(params){
                 //     if (self.item && self.item === params.item) {
                 //         self._renderOwnerAndDate(self.item);
@@ -99,8 +104,9 @@ define(["dojo/_base/declare",
 
                 this._renderDescription(mdRecord);
                 this._renderCollections(mdRecord);
-                this._renderActionStatus(mdRecord); // enable/disable buttons
-
+              //  this._renderActionStatus(mdRecord); // enable/disable buttons
+                this.addCollectionMenu();
+                this.removeCollectionMenu();
             },
 
             _mouseenter: function (e) {
@@ -118,7 +124,7 @@ define(["dojo/_base/declare",
                     CollectionBase.saveMdRecord(this.mdRecord);
                 }
                 this._renderCollections(this.mdRecord)
-                this._renderActionStatus(this.mdRecord);
+               // this._renderActionStatus(this.mdRecord);
                 // this.myTempDialog.show();
             },
             onRemoveCollectionClicked: function (evt) {
@@ -126,7 +132,7 @@ define(["dojo/_base/declare",
                 var coll =this.getSelectedCollectionValue();
                 CollectionBase._removeCollectionMdRecord(this.mdRecord, coll);
                 this._renderCollections(this.mdRecord)
-                this._renderActionStatus(this.mdRecord);
+               // this._renderActionStatus(this.mdRecord);
                 // this.myTempDialog.show();
             },
             onRemoveMDRecordClicked: function (evt) {
@@ -192,51 +198,51 @@ define(["dojo/_base/declare",
                 }, this.titleNode);
 
             },
-            _renderActionStatus: function (mdRecord) {
-                var add = this.addButton;
-                var rmColl = this.rmCollectionButton;
-                var rmMd = this.rmMdRecordButton;
-                var recSaved = this.itemIsSaved;
-
-              //  var collTxtBox = registry.byId("collectionMenuNode");
-              //  var coll = collTxtBox.value;
-                var coll = this.getSelectedCollectionValue();
-                switch (CollectionBase._inCollectionMdRecord(mdRecord, coll)) {
-                    case true:
-                        add.disabled = true;
-                        add.title = "item in " + coll;
-                        rmColl.disabled = false;
-                        rmColl.title = "remove item from " + coll;
-
-                        break;
-                    case false:
-                        add.disabled = false;
-                        add.title = "add item to " + coll;
-                        rmColl.disabled = true;
-                        rmColl.title = " not in " + coll;
-                        break;
-                    default:
-                        add.disabled = true;
-                        add.title = "Select a collection";
-                        rmColl.disabled = true;
-                        rmColl.title = "Select a collection";
-                        break;
-                }
-                if (recSaved) {
-                    rmMd.disabled = false;
-                    rmMd.visibility = "visible";
-                } else {
-                    rmMd.disabled = true;
-                    rmMd.visibility = "hidden";
-                    // rmMd.title = "Search Items cannot be saved, at present";
-                    // add.disabled = false;
-                    // add.title = "Search Items cannot be saved, at present";
-                    // rmColl.disabled = true;
-                    // rmColl.title = "Search Items cannot be saved, at present";
-                }
-
-
-            },
+            // _renderActionStatus: function (mdRecord) {
+            //     var add = this.addButton;
+            //     var rmColl = this.rmCollectionButton;
+            //     var rmMd = this.rmMdRecordButton;
+            //     var recSaved = this.itemIsSaved;
+            //
+            //   //  var collTxtBox = registry.byId("collectionMenuNode");
+            //   //  var coll = collTxtBox.value;
+            //     var coll = this.getSelectedCollectionValue();
+            //     switch (CollectionBase._inCollectionMdRecord(mdRecord, coll)) {
+            //         case true:
+            //             add.disabled = true;
+            //             add.title = "item in " + coll;
+            //             rmColl.disabled = false;
+            //             rmColl.title = "remove item from " + coll;
+            //
+            //             break;
+            //         case false:
+            //             add.disabled = false;
+            //             add.title = "add item to " + coll;
+            //             rmColl.disabled = true;
+            //             rmColl.title = " not in " + coll;
+            //             break;
+            //         default:
+            //             add.disabled = true;
+            //             add.title = "Select a collection";
+            //             rmColl.disabled = true;
+            //             rmColl.title = "Select a collection";
+            //             break;
+            //     }
+            //     if (recSaved) {
+            //         rmMd.disabled = false;
+            //         rmMd.visibility = "visible";
+            //     } else {
+            //         rmMd.disabled = true;
+            //         rmMd.visibility = "hidden";
+            //         // rmMd.title = "Search Items cannot be saved, at present";
+            //         // add.disabled = false;
+            //         // add.title = "Search Items cannot be saved, at present";
+            //         // rmColl.disabled = true;
+            //         // rmColl.title = "Search Items cannot be saved, at present";
+            //     }
+            //
+            //
+            // },
             // dojo.form.select can only produce a dropdown, and not a scrolling select box
             // can't use dojo/registry, so these isolates code for future change.
             getSelectedCollectionValue: function () {
@@ -266,6 +272,82 @@ define(["dojo/_base/declare",
                 var collMenuNode = dom.byId("savedSearchMenu");
                 return collMenuNode.selectedOptions[0].label;
             },
+            addCollectionMenu: function() {
+                var self = this;
+
+                var collections = CollectionBase.getCollections();
+                // var menu = new DropDownMenu({ style: "display: none;"});
+                var menu = new DropDownMenu();
+                collections.forEach(function (coll) {
+                    var c = coll.val;
+                    if (! CollectionBase._inCollectionMdRecord(self.mdRecord, c.id)) {
+                        var menuItem1 = new MenuItem({
+                            label: c.colName,
+
+                            onClick: function () {
+                                CollectionBase._addCollectionMdRecord(self.mdRecord, c.id);
+                                if (!self.itemIsSaved) {
+                                    CollectionBase.saveMdRecord(self.mdRecord);
+                                }
+                            }
+                        });
+                        menu.addChild(menuItem1);
+                    }
+                })
+                menu.startup();
+                // var button = new DropDownButton({
+                //     label: "Add to Collection",
+                //     name: "addButton",
+                //     dropDown: menu,
+                //     class: "btn btn-link btn-sm"
+                // });
+                // button.startup();
+                // this.addButton.appendChild(button.domNode);
+                var button = this.addButton;
+                button.set("dropDown", menu);
+            },
+            removeCollectionMenu:function() {
+                var self = this;
+                var mdColl = self.mdRecord.collections;
+                // var menu = new DropDownMenu({ style: "display: none;"});
+                if (mdColl) {
+
+                var rmMenu = new DropDownMenu();
+                mdColl.forEach(function (coll) {
+                    if (coll!=="default" && coll!=="All") {
+                        var c = coll;
+                        var menuItem1 = new MenuItem({
+                            label: CollectionBase.getCollectionNameById(c),
+
+                            onClick: function () {
+                                CollectionBase._removeCollectionMdRecord(self.mdRecord, c);
+                                if (!self.itemIsSaved) {
+                                    CollectionBase.saveMdRecord(self.mdRecord);
+                                }
+                            }
+                        });
+                        rmMenu.addChild(menuItem1);
+                    }
+                })
+                    rmMenu.startup();
+                // var rmButton = new DropDownButton({
+                //     label: "Remove from Collection",
+                //     name: "rmButton",
+                //     dropDown: rmMenu,
+                //     class: "btn btn-link btn-sm"
+                // });
+                // rmButton.startup();
+               // this.rmCollectionButton.appendChild(rmButton.domNode);
+                    var rmButton = this.rmCollectionButton;
+                    rmButton.set("dropDown", rmMenu);
+                if (rmMenu.getChildren().length ===0 ) {
+                    rmButton.set("title" ,"No Collections");
+                    rmButton.set("disabled", true);
+                    rmButton.set("cursor", "not-allowed");
+
+                }
+            }
+            }
         });
 
         return oThisClass;

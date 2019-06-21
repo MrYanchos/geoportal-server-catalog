@@ -13,16 +13,22 @@
         <div class="g-item-description clearfix " data-dojo-attach-point="descriptionNode"></div>
     </div>
     <div >
-        <button type="button"
-                data-dojo-attach-point="addButton"
-                data-dojo-attach-event="onClick: onAddCollectionClicked"
-                class="btn btn-link btn-sm"
-        >Add to Collection</button>
-        <button type="button"
-                data-dojo-attach-point="rmCollectionButton"
-                data-dojo-attach-event="onClick: onRemoveCollectionClicked"
-                class="btn btn-link btn-sm"
-        >Remove from Collection</button>
+        <!--<button type="button"-->
+                <!--data-dojo-attach-point="addButton"-->
+                <!--data-dojo-attach-event="onClick: addToCollectionMenu"-->
+                <!--class="btn btn-link btn-sm"-->
+        <!--&gt;Add to Collection</button>-->
+        <button data-dojo-attach-point="addButton" data-dojo-type="dijit/form/DropDownButton" class="btn btn-link btn-sm">
+        Add to Collection</button>
+        <!--<button type="button"-->
+                <!--data-dojo-attach-point="rmCollectionButton"-->
+                <!--data-dojo-attach-event="onClick: onRemoveCollectionClicked"-->
+                <!--class="btn btn-link btn-sm"-->
+        <!--&gt;Remove from Collection</button>-->
+        <button data-dojo-attach-point="rmCollectionButton" data-dojo-type="dijit/form/DropDownButton"
+                class="btn btn-link btn-sm">
+            Remove from Collection
+        </button>
         <button type="button"
                 data-dojo-attach-point="rmMdRecordButton"
                 data-dojo-attach-event="onClick: onRemoveMDRecordClicked"
