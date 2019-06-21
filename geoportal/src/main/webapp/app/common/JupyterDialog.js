@@ -72,6 +72,12 @@ define(["dojo/_base/declare",
                     var titleQuery = "$.hubs[?title='" + hub + "']";
                     var hubConfig = jsonquery(titleQuery, this.jupyter_hubs);
                     if (hubConfig[0] && hubConfig[0]["login"]) {
+                        if ( hubConfig[0]["default_path"]) {
+                            this.jusername.set( "value", hubConfig[0]["default_path"]);
+                        } else {
+                            this.jusername.set( "value", null);
+                            this.jusername.set( "placeHolder", "Login Name");
+                        }
                         this.jusernameLabel.innerHTML = hubConfig[0]["login"];
                         this.jusernamegroup.hidden = false;
                     } else {

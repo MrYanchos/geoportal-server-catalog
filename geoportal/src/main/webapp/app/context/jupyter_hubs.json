@@ -61,6 +61,21 @@
 
     },
     {
+      "title": "Any Notebook URL",
+      "login": "URL to Dispatcher",
+      "default_path": "http://localhost:8888/notebooks/jupyter-cinergi/CinergiDispatch-UseMetadata.ipynb",
+      "uri_template": "{username}",
+      "url_encode_options": true,
+      "params": {
+
+        "documentId": "documentId={documentId}"
+      ,
+
+        "collection": "collection={collectionPackage}"
+      }
+
+    },
+    {
       "title": "UCSD Data Science Hub (UCSD)",
       "uri_template": "https://datahub.ucsd.edu/hub/user-redirect/notebooks/jupyter-cinergi/CinergiDispatch.ipynb",
       "url_encode_options": false,
