@@ -9,12 +9,17 @@ define(["dojo/_base/declare",
         "dojo/i18n!app/nls/resources",
         "app/collection/CollectionComponent",
         "app/collection/CollectionBase",
-        "app/common/JupyterDialog",],
-    function (declare, lang, array, dom, domConstruct, ioQuery, registry, template, i18n, CollectionComponent, CollectionBase, JupyterDialog) {
+        "app/common/JupyterDialog",
+    "app/context/AppClient"],
+    function (declare, lang, array, dom, domConstruct, ioQuery, registry, template, i18n,
+              CollectionComponent, CollectionBase, JupyterDialog,
+        AppClient
+        ) {
         var oThisClass = declare([CollectionComponent], {
 
             i18n: i18n,
             templateString: template,
+            baseUrl:null,
             records: [],
             encodedRecords: null,
 
@@ -23,7 +28,7 @@ standalone: all records included, link null
 link: link to endpoint which will serve a standalone json package.
 service: known service. Link points to service endpoint, use id or collectionId in service
             */
-            recordPackage: function (id, collectionId, title, recordIds,  packageType="standalone",link, ) {
+            recordPackage: function (id, collectionId, title, briefrecords,  packageType="standalone",link, ) {
                 var self = this;
                 var recPack = {
                     "id": id,
@@ -32,20 +37,27 @@ service: known service. Link points to service endpoint, use id or collectionId 
                     "collectionlink": link,
                     "packageType": packageType,
 
-                    "recordIds": recordIds,
+                    "briefrecords": briefrecords,
 
                 };
                 return recPack;
             },
 
             /*
-            recordLink provides (xml/json) need to fully decide.
+            recordLink provides (xml/js, on) need to fully decide.
+            csw brief record is an
+            * identifier,
+            * title
+            * type(optional)
+            * BoundingBox (optional)
             */
-            recordId: function (id, link) {
+            recordId: function (id, link, title) {
                 var self = this;
                 var recIds = {
-                    "id": id,
+                    "identifier": id,
                     "recordlink": link,
+                    "title": title,
+
 
                 };
                 return recIds;
@@ -54,7 +66,7 @@ service: known service. Link points to service endpoint, use id or collectionId 
                 this.inherited(arguments);
                 this.sendSavedPage.title = "Send Page";
                 this.sendSavedCollection.title = "Send Collection";
-
+                var thisUrl = require.toUrl(document.URL);
 
             },
             startup: function () {
@@ -76,7 +88,8 @@ service: known service. Link points to service endpoint, use id or collectionId 
                 var collID = this.getSelectedCollectionValue();
                 var collName = this.getSelectedCollectionDisplayedValue();
                 var id = CollectionBase.createUUID();
-                var rp = this.recordPackage(id, collID, collName, packageType, link, this.records);
+                //  recordPackage: function (id, collectionId, title, briefrecords,  packageType="standalone",link, ) {
+                var rp = this.recordPackage(id, collID, collName,  this.records,packageType, link);
 
                 return rp;
 
@@ -84,8 +97,11 @@ service: known service. Link points to service endpoint, use id or collectionId 
             createRecordIds: function (savedRecords) {
                 var self = this;
                 var records = [];
+
                 array.forEach(savedRecords, function (rec) {
-                    var recId = self.recordId(rec.val.id, "");
+                    var url = location.origin + location.pathname +"rest/metadata/item";
+                    url += "/"+encodeURIComponent(rec.val.id)+"/xml";
+                    var recId = self.recordId(rec.val.id, url, rec.val.title);
 
                     records.push(recId);
                 })

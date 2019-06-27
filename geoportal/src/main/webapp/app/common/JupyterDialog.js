@@ -125,7 +125,7 @@ define(["dojo/_base/declare",
 
                          */
                         if (hub.url_encode_options ) {
-                            var param = encodeURI('?' + param);
+                            param = encodeURI('?' + param);
                             hubUrl = hubUrl + param;
                         }
                         else {

@@ -35,7 +35,7 @@
     {
       "title": "Your Computer - jupyter-cinergi",
       "uri_template": "http://localhost:8888/notebooks/jupyter-cinergi/CinergiDispatch-UseMetadata.ipynb",
-      "url_encode_options": true,
+      "url_encode_options": false,
       "params": {
 
         "documentId": "documentId={documentId}"
@@ -50,7 +50,7 @@
       "login": "Alternate Dispatcher",
       "default_path": "jupyter-cinergi/CinergiDispatch-UseMetadata.ipynb",
       "uri_template": "http://localhost:8888/notebooks/{username}",
-      "url_encode_options": true,
+      "url_encode_options": false,
       "params": {
 
         "documentId": "documentId={documentId}"
@@ -65,7 +65,7 @@
       "login": "URL to Dispatcher",
       "default_path": "http://localhost:8888/notebooks/jupyter-cinergi/CinergiDispatch-UseMetadata.ipynb",
       "uri_template": "{username}",
-      "url_encode_options": true,
+      "url_encode_options": false,
       "params": {
 
         "documentId": "documentId={documentId}"
