@@ -75,6 +75,8 @@ service: known service. Link points to service endpoint, use id or collectionId 
             processSavedResults: function (records, totalRecords, nextPage, startRec, endRec) {
                 if (totalRecords > 20) {
                     this.sendSavedCollection.set({"display": "hidden", disabled: true});
+                } else {
+                    this.sendSavedCollection.set({"display": "initial", disabled: false});
                 }
                 this.records = this.createRecordIds(records);
                 var package = this.createRecordPackage("standalone", "");
@@ -101,7 +103,7 @@ service: known service. Link points to service endpoint, use id or collectionId 
                 array.forEach(savedRecords, function (rec) {
                     var url = location.origin + location.pathname +"rest/metadata/item";
                     url += "/"+encodeURIComponent(rec.val.id)+"/xml";
-                    var recId = self.recordId(rec.val.id, url, rec.val.title);
+                    var recId = self.recordId(rec.val.id, url, rec.val.title.trim(0,20));
 
                     records.push(recId);
                 })
@@ -114,6 +116,8 @@ service: known service. Link points to service endpoint, use id or collectionId 
 
             },
             click_sendSavedCollection: function (evt) {
+                var dialog = new JupyterDialog();
+                dialog.show(this.encodedRecords, "collection");
             },
             click_sendSavedChecked: function (evt) {
             },
