@@ -16,11 +16,20 @@ define(["dojo/_base/declare",
         "dojo/text!app/context/jupyter_hubs.json",
         "dojox/json/query",
         "dojo/fx/Toggler",
+<<<<<<< Updated upstream
         "dojo/request/iframe"
    // "app/common/OkCancelBar"
     ],
     function(declare, lang,array, dom, on, keys, Templated, template, i18n, ModalDialog,registry,Select,Memory,
              TextBox, hubs, jsonquery, Toggler, iframe) {
+=======
+        "dojo/request/iframe",
+        "dojo/request"
+        // "app/common/OkCancelBar"
+    ],
+    function (declare, lang, array, dom, on, keys, Templated, template, i18n, ModalDialog, registry, Select, Memory,
+              TextBox, hubs, jsonquery, Toggler, iframe, dojoRequest) {
+>>>>>>> Stashed changes
 
         var oThisClass = declare([Templated], {
 
@@ -89,6 +98,7 @@ define(["dojo/_base/declare",
                 var hub = this.hubMenu.value;
                 //var hubName = this.hubMenu.getOptionLabel();
                 var user = this.jusername.value;
+<<<<<<< Updated upstream
                 if (hub!== null && hub.length > 0 ) {
                     this.okButton.disabled=true;
 if ( user!== null && user.length > 0){
@@ -113,6 +123,76 @@ if ( user!== null && user.length > 0){
                     //     if (typeof error === "string") self.handleError(error);
                     //     else self.handleError(i18n.general.error,error);
                     // });
+=======
+                if (hubs.length >0 ) {
+                    var hub = hubs[0];
+                    this.okButton.disabled = true;
+                    try {
+                        var hubUrl = hub.uri_template;
+                        if (user !== null && user.length > 0) {
+                            hubUrl = hubUrl.replace("{username}", user);
+                        }
+                        ;
+                        if (this.type === "documentId") {
+                            var paramTemplate = hub.params["documentId"];
+                            var param = paramTemplate.replace("{documentId}", encodeURIComponent(this.documentId));
+                        }
+                        if (this.type === "collection") {
+                            var paramTemplate = hub.params["collection"];
+                            var param = paramTemplate.replace("{collectionPackage}", encodeURIComponent(this.collectionJson));
+                        }
+                        /*
+                        "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/stable?urlpath=%2Fnotebooks%2FCinergiDispatch.ipynb?"
+
+                         */
+                        if (hub.url_encode_options ) {
+                            param = encodeURI('?' + param);
+                            hubUrl = hubUrl + param;
+                        }
+                        else {
+                            var i = hubUrl.lastIndexOf('?');
+                            if (i > 0) {
+                                if (i === hubUrl.length) {
+                                    hubUrl = hubUrl + param;
+                                } else {
+                                    hubUrl = hubUrl + '&' + param;
+                                }
+                            } else {
+                                hubUrl = hubUrl + '?' + param;
+                            }
+                        }
+                        //var fileURL = URL.createObjectURL(hubUrl);
+                        //window.open(fileURL);
+                        // create an anchor and click on it.
+
+                        url = "geoportal/rest/collection/toSuave";
+                        response = dojoRequest.post(url);
+                        resultat = response.getEntity()
+
+
+                        resultat = runPyScript(hubUrl);
+
+                        var ancorTag = document.createElement('a');
+                        ancorTag.href = resultat;
+                        ancorTag.target = '_blank';
+                        // ancorTag.download = 'ConsumptionReport.pdf';
+                        document.body.appendChild(ancorTag);
+                        ancorTag.click();
+                        document.body.removeChild(ancorTag);
+
+                        // window.open("https://google.com/", "_blank");
+                        // this.dialog.okCancelBar.showWorking(i18n.general.working,true);
+                        // AppContext.appUser.signIn(u,p).then(function(){
+                        //     self.dialog.hide();
+                        // }).otherwise(function(error){
+                        //     if (typeof error === "string") self.handleError(error);
+                        //     else self.handleError(i18n.general.error,error);
+                        // });
+                    } catch (ex ) {
+                        this.okButton.disabled = false;
+                        self.handleError("Hubs defined in jyputer_hubs.json, incorrect. Contact adminstrator");
+                    }
+>>>>>>> Stashed changes
                 } else {
                     self.handleError(i18n.login.incomplete);
                 }
