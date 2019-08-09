@@ -119,6 +119,7 @@ define(["dojo/_base/declare",
                         if (this.type === "collection") {
                             var paramTemplate = hub.params["collection"];
                             var param = paramTemplate.replace("{collectionPackage}", encodeURIComponent(this.collectionJson));
+                            System.out.println(this.collectionJson);
                         }
                         /*
                         "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/stable?urlpath=%2Fnotebooks%2FCinergiDispatch.ipynb?"
@@ -143,6 +144,49 @@ define(["dojo/_base/declare",
                         //var fileURL = URL.createObjectURL(hubUrl);
                         //window.open(fileURL);
                         // create an anchor and click on it.
+
+                        // var dfd = null;
+                        //
+                        // try {
+                        //     dfd = this._dfd = dojoRequest.post(url, {
+                        //         handleAs: "json",
+                        //         headers: {"Content-Type": "application/json"},
+                        //         data: JSON.stringify(postData)
+                        //     });
+                        //
+                        //
+                        //     dfd.then(function (response) {
+                        //         if (!dfd.isCanceled()) {
+                        //             //console.warn("search-response",response);
+                        //             self.lastQueryCount = 0;
+                        //             self.lastQueryWasMyContent = !!params.wasMyContent;
+                        //             if (postData && postData.query) {
+                        //                 self.lastQuery = JSON.stringify({"query": postData.query});
+                        //             } else {
+                        //                 self.lastQuery = null;
+                        //             }
+                        //             response.urlParams = params.urlParams;
+                        //             array.forEach(components, function (component) {
+                        //                 component.processResults(response);
+                        //             });
+                        //         }
+                        //     }).otherwise(function (error) {
+                        //         if (!dfd.isCanceled()) {
+                        //             if (error && error.dojoType && error.dojoType === "cancel") {
+                        //             } else {
+                        //                 console.warn("search-error");
+                        //                 console.warn(error);
+                        //                 array.forEach(components, function (component) {
+                        //                     component.processError(error);
+                        //                 });
+                        //             }
+                        //         }
+                        //     });
+                        //     return dfd;
+                        // } catch(error) {
+                        //     console.warn("search-error");
+                        // }
+
                         var ancorTag = document.createElement('a');
                         ancorTag.href = hubUrl;
                         ancorTag.target = '_blank';

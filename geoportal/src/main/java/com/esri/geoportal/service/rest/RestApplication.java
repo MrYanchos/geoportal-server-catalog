@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+import com.esri.geoportal.cinergi.collection.collection.service.CollectionService;
 
 /**
  * The rest application.
@@ -34,6 +35,7 @@ public class RestApplication extends Application {
     Set<Class<?>> resources = new HashSet<Class<?>>();
     resources.add(GeoportalService.class);
     resources.add(MetadataService.class);
+    resources.add(CollectionService.class);
     return resources;
   }
 
