@@ -41,7 +41,11 @@ function(declare, lang, topic, appTopics, Templated, template, i18n, util, Searc
       var self = this;
       this.updateUI();
       
-      var ignoreMapPanelActivated = false; 
+      var ignoreMapPanelActivated = false;
+      $("#branding").on("click",function(e) {
+        e.preventDefault()
+        $("a[href='#searchPanel']").tab('show');
+      });
       $("a[href='#searchPanel']").on("shown.bs.tab",function(e) {
         location.hash = '#searchPanel';
       });

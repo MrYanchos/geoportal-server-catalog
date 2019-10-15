@@ -3,7 +3,7 @@
     -->
     <nav class="navbar navbar-inverse">
 
-            <a class="navbar-brand" href="#">
+            <a id="branding" class="navbar-brand" href="#">
                 <img class="navbar-logo" src="images/DataDiscoveryStudioBufferedWhite.png"/>
             </a>
             <!-- <a class="navbar-brand" href="#">${i18n.nav.brand}</a> -->
@@ -105,6 +105,10 @@
             <div data-dojo-type="app/main/AboutPanel" data-dojo-attach-point="aboutPanel"></div>
         </div>
     </div>
-
+    <script>
+        $(function () {
+            $('#searchPanel  li:last-child a').tab('show')
+        })
+    </script>
 </div>
 

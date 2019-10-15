@@ -174,7 +174,7 @@ function(declare, lang, array, query, domClass, topic, appTopics, registry,
 
             dfd.then(function (response) {
                 if (!dfd.isCanceled()) {
-                    //console.warn("search-response",response);
+                    console.warn("search-response",response);
                     self.lastQueryCount = 0;
                     self.lastQueryWasMyContent = !!params.wasMyContent;
                     if (postData && postData.query) {

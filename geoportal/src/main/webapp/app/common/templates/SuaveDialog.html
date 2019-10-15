@@ -1,0 +1,29 @@
+<div data-dojo-id="wbDialog" title="JypterHub and Username">
+    <div data-dojo-type="dojo/store/Memory"
+         data-dojo-id="hubStore"
+     style="width: 40em;"  ></div>
+    <form>
+
+        <div style="height: 3em">
+    <fieldset class="form-group" data-dojo-attach-point="jusernamegroup" >
+            <label for="${id}_jusername" data-dojo-attach-point="jusernameLabel">username:</label>
+            <input data-dojo-type="dijit/form/TextBox"
+                   name="username" id="${id}_jusername"
+                       data-dojo-attach-point="jusername"
+                   placeholder="Login Name"
+                   style="width: 30em;" />
+
+</fieldset>
+        </div>
+        <button type="button"
+                data-dojo-attach-point="okButton"
+                data-dojo-attach-event="onClick: onOkClicked"
+                class="btn btn-primary btn-sm"
+        >${okLabel}</button>
+        <button type="button"
+                data-dojo-attach-point="cancelButton"
+                data-dojo-attach-event="onClick: onCancelClicked"
+                class="btn btn-link btn-sm"
+        >${cancelLabel}</button>
+   </form>
+</div>
