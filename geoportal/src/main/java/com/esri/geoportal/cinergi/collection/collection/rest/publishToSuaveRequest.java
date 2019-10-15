@@ -137,39 +137,30 @@ public class publishToSuaveRequest extends AppRequest {
 
       httppost.setEntity(reqEntity);
       CloseableHttpResponse respo = httpClient.execute(httppost);
-      String aaa = respo.toString();
-      System.out.println();
-     }
-     finally {
-      httpClient.close();
-     }
-//    Map<String, Object> headers = new HashMap<>();
-//    headers.put("User-Agent", "suave user agent");
-//    headers.put("referer", referer);
-//    String upload_data =
-//    RawResponse resp = Requests.post(upload_url).headers(headers)
-//            .multiPartBody(Part.text("file", locfile_name),
-//            Part.text("data", Part.text("name", survey_name),
-//                    Part.text("dzc", dzc_file),
-//                    Part.text("user", user)
-//            )).send();
 
 
-//    int stcode = resp.statusCode();
+    int stcode = respo.getStatusLine().getStatusCode();
 
-//    if (stcode == 200) {
-//      String s_url = new_survey_url_base + user + "_" + survey_name + ".csv" + "&views=" + views + "&view=" + view;
-//      writeOk(response, s_url);
-//    }
+    if (stcode == 200) {
+      String s_url = new_survey_url_base + user + "_" + survey_name + ".csv" + "&views=" + views + "&view=" + view;
+      writeOk(response, s_url);
+    }
 
 //    String respstr = resp.readToText();
-    /* ES 2to5 */
-    // if (resp.isFound()) {
+       /* ES 2to5 */
+       // if (resp.isFound()) {
 //    if (resp.getResult().equals(Result.DELETED)) {
 //      this.writeOk(response,resp.getId());
 //    } else {
 //      response.writeIdNotFound(this,json);
 //    }
+       String aaa = respo.toString();
+       System.out.println();
+     }
+     finally {
+      httpClient.close();
+     }
+
     response.setStatus(Response.Status.OK);
     return response;
   }

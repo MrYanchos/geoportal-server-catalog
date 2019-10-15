@@ -10,9 +10,10 @@ define(["dojo/_base/declare",
         "app/collection/CollectionComponent",
         "app/collection/CollectionBase",
         "app/common/JupyterDialog",
+        "app/common/SuaveDialog",
     "app/context/AppClient"],
     function (declare, lang, array, dom, domConstruct, ioQuery, registry, template, i18n,
-              CollectionComponent, CollectionBase, JupyterDialog,
+              CollectionComponent, CollectionBase, JupyterDialog, SuaveDialog,
         AppClient
         ) {
         var oThisClass = declare([CollectionComponent], {
@@ -117,6 +118,10 @@ service: known service. Link points to service endpoint, use id or collectionId 
             },
             click_sendSavedCollection: function (evt) {
                 var dialog = new JupyterDialog();
+                dialog.show(this.encodedRecords, "collection");
+            },
+            click_sendToSuave: function (evt) {
+                var dialog = new SuaveDialog();
                 dialog.show(this.encodedRecords, "collection");
             },
             click_sendSavedChecked: function (evt) {

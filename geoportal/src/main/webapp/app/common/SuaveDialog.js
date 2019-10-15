@@ -5,7 +5,7 @@ define(["dojo/_base/declare",
         "dojo/on",
         "dojo/keys",
         "app/common/Templated",
-        "dojo/text!./templates/JupyterDialog.html",
+        "dojo/text!./templates/SuaveDialog.html",
         "dojo/i18n!app/nls/resources",
         "dijit/Dialog",
         // "app/common/ModalDialog",
@@ -65,7 +65,7 @@ define(["dojo/_base/declare",
                 this.inherited(arguments);
                 // this.toggler = new Toggler( {node: this.jusername.id});
                 // this.toggler.hide();
-                this.jusernamegroup.hidden = true;
+                this.jusernamegroup.hidden = false;
             },
             updateDialog: function (e) {
                 var hub = this.hubMenu.focusNode.textContent;
@@ -99,51 +99,8 @@ define(["dojo/_base/declare",
             execute: function () {
                 var self = this;
 
-                var hubName = this.hubMenu.value;
-                var hubs = array.filter(this.jupyter_hubs.hubs, function(jh){
-                   return  jh.title===hubName;
-                });
-                var user = this.jusername.value;
-                if (hubs.length >0 ) {
-                    var hub = hubs[0];
-                    this.okButton.disabled = true;
-                    try {
-                        var hubUrl = hub.uri_template;
-                        if (user !== null && user.length > 0) {
-                            hubUrl = hubUrl.replace("{username}", user);
-                        }
-                        ;
-                        if (this.type === "documentId") {
-                            var paramTemplate = hub.params["documentId"];
-                            var param = paramTemplate.replace("{documentId}", encodeURIComponent(this.documentId));
-                        }
-                        if (this.type === "collection") {
-                            var paramTemplate = hub.params["collection"];
-                            var param = paramTemplate.replace("{collectionPackage}", encodeURIComponent(this.collectionJson));
-                        }
-                        /*
-                        "https://mybinder.org/v2/gh/CINERGI/jupyter-cinergi.git/stable?urlpath=%2Fnotebooks%2FCinergiDispatch.ipynb?"
 
-                         */
-                        if (hub.url_encode_options ) {
-                            param = encodeURI('?' + param);
-                            hubUrl = hubUrl + param;
-                        }
-                        else {
-                            var i = hubUrl.lastIndexOf('?');
-                            if (i > 0) {
-                                if (i === hubUrl.length) {
-                                    hubUrl = hubUrl + param;
-                                } else {
-                                    hubUrl = hubUrl + '&' + param;
-                                }
-                            } else {
-                                hubUrl = hubUrl + '?' + param;
-                            }
-                        }
-                        //var fileURL = URL.createObjectURL(hubUrl);
-                        //window.open(fileURL);
-                        // create an anchor and click on it.
+                var user = this.jusername.value;
 
                         var dfd = null;
                         var url = "./rest/collection/toSuave";
@@ -168,18 +125,18 @@ define(["dojo/_base/declare",
                                     }
                                 }
                             });
-                            return dfd;
+                            //return dfd;
                         } catch(error) {
                             console.warn("search-error");
                         }
 
                         var ancorTag = document.createElement('a');
-                        ancorTag.href = hubUrl;
-                        ancorTag.target = '_blank';
+                        //ancorTag.href = hubUrl;
+                        //ancorTag.target = '_blank';
                         // ancorTag.download = 'ConsumptionReport.pdf';
-                        document.body.appendChild(ancorTag);
-                        ancorTag.click();
-                        document.body.removeChild(ancorTag);
+                        //document.body.appendChild(ancorTag);
+                        //ancorTag.click();
+                        //document.body.removeChild(ancorTag);
 
                         // window.open("https://google.com/", "_blank");
                         // this.dialog.okCancelBar.showWorking(i18n.general.working,true);
@@ -189,14 +146,6 @@ define(["dojo/_base/declare",
                         //     if (typeof error === "string") self.handleError(error);
                         //     else self.handleError(i18n.general.error,error);
                         // });
-                    } catch (ex ) {
-                        this.okButton.disabled = false;
-                        self.handleError("Hubs defined in jyputer_hubs.json, incorrect. Contact adminstrator");
-                    }
-                } else {
-                    this.okButton.disabled = false;
-                    self.handleError(i18n.login.incomplete);
-                }
             },
 
             handleError: function (msg, error) {
@@ -224,50 +173,6 @@ define(["dojo/_base/declare",
                 }
                 if (type === 'collection') {
                      this.collectionJson = item;
-                }
-                var m = registry.byId(self.hubMenu.id);
-                if (lang.isArray(this.jupyter_hubs.hubs)) {
-                    var optionsHub = [];
-                    array.forEach(this.jupyter_hubs.hubs, function (hub) {
-
-                        // var ddli = domConstruct.create("li", {}, ddul);
-                        //var uri = hub.uri_template.replace("{docId}", encodeURIComponent(docId));
-                        // var divClass = "small";
-                        var uri = hub.uri_template;
-                        if (hub.disabled) {
-                            divClass = "small disabled";
-                        }
-
-                        // domConstruct.create("a", {
-                        //     "class": "small",
-                        //     href: uri,
-                        //     target: "_blank",
-                        //     innerHTML: hub.title
-                        // }, ddli);
-                        optionsHub.push(
-                            {
-                                label: hub.title,
-                                value: hub.title
-                            }
-                        );
-
-
-                    });
-                    // var s = new Select({
-                    //
-                    //
-                    // });
-                    m.addOption(optionsHub);
-                    m.startup();
-                    // s.addOption(optionsHub);
-                    //  s.placeAt(m);
-                    //  s.startup();
-                    // m.store.add(
-                    //          {name:"Alabama", id:"AL"});
-                    //
-                    //  m.store.add(  {name:"Alaska", id:"AK"});
-
-
                 }
                 this.own(on(this.jusername, "keyup", function (evt) {
                     if (evt.keyCode === keys.ENTER) self.execute();

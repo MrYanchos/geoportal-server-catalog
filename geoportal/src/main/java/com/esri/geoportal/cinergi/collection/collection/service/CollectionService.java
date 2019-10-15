@@ -59,7 +59,8 @@ public class CollectionService {
 
       request.init(collectionJson);
       AppResponse response = request.execute();
-      return response.build();
+      Response resp = response.build();
+      return resp;
     } catch (Throwable t) {
       return this.writeException(t,pretty);
     }
