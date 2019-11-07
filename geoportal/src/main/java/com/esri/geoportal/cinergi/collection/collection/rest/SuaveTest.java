@@ -20,6 +20,24 @@ public class SuaveTest {
     String new_survey_url_base = survey_url.split(user)[0];
     String dzc_file = "https://maxim.ucsd.edu/dzgen/lib-staging-uploads/7a1385a0285c814637248104c649234d/content.dzc";
 
+
+    public static String[] getNC(String collectionJson){
+        String[] retstr = new String[3];
+        try {
+            JSONObject js =  new JSONObject(collectionJson);
+            retstr[0] = js.getString("name");
+            JSONObject jsonss = js.getJSONObject("jsn");
+            retstr[1] = jsonss.toString();
+            retstr[2] = js.getString("sname");
+            return retstr;
+        }
+        catch(Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
+
+
     public static String[] getJsonIds(String collectionJson){
         try {
             JSONArray colj = new JSONObject(collectionJson).getJSONArray("briefrecords");
@@ -122,7 +140,7 @@ public class SuaveTest {
                         temparr = (JSONArray)md.get("keywords_s");
                         multi = (String)temparr.get(0);
                         for (int j = 1; j < temparr.length(); j++) {
-                            multi = multi + ", " + (String)temparr.get(j);
+                            multi = multi + "|" + (String)temparr.get(j);
                         }
                     } else {
                         multi = (String)md.get("keywords_s");
@@ -135,7 +153,7 @@ public class SuaveTest {
                         temparr = (JSONArray)md.get("services_nst");
                         multi = (String)((JSONObject)temparr.get(0)).get("url_s");
                         for (int j = 1; j < temparr.length(); j++) {
-                            multi = multi + ", " + (String)((JSONObject)temparr.get(j)).get("url_s");
+                            multi = multi + "|" + (String)((JSONObject)temparr.get(j)).get("url_s");
                         }
                         alld[i][7] = multi;
                         alld[i][8] = (String)((JSONObject)temparr.get(0)).get("url_name_s");
@@ -149,7 +167,7 @@ public class SuaveTest {
                         temparr = (JSONArray)md.get("dist_link_nst");
                         multi = (String)((JSONObject)temparr.get(0)).get("url_s");
                         for (int j = 1; j < temparr.length(); j++) {
-                            multi = multi + ", " + (String)((JSONObject)temparr.get(j)).get("url_s");
+                            multi = multi + "|" + (String)((JSONObject)temparr.get(j)).get("url_s");
                         }
                         alld[i][7] = multi;
                         alld[i][8] = (String)((JSONObject)temparr.get(0)).get("url_name_s");
@@ -166,7 +184,7 @@ public class SuaveTest {
                         temparr = (JSONArray)md.get("apiso_TopicCategory_s");
                         multi = (String)temparr.get(0);
                         for (int j = 1; j < temparr.length(); j++) {
-                           multi = multi + ", " + (String)temparr.get(j);
+                           multi = multi + "|" + (String)temparr.get(j);
                         }
                     } else {
                         multi = (String)md.get("apiso_TopicCategory_s");

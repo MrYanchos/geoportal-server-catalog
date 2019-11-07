@@ -4,16 +4,24 @@
      style="width: 40em;"  ></div>
     <form>
 
-        <div style="height: 3em">
+        <div style="height: 7em">
     <fieldset class="form-group" data-dojo-attach-point="jusernamegroup" >
             <label for="${id}_jusername" data-dojo-attach-point="jusernameLabel">username:</label>
             <input data-dojo-type="dijit/form/TextBox"
                    name="username" id="${id}_jusername"
-                       data-dojo-attach-point="jusername"
+                   data-dojo-attach-point="jusername"
                    placeholder="Login Name"
                    style="width: 30em;" />
+    </fieldset>
 
-</fieldset>
+            <fieldset class="form-group" data-dojo-attach-point="survnamegroup" >
+            <label for="${id}_survname" data-dojo-attach-point="survnameLabel">username:</label>
+            <input data-dojo-type="dijit/form/TextBox"
+                   name="survey_name" id="${id}_survname"
+                   data-dojo-attach-point="survname"
+                   placeholder="Survey Name"
+                   style="width: 30em;" />
+        </fieldset>
         </div>
         <button type="button"
                 data-dojo-attach-point="okButton"

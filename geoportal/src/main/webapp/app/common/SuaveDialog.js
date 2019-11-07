@@ -66,6 +66,7 @@ define(["dojo/_base/declare",
                 // this.toggler = new Toggler( {node: this.jusername.id});
                 // this.toggler.hide();
                 this.jusernamegroup.hidden = false;
+                this.survnamegroup.hidden = false;
             },
             updateDialog: function (e) {
                 var hub = this.hubMenu.focusNode.textContent;
@@ -75,13 +76,21 @@ define(["dojo/_base/declare",
                     if (hubConfig[0] && hubConfig[0]["login"]) {
                         if ( hubConfig[0]["default_path"]) {
                             this.jusername.set( "value", hubConfig[0]["default_path"]);
+                            this.survname.set( "value", hubConfig[0]["default_path"]);
+
                         } else {
                             this.jusername.set( "value", null);
+                            this.survname.set( "value", null);
                             this.jusername.set( "placeHolder", "Login Name");
+                            this.survname.set( "placeHolder", "Survey Name");
+
                         }
                         this.jusernameLabel.innerHTML = hubConfig[0]["login"];
                         this.jusernamegroup.hidden = false;
+                        this.survnameLabel.innerHTML = hubConfig[0]["login"];
+                        this.survnamegroup.hidden = false;
                     } else {
+                        this.survnamegroup.hidden = true;
                         this.jusernamegroup.hidden = true;
                     }
                 }
@@ -101,51 +110,40 @@ define(["dojo/_base/declare",
 
 
                 var user = this.jusername.value;
+                var sname = this.survname.value;
+                var dfd = null;
+                var url = "./rest/collection/toSuave";
+                try {
+                    dfd = dojoRequest.post(url, {
+                        handleAs: "json",
+                        headers: {"Content-Type": "application/json"},
+                        data: "{\"jsn\": " + this.collectionJson + ", \"name\": " + user + ", \"sname\": " + sname + "}"
+                    });
 
-                        var dfd = null;
-                        var url = "./rest/collection/toSuave";
-                        try {
-                            dfd = dojoRequest.post(url, {
-                                handleAs: "json",
-                                headers: {"Content-Type": "application/json"},
-                                data: this.collectionJson
-                            });
 
-
-                            dfd.then(function (response) {
-                                if (!dfd.isCanceled()) {
-                                    var returnUrl = response;
-                                }
-                            }).otherwise(function (error) {
-                                if (!dfd.isCanceled()) {
-                                    if (error && error.dojoType && error.dojoType === "cancel") {
-                                    } else {
-                                        console.warn("search-error");
-                                        console.warn(error);
-                                    }
-                                }
-                            });
-                            //return dfd;
-                        } catch(error) {
-                            console.warn("search-error");
+                    dfd.then(function (response) {
+                        if (!dfd.isCanceled()) {
+                            var returnUrl = response.url;
+                            var ancorTag = document.createElement('a');
+                            ancorTag.href = returnUrl;
+                            ancorTag.target = '_blank';
+                            // ancorTag.download = 'ConsumptionReport.pdf';
+                            document.body.appendChild(ancorTag);
+                            ancorTag.click();
+                            document.body.removeChild(ancorTag);
                         }
-
-                        var ancorTag = document.createElement('a');
-                        //ancorTag.href = hubUrl;
-                        //ancorTag.target = '_blank';
-                        // ancorTag.download = 'ConsumptionReport.pdf';
-                        //document.body.appendChild(ancorTag);
-                        //ancorTag.click();
-                        //document.body.removeChild(ancorTag);
-
-                        // window.open("https://google.com/", "_blank");
-                        // this.dialog.okCancelBar.showWorking(i18n.general.working,true);
-                        // AppContext.appUser.signIn(u,p).then(function(){
-                        //     self.dialog.hide();
-                        // }).otherwise(function(error){
-                        //     if (typeof error === "string") self.handleError(error);
-                        //     else self.handleError(i18n.general.error,error);
-                        // });
+                    }).otherwise(function (error) {
+                        if (!dfd.isCanceled()) {
+                            if (error && error.dojoType && error.dojoType === "cancel") {
+                            } else {
+                                console.warn("search-error");
+                            }
+                        }
+                    });
+                    return dfd;
+                } catch(error) {
+                    console.warn("search-error");
+                }
             },
 
             handleError: function (msg, error) {

@@ -29,6 +29,10 @@ import java.util.Random;
 import javax.json.*;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import net.dongliu.requests.*;
@@ -44,7 +48,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.HttpClients;
-import sun.nio.ch.IOUtil;
+
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -55,16 +59,25 @@ import java.util.Map;
 /**
  * Delete an item.
  */
-public class publishToSuaveRequest extends AppRequest {
+public class publishToSuaveRequest {
+        //extends AppRequest {
 
   /** Instance variables. */
   private String collectionJson;
+  public Object appUser;
+  private AsyncResponse asyncResponse;
+  private Response response;
 
   /** Constructor. */
   public publishToSuaveRequest() {
     super();
   }
-  
+
+  public publishToSuaveRequest(AsyncResponse asyncResponse, Object appUser) {
+    this.asyncResponse = asyncResponse;
+    this.appUser = appUser;
+  }
+
   /** The item collectionJson. */
   public String getJson() {
     return collectionJson;
@@ -75,15 +88,39 @@ public class publishToSuaveRequest extends AppRequest {
   }
   
   /** Methods =============================================================== */
-  
-  @Override
-  public AppResponse execute() throws Exception {
-    AppResponse response = new AppResponse();
+  /**
+   * Execute the request.
+   * @param hsr the servlet request
+   * @param body the request body
+   */
+  public void execute(HttpServletRequest hsr, String body) {
+    this.execute(hsr,null,body);
+  }
+  /**
+   * Execute the request.
+   * @param hsr the servlet request
+   * @param requestParams the rest parameters
+   * @param body the request body
+   */
+  public void execute(HttpServletRequest hsr,
+                      MultivaluedMap<String, String> requestParams,
+                      String body) {
 
-    String[] colIds = SuaveTest.getJsonIds(getJson());
+ //   @Override
+ // public AppResponse execute() throws Exception {
+    //AppResponse response = new AppResponse();
+    init(body);
+    String[] name_col = SuaveTest.getNC(getJson());
+    String user = name_col[0];
+    String alljsn = name_col[1];
+    String survey_name = name_col[2];
+
+    String[] colIds = SuaveTest.getJsonIds(alljsn);
+
     if (colIds == null || colIds.length == 0) {
-      response.writeIdIsMissing(this);
-      return response;
+      //response.writeIdIsMissing(this);
+    //  return response;
+      putResponse(StatusCodes.BAD_REQUEST,MediaType.TEXT_PLAIN, "error No Identifiers", null);
     }
     AccessUtil au = new AccessUtil();
 
@@ -97,7 +134,11 @@ public class publishToSuaveRequest extends AppRequest {
       ElasticContext ec = GeoportalContext.getInstance().getElasticContext();
       itemUtil = new ItemUtil();
       // foreach itemid
-      colJsons[i] = itemUtil.readItemJson(ec.getItemIndexName(), ec.getItemIndexType(), colIds[i]).toString();
+      try {
+        colJsons[i] = itemUtil.readItemJson(ec.getItemIndexName(), ec.getItemIndexType(), colIds[i]).toString();
+      } catch (Exception ex ){
+        putResponse(StatusCodes.INTERNAL_SERVER_ERROR,MediaType.TEXT_PLAIN, "error Cannot get Values", null);
+      }
     }
 
 
@@ -105,16 +146,16 @@ public class publishToSuaveRequest extends AppRequest {
     String locfile_name = SuaveTest.writeFile(colJsons);
 
     Random rand = new Random();
-    String survey_name = "javatt" + rand.nextInt(1000);
     String survey_url = "http://suave-dev.sdsc.edu/main/file=Yasha_Picasso_Paintings_clone_.csv";
-    String user = "Yasha";
+    //String user = "Yasha";
     String views = "1110101";
     String view = "grid";
     String referer = survey_url.split("/main")[0] +"/";
     String upload_url = referer + "uploadCSV";
-    String new_survey_url_base = survey_url.split(user)[0];
+    String new_survey_url_base = "http://suave-dev.sdsc.edu/main/file=";
     String dzc_file = "https://maxim.ucsd.edu/dzgen/lib-staging-uploads/7a1385a0285c814637248104c649234d/content.dzc";
     String responseFromSuave = null;
+    String s_url = null;
 
      CloseableHttpClient httpClient = HttpClients.createDefault();
      try {
@@ -142,8 +183,9 @@ public class publishToSuaveRequest extends AppRequest {
     int stcode = respo.getStatusLine().getStatusCode();
 
     if (stcode == 200) {
-      String s_url = new_survey_url_base + user + "_" + survey_name + ".csv" + "&views=" + views + "&view=" + view;
-      writeOk(response, s_url);
+      s_url = new_survey_url_base + user + "_" + survey_name + ".csv" + "&views=" + views + "&view=" + view;
+     // this.writeOk(response, s_url);
+      putResponse(StatusCodes.OK,MediaType.APPLICATION_JSON,"{\"url\": \"" + s_url + "\"}", null);
     }
 
 //    String respstr = resp.readToText();
@@ -156,13 +198,19 @@ public class publishToSuaveRequest extends AppRequest {
 //    }
        String aaa = respo.toString();
        System.out.println();
+     } catch (Exception ex){
+
      }
      finally {
-      httpClient.close();
+       try {
+         httpClient.close();
+       } catch (Exception ex) {
+
+       }
      }
 
-    response.setStatus(Response.Status.OK);
-    return response;
+  //  response.setStatus(Response.Status.OK);
+ //   return response;
   }
   
   /**
@@ -172,17 +220,39 @@ public class publishToSuaveRequest extends AppRequest {
   public void init(String collectionJson) {
     this.setJson(collectionJson);
   }
-  
   /**
-   * Write the response. 
-   * @param response the response
-   * @param url the item collectionJson
+   * Put the response.
+   * @param status the status
+   * @param mediaType the media type
+   * @param entity the response body
    */
-  public void writeOk(AppResponse response, String url) {
-    JsonObjectBuilder jsonBuilder = Json.createObjectBuilder();
-    jsonBuilder.add("url",url);
-    jsonBuilder.add("status","posted");
-    response.writeOkJson(this,jsonBuilder);
+  public void putResponse(int status, String mediaType, String entity, Map<String,String> headers) {
+    //System.err.println(status);
+    //System.err.println(entity);
+    //System.err.println(entity.substring(0,1000));
+    Response.Status rStatus = Response.Status.fromStatusCode(status);
+    MediaType rMediaType = MediaType.valueOf(mediaType).withCharset("UTF-8");
+    Response.ResponseBuilder r = Response.status(rStatus).entity(entity).type(rMediaType);
+    if (headers != null) {
+      for (Map.Entry<String,String> entry: headers.entrySet()) {
+        r.header(entry.getKey(),entry.getValue());
+      }
+    }
+    this.response = r.build();
+    if (this.asyncResponse != null) {
+      this.asyncResponse.resume(this.response);
+    }
   }
+//  /**
+//   * Write the response.
+//   * @param response the response
+//   * @param url the item collectionJson
+//   */
+//  public void writeOk(AppResponse response, String url) {
+//    JsonObjectBuilder jsonBuilder = Json.createObjectBuilder();
+//    jsonBuilder.add("url",url);
+//    jsonBuilder.add("status","posted");
+//    response.writeOkJson(this,jsonBuilder);
+//  }
   
 }

@@ -40,41 +40,47 @@ import javax.ws.rs.core.SecurityContext;
  */
 @Path("/collection")
 public class CollectionService {
-  
+  private AsyncResponse asyncResponse;
   @POST
   @Path("/toSuave")
   @Consumes({MediaType.APPLICATION_JSON,MediaType.TEXT_PLAIN, MediaType.WILDCARD})
-   public Response putSuave(@Suspended final AsyncResponse asyncResponse,
+   //public Response putSuave(@Suspended final AsyncResponse asyncResponse,
+public void putSuave(@Suspended final AsyncResponse asyncResponse,
       @Context SecurityContext sc,
       @Context HttpServletRequest hsr,
       String body)
   {
+    this.asyncResponse = asyncResponse;
     AppUser user = new AppUser(hsr,sc);
-    return publishSuave(user, true, body);
+  //  return publishSuave(user, true, body);
+    new publishToSuaveRequest(asyncResponse,user).execute(hsr,body);
   }
 
-    protected Response publishSuave(AppUser user,boolean pretty, String collectionJson) {
-    try {
-      publishToSuaveRequest request = new publishToSuaveRequest();
+//    protected Response publishSuave(AppUser user,boolean pretty, String collectionJson) {
+//    try {
+//      publishToSuaveRequest request = new publishToSuaveRequest();
+//
+//      request.init(collectionJson);
+//      AppResponse response = request.execute();
+//      Response resp = response.build();
+//      if (this.asyncResponse != null) {
+//        this.asyncResponse.resume(resp);
+//      }
+//      return resp;
+//    } catch (Throwable t) {
+//      return this.writeException(t,pretty);
+//    }
+//  }
 
-      request.init(collectionJson);
-      AppResponse response = request.execute();
-      Response resp = response.build();
-      return resp;
-    } catch (Throwable t) {
-      return this.writeException(t,pretty);
-    }
-  }
-
-  /**
-   * Write an exception response.
-   * @param t the cause
-   * @param pretty for pretty JSON
-   * @return the response
-   */
-  protected Response writeException(Throwable t, boolean pretty) {
-    return (new AppResponse()).buildException(t,pretty);
-  }
+//  /**
+//   * Write an exception response.
+//   * @param t the cause
+//   * @param pretty for pretty JSON
+//   * @return the response
+//   */
+//  protected Response writeException(Throwable t, boolean pretty) {
+//    return (new AppResponse()).buildException(t,pretty);
+//  }
 
 //  @GET
 //  @Path("/item/{id}")
